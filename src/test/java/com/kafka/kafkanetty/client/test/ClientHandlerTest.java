@@ -124,6 +124,7 @@ public class ClientHandlerTest {
         FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, ACCEPTED, Unpooled.copiedBuffer(serverResponseContent,CharsetUtil.UTF_8));
         ch.writeInbound(response);
         
+        
         ch.readInbound();
         ByteBuf outbound = (ByteBuf)ch.readOutbound();
         
