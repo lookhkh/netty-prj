@@ -36,6 +36,7 @@ import io.netty.util.CharsetUtil;
  * API 연동 규격에 따라 헤더정보 변경 필요
  * 
  * */
+@DisplayName("Client 용 Netty Handler 테스트")
 public class ClientHandlerTest {
 
 	private String host = "localhost";

@@ -11,13 +11,35 @@ import lombok.Data;
 public class MsgFromKafkaVo {
 
 	private KafkaKeyEnum key;
-	private String payload;
+    private TypeOfSending type;
+	private Object payload;
 	
 	@Builder
-	public MsgFromKafkaVo(KafkaKeyEnum key, String payload) {
+	public MsgFromKafkaVo(KafkaKeyEnum key, TypeOfSending type, Object payload) {
 		this.key = key;
+		this.type = type;
 		this.payload = payload;
 	}
+
+	/**
+	 * 
+	 * @return 0 : SINGLE / 1 : MULTIPLE
+	 * 
+	 * **/
+	public int getCodeOfType() {
+		return this.type.getCode();	
+	}
+
+	/**
+	 * @return 0 : android | 1 : IOS | 2 : SMS 
+	 * 
+	 * **/
+	public int getTypeValue() {
+		// TODO Auto-generated method stub
+		return this.key.getTypeCode();
+	}
+	
+	
 	
 	
 }

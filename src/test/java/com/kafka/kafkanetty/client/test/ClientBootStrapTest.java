@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import com.kafka.kafkanetty.client.ClientBootStrap;
 
-
+@DisplayName("Client 용 BootStrap 생성 시 주어진 Host, Port가 알맞은지 확인")
 public class ClientBootStrapTest {
 	
 
