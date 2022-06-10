@@ -1,4 +1,4 @@
-package com.kafka.kafkanetty;
+package com.kafka.kafkanetty.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

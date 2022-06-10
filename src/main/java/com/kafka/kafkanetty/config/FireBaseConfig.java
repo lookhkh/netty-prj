@@ -1,4 +1,4 @@
-package com.kafka.kafkanetty;
+package com.kafka.kafkanetty.config;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

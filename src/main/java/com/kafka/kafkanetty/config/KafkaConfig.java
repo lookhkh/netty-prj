@@ -1,7 +1,10 @@
-package com.kafka.kafkanetty.kafka.config;
+package com.kafka.kafkanetty.config;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -22,7 +25,7 @@ import lombok.AllArgsConstructor;
 
 /*
  * TODO KAFKA Consumer 설정이 반영이 안되고 있는 듯 한데 처리해야할 필요
- * 
+ * TODO 단건 PUSH 처리 시, 쓰레드풀 크기 조절 필요 현재는 100 220610 조현일
  * 
  * */
 @AllArgsConstructor
@@ -37,6 +40,12 @@ public class KafkaConfig {
 	@Autowired
 	private final DispatcherController controller;
 	
+	@Bean("single")
+	public ExecutorService getDefault() {
+		ExecutorService service =  Executors.newFixedThreadPool(100);
+		return service;
+		
+	}
 	
 	@Bean
 	public ConcurrentKafkaListenerContainerFactory<String, String> kafkaContainerFactory(){
@@ -53,10 +62,15 @@ public class KafkaConfig {
 		
 	}
 	
+	
+
 
 	public AckMessageListener ackMessageListener() {
 		return new AckMessageListener(controller);
 	}
+	
+	
+	
 
 	public ConsumerFactory<? super String, ? super String> consumerFactory() {
 		
@@ -69,5 +83,7 @@ public class KafkaConfig {
 
 		return new DefaultKafkaConsumerFactory<>(config);
 	}
+	
+	
 	
 }

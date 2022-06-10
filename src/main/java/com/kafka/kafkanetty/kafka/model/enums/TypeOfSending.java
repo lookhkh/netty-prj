@@ -1,4 +1,4 @@
-package com.kafka.kafkanetty.kafka.model;
+package com.kafka.kafkanetty.kafka.model.enums;
 
 public enum TypeOfSending {
 

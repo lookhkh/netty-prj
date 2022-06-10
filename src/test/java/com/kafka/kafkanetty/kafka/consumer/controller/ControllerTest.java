@@ -15,10 +15,10 @@ import com.kafka.kafkanetty.exception.InvalidMsgFormatException;
 import com.kafka.kafkanetty.kafka.DispatcherController;
 import com.kafka.kafkanetty.kafka.DispatcherControllerImpl;
 import com.kafka.kafkanetty.kafka.DynamicHandlerManager;
-import com.kafka.kafkanetty.kafka.model.KafkaKeyEnum;
 import com.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
 import com.kafka.kafkanetty.kafka.model.ResultOfPush;
-import com.kafka.kafkanetty.kafka.model.TypeOfSending;
+import com.kafka.kafkanetty.kafka.model.enums.KafkaKeyEnum;
+import com.kafka.kafkanetty.kafka.model.enums.TypeOfSending;
 import com.kafka.kafkanetty.kafka.parser.KafkaMsgParser;
 import com.kafka.kafkanetty.kafka.parser.KafkaMsgParserImpl;
 

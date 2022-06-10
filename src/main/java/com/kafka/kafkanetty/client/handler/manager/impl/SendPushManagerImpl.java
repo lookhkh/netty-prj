@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -19,6 +20,7 @@ import com.kafka.kafkanetty.kafka.model.push.AndroidVo;
 import com.kafka.kafkanetty.kafka.model.push.IOSVo;
 import com.kafka.kafkanetty.kafka.model.push.MobileAbstractVo;
 
+@Component
 public class SendPushManagerImpl implements SendPushManager {
 
 	@Autowired

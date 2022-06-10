@@ -1,4 +1,4 @@
-package com.kafka.kafkanetty.kafka.model;
+package com.kafka.kafkanetty.kafka.model.enums;
 
 public enum KafkaKeyEnum {
 
@@ -12,7 +12,7 @@ public enum KafkaKeyEnum {
 		this.code  = code;
 	}
 
-	int getTypeCode() {
+	public int getTypeCode() {
 		// TODO Auto-generated method stub
 		return this.code;
 	}

@@ -1,5 +1,8 @@
 package com.kafka.kafkanetty.kafka.model;
 
+import com.kafka.kafkanetty.kafka.model.enums.KafkaKeyEnum;
+import com.kafka.kafkanetty.kafka.model.enums.TypeOfSending;
+
 import lombok.Builder;
 import lombok.Data;
 /**
