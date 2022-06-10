@@ -3,6 +3,7 @@ package com.kafka.kafkanetty.kafka.parser;
 import org.springframework.stereotype.Component;
 
 import com.kafka.kafkanetty.client.request.wrapper.ClientRequestWrapper;
+import com.kafka.kafkanetty.exception.InvalidMsgFormatException;
 import com.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
 
 import lombok.AllArgsConstructor;
@@ -16,5 +17,5 @@ import lombok.AllArgsConstructor;
 
 public interface KafkaMsgParser {
 
-	public MsgFromKafkaVo parse(String msg);
+	public MsgFromKafkaVo parse(String msg) throws InvalidMsgFormatException;
 }

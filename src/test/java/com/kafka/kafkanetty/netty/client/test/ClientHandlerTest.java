@@ -1,4 +1,4 @@
-package com.kafka.kafkanetty.client.test;
+package com.kafka.kafkanetty.netty.client.test;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
 import static org.junit.jupiter.api.Assertions.assertEquals;

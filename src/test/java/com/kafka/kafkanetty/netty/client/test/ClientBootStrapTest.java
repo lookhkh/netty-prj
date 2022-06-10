@@ -1,4 +1,4 @@
-package com.kafka.kafkanetty.client.test;
+package com.kafka.kafkanetty.netty.client.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

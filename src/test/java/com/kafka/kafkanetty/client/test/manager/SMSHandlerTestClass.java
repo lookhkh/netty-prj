@@ -1,4 +1,4 @@
-package com.kafka.kafkanetty.client.test.handler;
+package com.kafka.kafkanetty.client.test.manager;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

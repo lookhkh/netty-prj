@@ -1,8 +1,10 @@
 package com.kafka.kafkanetty.kafka;
 
+import com.kafka.kafkanetty.kafka.model.ResultOfPush;
+
 public interface DispatcherController {
 
 	
-	public void route(String msg);
+	public ResultOfPush route(String msg);
 
 }

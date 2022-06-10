@@ -1,4 +1,4 @@
-package com.kafka.kafkanetty.client.test;
+package com.kafka.kafkanetty.netty.client.test;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
