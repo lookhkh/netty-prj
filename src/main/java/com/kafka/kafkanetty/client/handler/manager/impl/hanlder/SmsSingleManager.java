@@ -1,4 +1,4 @@
-package com.kafka.kafkanetty.client.handler.manager.impl;
+package com.kafka.kafkanetty.client.handler.manager.impl.hanlder;
 
 import org.springframework.stereotype.Component;
 
@@ -6,8 +6,8 @@ import com.kafka.kafkanetty.client.handler.manager.SendManager;
 import com.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
 import com.kafka.kafkanetty.kafka.model.ResultOfPush;
 
-@Component("sms-multiple-manager")
-public class SmsMultipleManager implements SendManager {
+@Component("sms-single-manager")
+public class SmsSingleManager implements SendManager {
 
 	@Override
 	public ResultOfPush send(MsgFromKafkaVo vo) {

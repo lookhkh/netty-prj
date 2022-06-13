@@ -11,9 +11,11 @@ import org.mockito.Mockito;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.kafka.kafkanetty.client.handler.manager.SendManager;
-import com.kafka.kafkanetty.client.handler.manager.impl.PushSingleManager;
+import com.kafka.kafkanetty.client.handler.manager.ValidationManager;
+import com.kafka.kafkanetty.client.handler.manager.impl.hanlder.PushSingleManager;
 import com.kafka.kafkanetty.client.handler.manager.vo.UserInfoOnPush;
 import com.kafka.kafkanetty.client.handler.mapper.SmsPushMapper;
+import com.kafka.kafkanetty.exception.UserInfoInvalidException;
 import com.kafka.kafkanetty.exception.UserNotAllowNotificationException;
 import com.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
 
@@ -34,6 +36,8 @@ public class PushHandlerTest {
 	
 	FirebaseMessaging instance = TestUtil.instance;
 	SmsPushMapper mapper = TestUtil.mapper;
+	
+	ValidationManager validMng = TestUtil.validMngSpy;
 
 	SendManager mng = TestUtil.pushSingle;
 	
@@ -51,46 +55,25 @@ public class PushHandlerTest {
 
 	
 	
-	@Test
-	@DisplayName("PushSingleManager에 SMS VO를 넣을 경우 혹은 MultiplePushVo를 넣을 경우 IllegalArgument Exception이 터진다.")
-	/*
-	 * https://firebase.google.com/docs/cloud-messaging/auth-server 
-	 * 
-	 * */
-	public void test() {
-		
-	 Mockito.when(mapper.getIfSendYnByUserNo(ArgumentMatchers.any(MsgFromKafkaVo.class))).thenReturn(userInfoOnPushWithYesForNotification);
-
-		
-		
-	  assertThrows(IllegalArgumentException.class, ()->mng.send(voForMultipleSMS));
-	  assertThrows(IllegalArgumentException.class, ()->mng.send(voForSingleSMS));
-	  assertThrows(IllegalArgumentException.class, ()->mng.send(voForMultiplePush));
-
-	  assertDoesNotThrow(()->mng.send(voForSinglePush)); 
-
-	}
 	
 	@Test
-	@DisplayName("PushSingleManager에 넣은 사용자가 수신 여부를 N로 할 경우 UserNotAllowNotification Exception이 터진다")
+	@DisplayName("PushSingleManager에 넣은 사용자가 수신 여부를 N로 할 경우 vailidationMng가 던진 UserNotAllowNotification을 잡지 않고 위로 던진다")
 	public void test2() {
 		
-	 Mockito.when(mapper.getIfSendYnByUserNo(ArgumentMatchers.any(MsgFromKafkaVo.class))).thenReturn(userInfoOnPushWithNoForNotification); //유저가 수신 여부를 N으로 했을 경우
-
+	
+	 Mockito.doThrow(UserNotAllowNotificationException.class).when(validMng).validSingleUserInfo(voForSinglePush);
 	  assertThrows(UserNotAllowNotificationException.class,()->mng.send(voForSinglePush)); 
 
 	}
 	
-	
+
 	@Test
-	@DisplayName("VO가 0,1,2 외의 값을 가질 경우 IllegalArgumentException이 터진다")
-	public void test3() {
-     MsgFromKafkaVo vo = Mockito.mock(MsgFromKafkaVo.class);
-     
-	 Mockito.when(mapper.getIfSendYnByUserNo(vo)).thenReturn(userInfoOnPushWithYesForNotification); //유저가 수신 여부를 N으로 했을 경우
-	 Mockito.when(vo.getTypeValue()).thenReturn(3);
-	 
-	  assertThrows(IllegalArgumentException.class,()->mng.send(vo)); 
+	@DisplayName("PushSingleManager에 넣은 사용자의 정보가 invalid 할 경우, vailidationMng가 던진 UserInfoInvalidException을 잡지 않고 위로 던진다")
+	public void test2_1() {
+		
+	
+	 Mockito.doThrow(UserInfoInvalidException.class).when(validMng).validSingleUserInfo(voForSinglePush);
+	  assertThrows(UserInfoInvalidException.class,()->mng.send(voForSinglePush)); 
 
 	}
 	

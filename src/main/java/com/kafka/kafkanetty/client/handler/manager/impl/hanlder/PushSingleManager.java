@@ -1,4 +1,4 @@
-package com.kafka.kafkanetty.client.handler.manager.impl;
+package com.kafka.kafkanetty.client.handler.manager.impl.hanlder;
 
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -7,6 +7,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.kafka.kafkanetty.client.handler.manager.SendManager;
 import com.kafka.kafkanetty.client.handler.manager.SendPushManager;
+import com.kafka.kafkanetty.client.handler.manager.ValidationManager;
 import com.kafka.kafkanetty.client.handler.manager.vo.UserInfoOnPush;
 import com.kafka.kafkanetty.client.handler.mapper.SmsPushMapper;
 import com.kafka.kafkanetty.exception.UserInfoInvalidException;
@@ -32,39 +33,15 @@ import lombok.extern.slf4j.Slf4j;
 public class PushSingleManager implements SendManager {
 	
 	private final FirebaseMessaging instance;
-	private final SmsPushMapper  mapper;
 	private final SendPushManager manager;
-	
+	private final ValidationManager validMng;
 
 	@Override
 	@Transactional
 	public ResultOfPush send(MsgFromKafkaVo vo) {
 		log.info("PushSingleSendManager received {}",vo);
-		
-		if(vo.getCodeOfType() == 1 || vo.getTypeValue() == 2) {
-			throw new IllegalArgumentException("PushSingleSendManager Only take Push Type and Single Type Vo => {}"+vo);
-		}
-		
-		/*
-		 * 
-		 * TODO 어떤 데이터를 활용해서 DB에서 정보를 가져올 것인가? 220610 조현일
-		 * 
-		 * */
-		
-		UserInfoOnPush info = mapper.getIfSendYnByUserNo(vo);
-		
-		if(!info.validation()) {
-			throw new UserInfoInvalidException("Validation Result -> invalid "+info, info);
-		}
-		
-		if(!info.getPushYn()) {
-			/**
-			 * TODO PUSH 단걸 발생 실패 처리. 사유 : USER 알람 수신 N 220609 조현일
-			 * 
-			 * **/
-			
-			throw new UserNotAllowNotificationException(vo+" not allow to get notified", vo);
-		}
+
+		validMng.validSingleUserInfo(vo);
 		
 		ResultOfPush result;
 		
@@ -101,9 +78,5 @@ public class PushSingleManager implements SendManager {
 		
 		
 	}
-
-
-
-
 	
 }

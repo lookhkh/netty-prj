@@ -1,9 +1,5 @@
 package com.kafka.kafkanetty.client;
 
-import org.springframework.stereotype.Component;
-
-import com.kafka.kafkanetty.client.request.wrapper.ClientRequestWrapper;
-
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -94,10 +90,6 @@ public class ClientBootStrap {
         }
 		
 		return true;
-	}
-
-	public <T> void send(ClientRequestWrapper<T> clientStringBasedRequestWrapper) {
-		// TODO Auto-generated method stub
 	}
 
 	public void stop() {

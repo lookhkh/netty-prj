@@ -39,7 +39,7 @@ public class FireBaseConfig {
 	   public FirebaseMessaging firebaseSetting() throws URISyntaxException {
 			
 			String fireBaseCreateScoped =  env.getProperty("project.properties.fms.fireBaseCreateScoped");
-			String credentialPath = "onnuri-push-server-firebase-adminsdk.json";
+			String credentialPath = "onnuri-4b38d-firebase-adminsdk-jympu-ea1fc6a964.json";
 
 
 			GoogleCredentials googleCredentials;

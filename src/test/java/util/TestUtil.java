@@ -1,19 +1,24 @@
 package util;
 
+import java.util.Arrays;
+
 import org.mockito.Mockito;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.kafka.kafkanetty.client.handler.manager.SendManager;
 import com.kafka.kafkanetty.client.handler.manager.SendPushManager;
-import com.kafka.kafkanetty.client.handler.manager.impl.PushMultipleManager;
-import com.kafka.kafkanetty.client.handler.manager.impl.PushSingleManager;
-import com.kafka.kafkanetty.client.handler.manager.impl.SmsMultipleManager;
-import com.kafka.kafkanetty.client.handler.manager.impl.SmsSingleManager;
+import com.kafka.kafkanetty.client.handler.manager.ValidationManager;
+import com.kafka.kafkanetty.client.handler.manager.impl.ValidationManagerImpl;
+import com.kafka.kafkanetty.client.handler.manager.impl.hanlder.PushMultipleManager;
+import com.kafka.kafkanetty.client.handler.manager.impl.hanlder.PushSingleManager;
+import com.kafka.kafkanetty.client.handler.manager.impl.hanlder.SmsMultipleManager;
+import com.kafka.kafkanetty.client.handler.manager.impl.hanlder.SmsSingleManager;
 import com.kafka.kafkanetty.client.handler.manager.vo.UserInfoOnPush;
 import com.kafka.kafkanetty.client.handler.mapper.SmsPushMapper;
 import com.kafka.kafkanetty.kafka.DispatcherControllerImpl;
 import com.kafka.kafkanetty.kafka.DynamicHandlerManager;
 import com.kafka.kafkanetty.kafka.listener.AckMessageListener;
+import com.kafka.kafkanetty.kafka.model.DataBody;
 import com.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
 import com.kafka.kafkanetty.kafka.model.enums.KafkaKeyEnum;
 import com.kafka.kafkanetty.kafka.model.enums.TypeOfSending;
@@ -25,47 +30,66 @@ import com.kafka.kafkanetty.kafka.parser.KafkaMsgParser;
 public class TestUtil {
 
 	/***************                 Test VO                   ***********/
+	public static DataBody bodyOfMultipleSms = DataBody.builder()
+			.title("SMS Multiple Test Header")
+			.body("SMS Mutilple Test Body Msg")
+			.build();
+	
+	public static DataBody bodyOfSingleSms = DataBody.builder()
+			.title("SMS Single Test Header")
+			.body("SMS Single Test Body Msg")
+			.build();
+	
+	public static DataBody bodyOfMultiplePush = DataBody.builder()
+			.title("Push Multiple Test Header")
+			.body("Push Mutilple Test Body Msg")
+			.build();
+	
+	public static DataBody bodyOfSinglePush = DataBody.builder()
+			.title("Push Single Test Header")
+			.body("Push Single Test Body Msg")
+			.build();
 	
 	public static MsgFromKafkaVo voForMultipleSMS =  MsgFromKafkaVo.builder()
 			.key(KafkaKeyEnum.SMS)
-			.payload("TEST For sms")
+			.payload(Arrays.asList(bodyOfMultipleSms))
 			.type(TypeOfSending.MULTIPLE)
 			.build();
 	
 	public static MsgFromKafkaVo voForSingleSMS =  MsgFromKafkaVo.builder()
 			.key(KafkaKeyEnum.SMS)
-			.payload("TEST For sms")
+			.payload(Arrays.asList(bodyOfSingleSms))
 			.type(TypeOfSending.SINGLE)
 			.build();
 	
 	public static MsgFromKafkaVo voForMultiplePush =  MsgFromKafkaVo.builder()
 			.key(KafkaKeyEnum.ANDROID)
-			.payload("TEST For sms")
+			.payload(Arrays.asList(bodyOfMultiplePush))
 			.type(TypeOfSending.MULTIPLE)
 			.build();
 	
 	public static MsgFromKafkaVo voForSinglePush =  MsgFromKafkaVo.builder()
 			.key(KafkaKeyEnum.ANDROID)
-			.payload("TEST For sms")
+			.payload(Arrays.asList(bodyOfSinglePush))
 			.type(TypeOfSending.SINGLE)
 			.build();
 	
 	
 	public static MsgFromKafkaVo voForAndroid =  MsgFromKafkaVo.builder()
 				.key(KafkaKeyEnum.ANDROID)
-				.payload("TEST For Android")
+				.payload(Arrays.asList(bodyOfSinglePush))
 				.type(TypeOfSending.SINGLE)
 				.build();
 	
 	public static MsgFromKafkaVo voForIOS =  MsgFromKafkaVo.builder()
 				.key(KafkaKeyEnum.IOS)
-				.payload("TEST For IOS")
+				.payload(Arrays.asList(bodyOfSinglePush))
 				.type(TypeOfSending.SINGLE)
 				.build();
 	
 	public static MsgFromKafkaVo voForSMS =  MsgFromKafkaVo.builder()
 				.key(KafkaKeyEnum.SMS)
-				.payload("TEST For sms")
+				.payload(Arrays.asList(bodyOfMultipleSms))
 				.type(TypeOfSending.MULTIPLE)
 				.build();
 	
@@ -91,12 +115,13 @@ public class TestUtil {
 	
 	/***************                 Test Spy                   ***********/
 
-	public static SendPushManager manager = Mockito.spy(SendPushManager.class);
+	public static ValidationManager validMngSpy = Mockito.spy(ValidationManager.class);
+	public static SendPushManager managerSpy = Mockito.spy(SendPushManager.class);
 	
 	public static SendManager smsSingle = Mockito.spy(new SmsSingleManager());
 	public static SendManager smsMulti = Mockito.spy(new SmsMultipleManager());
-	public static SendManager pushSingle = Mockito.spy(new PushSingleManager(instance,mapper,manager));
-	public static SendManager pushMulti = Mockito.spy(new PushMultipleManager(instance));
+	public static SendManager pushSingle = Mockito.spy(new PushSingleManager(instance, managerSpy ,validMngSpy));
+	public static SendManager pushMulti = Mockito.spy(new PushMultipleManager(instance,validMngSpy));
 	public static TempMongodbTemplate mongo = Mockito.spy(TempMongodbTemplate.class);
 
 	/***************                 Test Spy                   ***********/

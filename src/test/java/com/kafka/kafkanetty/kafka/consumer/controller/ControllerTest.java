@@ -4,12 +4,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kafka.kafkanetty.exception.InvalidMsgFormatException;
 import com.kafka.kafkanetty.kafka.DispatcherController;
@@ -79,7 +82,7 @@ public class ControllerTest {
 	
 	@Test
 	@DisplayName("ANDROID 단건 MSG 수신 후 push 후 성공 반환")
-	public void test1() {
+	public void test1() throws DatabindException, InvalidMsgFormatException, IOException {
 		
 		Mockito.when(parser.parse(jsonForAndroid)).thenReturn(voForAndroid);
 		Mockito.when(m.consume(voForAndroid)).thenReturn(result);
@@ -92,7 +95,7 @@ public class ControllerTest {
 	
 	@Test
 	@DisplayName("수신한 메시지의 포맷이 부적절한 경우 실패를 반환")
-	public void test2() {
+	public void test2() throws DatabindException, InvalidMsgFormatException, IOException {
 		
 		Mockito.when(parser.parse(jsonForAndroid)).thenThrow(InvalidMsgFormatException.class);
 		

@@ -1,12 +1,13 @@
 package com.kafka.kafkanetty.kafka.parser;
 
-import org.springframework.stereotype.Component;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
-import com.kafka.kafkanetty.client.request.wrapper.ClientRequestWrapper;
+import com.fasterxml.jackson.databind.DatabindException;
 import com.kafka.kafkanetty.exception.InvalidMsgFormatException;
+import com.kafka.kafkanetty.kafka.model.DataBody;
 import com.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
-
-import lombok.AllArgsConstructor;
 
 
 /**
@@ -17,5 +18,6 @@ import lombok.AllArgsConstructor;
 
 public interface KafkaMsgParser {
 
-	public MsgFromKafkaVo parse(String msg) throws InvalidMsgFormatException;
+
+	public MsgFromKafkaVo parse(String msg) throws InvalidMsgFormatException, DatabindException, IOException;
 }
