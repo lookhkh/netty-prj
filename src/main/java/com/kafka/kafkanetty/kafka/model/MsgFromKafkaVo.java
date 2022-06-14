@@ -5,8 +5,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.kafka.kafkanetty.kafka.model.enums.KafkaKeyEnum;
+import com.kafka.kafkanetty.kafka.model.enums.MsgType;
 import com.kafka.kafkanetty.kafka.model.enums.TypeOfSending;
 
 import lombok.Builder;
@@ -21,34 +24,38 @@ public class MsgFromKafkaVo {
 
 	
 	private final KafkaKeyEnum key;
-    
-	private final TypeOfSending type;
-	
-	private final List<String> tokens;
-    
-	private List<DataBody> payload;
-	
-	private final String id;
-	
+    private final MsgType msgType;
 	private final boolean isScheduled;
-	
+	private final TypeOfSending kind;
 	private final String timeOfDelievery;
+	private final String sender;
 	
+    private List<DataBody> payload;    
+
 	private final String actionUrl;
+	private final List<String> target;
+
 	
-	
-	
+	@JsonCreator
 	@Builder
-	public MsgFromKafkaVo(KafkaKeyEnum key, TypeOfSending type, List<String> tokens, List<DataBody> payload, String id,
-			boolean isScheduled, String timeOfDelievery, String actionUrl) {
+	public MsgFromKafkaVo(@JsonProperty("key") KafkaKeyEnum key,
+						  @JsonProperty("type")MsgType type, 
+						  @JsonProperty("tokens") List<String> target, 
+						  @JsonProperty("payload") List<DataBody> payload, 
+						  @JsonProperty("sender") String sender,
+						  @JsonProperty("scheduled") boolean isScheduled,
+						  @JsonProperty("timeOfDelievery")String timeOfDelievery, 
+						  @JsonProperty("actionUrl") String actionUrl,
+						  @JsonProperty("kind")TypeOfSending kind) {
 		this.key = key;
-		this.type = type;
-		this.tokens = tokens;
+		this.msgType = type;
+		this.target = target;
 		this.payload = payload;
-		this.id = id;
+		this.sender = sender;
 		this.isScheduled = isScheduled;
 		this.timeOfDelievery = timeOfDelievery;
 		this.actionUrl = actionUrl;
+		this.kind = kind;
 	}
 
 	/**
@@ -58,7 +65,7 @@ public class MsgFromKafkaVo {
 	 * **/
 	@JsonIgnore
 	public int getCodeOfType() {
-		return this.type.getCode();	
+		return this.kind.getCode();	
 	}
 
 	/**
@@ -96,7 +103,7 @@ public class MsgFromKafkaVo {
 					&& lengthOfBody  <= 2000;	
 		}else {
 			
-			return lengthOfTitle <= 30 && lengthOfBody<=200 && tokens.size() <= 500; 
+			return lengthOfTitle <= 30 && lengthOfBody<=200 && target.size() <= 500; 
 			
 		}
 	}

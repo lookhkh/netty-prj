@@ -1,18 +1,15 @@
 package com.kafka.kafkanetty.kafka.parser;
 
-import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.core.exc.StreamReadException;
-import com.fasterxml.jackson.databind.DatabindException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kafka.kafkanetty.exception.InvalidMsgFormatException;
 import com.kafka.kafkanetty.kafka.model.DataBody;
 import com.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
 
@@ -28,19 +25,36 @@ public class KafkaMsgParserImpl implements KafkaMsgParser {
 	private final ObjectMapper mapper;
 	
 	@Override
-		public MsgFromKafkaVo parse(String msg) throws InvalidMsgFormatException, StreamReadException  {
+		public MsgFromKafkaVo parse(String msg)   {
 		
-		MsgFromKafkaVo convertedValue = mapper.readValue(msg.getBytes(), MsgFromKafkaVo.class);
+		MsgFromKafkaVo convertedValue = null;
 		
-		Map<Boolean, List<DataBody>> result = convertedValue.validateDataBodys();
+		try {
+			convertedValue = mapper.readValue(msg, MsgFromKafkaVo.class);
+			
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new IllegalArgumentException("Message Json Parsing error",e);
+		} 
 		
-		result.getOrDefault(false, Arrays.asList())
-			.stream()
-			.forEach(data -> log.warn("MalFormed Msg Type {}",data));
 		
-		convertedValue.setPayload(result.getOrDefault(true, Arrays.asList()));
+			Map<Boolean, List<DataBody>> result = convertedValue.validateDataBodys();
+			
+			result.getOrDefault(false, Arrays.asList())
+				.stream()
+				.forEach(data -> log.warn("MalFormed Msg Type {}",data));
+			/**
+			 * TODO MalFormed Msg 데이터 HIST에 저장하는 로직 추가 220614 조현일
+			 * 
+			 * **/
+			
+			convertedValue.setPayload(result.getOrDefault(true, Arrays.asList()));
+			
+			return convertedValue; 
+			
 		
-		return convertedValue; 
+		
 		
 		}
 

@@ -1,33 +1,40 @@
 package com.kafka.kafkanetty.client.test.manager;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kafka.kafkanetty.exception.InvalidMsgFormatException;
 import com.kafka.kafkanetty.kafka.model.DataBody;
 import com.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
 import com.kafka.kafkanetty.kafka.model.enums.KafkaKeyEnum;
+import com.kafka.kafkanetty.kafka.model.enums.MsgType;
 import com.kafka.kafkanetty.kafka.model.enums.TypeOfSending;
 import com.kafka.kafkanetty.kafka.parser.KafkaMsgParser;
 import com.kafka.kafkanetty.kafka.parser.KafkaMsgParserImpl;
 
 import util.TestUtil;
 
+@DisplayName("메세지 파서 테스트")
 public class MsgParserTest {
 
 	ObjectMapper mapper = new ObjectMapper();
-	DataBody body = TestUtil.bodyOfSinglePush;
+	List<DataBody> bodyOfMultiplePush = TestUtil.bodyOfMultiplePush;
 	MsgFromKafkaVo vo = TestUtil.voForAndroid;
 	
 	KafkaMsgParser parser = new KafkaMsgParserImpl(mapper);
@@ -44,9 +51,6 @@ public class MsgParserTest {
 
 	}
 
-
-
-	
 	
 	@Test
 	@DisplayName("SMS, 제목 30bytes 미만, 내용 200 이상일 경우, 성공적으로 파싱된다.")
@@ -123,19 +127,21 @@ public class MsgParserTest {
 		
 		System.out.println("body".repeat(50).getBytes().length);
 		
+		
+		
 		MsgFromKafkaVo vo = MsgFromKafkaVo.builder()
-								.id("123abc")
+								.sender("123abc")
 								.actionUrl("www.log.com")
 								.isScheduled(false)
 								.key(KafkaKeyEnum.ANDROID)
-								.timeOfDelievery("2022-06-06")
-								.payload(Arrays.asList(body, DataBody.builder().title("title").body("body").build()))
-								.tokens(tokens)
-								.type(TypeOfSending.SINGLE)
+								.timeOfDelievery("2022-06-06 22:05:44")
+								.payload(bodyOfMultiplePush)
+								.target(tokens)
+								.type(MsgType.APP_PUSH)
 								.build();
 		Map<Boolean, List<DataBody>> result =  vo.validateDataBodys();
 		
-		assertEquals(result.get(false).size(), 2);
+		assertEquals(result.get(false).size(), 1);
 		
 		//assertEquals(result.get(false).get(0).getBody(), "body");
 
@@ -148,22 +154,47 @@ public class MsgParserTest {
 	}
 	
 	@Test
-	public void test53() throws InvalidMsgFormatException, JsonProcessingException {
+	@DisplayName("올바른 JSON String이 들어온 경우, 파싱에 성공하며, MsgFromKafka VO를 반환한다.")
+	public void test53() throws JsonProcessingException  {
 		
+		MsgFromKafkaVo test = MsgFromKafkaVo.builder()
+				.sender("123abc")
+				.actionUrl("www.log.com")
+				.isScheduled(false)
+				.key(KafkaKeyEnum.ANDROID)
+				.timeOfDelievery("2022-06-06")
+				.payload(bodyOfMultiplePush)
+				.target(Arrays.asList("hi"))
+				.type(MsgType.APP_PUSH)
+				
+				.kind(TypeOfSending.SINGLE)
+				.build();
+		
+		String value = mapper.writeValueAsString(test);
+		
+		MsgFromKafkaVo convertedVoFromJsonString = parser.parse(value);
+		
+		assertAll(
+				()->assertEquals(convertedVoFromJsonString.getActionUrl(), test.getActionUrl()),
+				()->assertEquals(convertedVoFromJsonString.getCodeOfType(), test.getCodeOfType()),
+				()->assertEquals(convertedVoFromJsonString.getSender(), test.getSender()),
+				()->assertEquals(convertedVoFromJsonString.getTimeOfDelievery(), test.getTimeOfDelievery()),
+				()->assertEquals(convertedVoFromJsonString.getTypeValue(), test.getTypeValue())
+				);
 		
 		
 	}
 	
 	private Map<Boolean, List<DataBody>> extracted(KafkaKeyEnum key, DataBody b) {
 		MsgFromKafkaVo vo = MsgFromKafkaVo.builder()
-								.id("123abc")
+								.sender("123abc")
 								.actionUrl("www.log.com")
 								.isScheduled(false)
 								.key(key)
 								.timeOfDelievery("2022-06-06")
 								.payload(Arrays.asList(b))
-								.tokens(Arrays.asList("abc"))
-								.type(TypeOfSending.SINGLE)
+								.target(Arrays.asList("abc"))
+								.type(MsgType.APP_PUSH)
 								.build();
 		Map<Boolean, List<DataBody>> result =  vo.validateDataBodys();
 		return result;

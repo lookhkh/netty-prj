@@ -2,6 +2,7 @@ package com.kafka.kafkanetty.client.test.manager.pushmanager;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -25,6 +26,7 @@ import util.TestUtil;
  * 3. 예외 상황 처리 및 결과 return <br>
  * 
  * **/
+@DisplayName("SMS PUSH manager 테스트, 직접적 외부연동 객체를 다룸")
 public class SmsPushManageTest {
 
 
@@ -47,7 +49,11 @@ public class SmsPushManageTest {
 
 	UserInfoOnPush userInfoOnPushWithNoForNotification = TestUtil.userInfoOnPushWithNo;
 
-	
+	@AfterEach
+	public void cleanUp() {
+		Mockito.reset(mapper);
+}
+
 	@Test
 	@DisplayName("MsgFromKafka Vo 객체를 Android 전송 용 객체로 Parsing 한다. - DB 모델 확정에 따른 추가 개발 후 진행")
 	public void test() {

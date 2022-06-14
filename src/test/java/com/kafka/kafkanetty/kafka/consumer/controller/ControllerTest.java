@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,10 +21,7 @@ import com.kafka.kafkanetty.kafka.DispatcherControllerImpl;
 import com.kafka.kafkanetty.kafka.DynamicHandlerManager;
 import com.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
 import com.kafka.kafkanetty.kafka.model.ResultOfPush;
-import com.kafka.kafkanetty.kafka.model.enums.KafkaKeyEnum;
-import com.kafka.kafkanetty.kafka.model.enums.TypeOfSending;
 import com.kafka.kafkanetty.kafka.parser.KafkaMsgParser;
-import com.kafka.kafkanetty.kafka.parser.KafkaMsgParserImpl;
 
 import util.TestUtil;
 
@@ -63,7 +61,7 @@ public class ControllerTest {
 	String jsonForIOS;
 	String jsonForSMS;
 	
-	
+
 	
 	@BeforeEach
 	public void init() throws JsonProcessingException {

@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
@@ -54,7 +55,11 @@ public class PushHandlerTest {
 	UserInfoOnPush userInfoOnPushWithNoForNotification = TestUtil.userInfoOnPushWithNo;
 
 	
-	
+	@AfterEach
+	public void cleanUp() {
+		Mockito.reset(mapper);
+
+	}
 	
 	@Test
 	@DisplayName("PushSingleManager에 넣은 사용자가 수신 여부를 N로 할 경우 vailidationMng가 던진 UserNotAllowNotification을 잡지 않고 위로 던진다")

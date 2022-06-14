@@ -19,5 +19,5 @@ import com.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
 public interface KafkaMsgParser {
 
 
-	public MsgFromKafkaVo parse(String msg) throws InvalidMsgFormatException, DatabindException, IOException;
+	public MsgFromKafkaVo parse(String msg);
 }

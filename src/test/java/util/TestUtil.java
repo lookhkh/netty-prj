@@ -1,6 +1,7 @@
 package util;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.mockito.Mockito;
 
@@ -8,7 +9,6 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.kafka.kafkanetty.client.handler.manager.SendManager;
 import com.kafka.kafkanetty.client.handler.manager.SendPushManager;
 import com.kafka.kafkanetty.client.handler.manager.ValidationManager;
-import com.kafka.kafkanetty.client.handler.manager.impl.ValidationManagerImpl;
 import com.kafka.kafkanetty.client.handler.manager.impl.hanlder.PushMultipleManager;
 import com.kafka.kafkanetty.client.handler.manager.impl.hanlder.PushSingleManager;
 import com.kafka.kafkanetty.client.handler.manager.impl.hanlder.SmsMultipleManager;
@@ -21,6 +21,7 @@ import com.kafka.kafkanetty.kafka.listener.AckMessageListener;
 import com.kafka.kafkanetty.kafka.model.DataBody;
 import com.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
 import com.kafka.kafkanetty.kafka.model.enums.KafkaKeyEnum;
+import com.kafka.kafkanetty.kafka.model.enums.MsgType;
 import com.kafka.kafkanetty.kafka.model.enums.TypeOfSending;
 import com.kafka.kafkanetty.kafka.model.push.AndroidVo;
 import com.kafka.kafkanetty.kafka.model.push.IOSVo;
@@ -29,68 +30,91 @@ import com.kafka.kafkanetty.kafka.parser.KafkaMsgParser;
 
 public class TestUtil {
 
+	public static String actionUrl = "www.action.url";
+	public static String time = "2022-06-06 13:22:10";
+	
 	/***************                 Test VO                   ***********/
-	public static DataBody bodyOfMultipleSms = DataBody.builder()
+	public static List<DataBody> bodyOfMultipleSms = Arrays.asList(DataBody.builder()
 			.title("SMS Multiple Test Header")
 			.body("SMS Mutilple Test Body Msg")
-			.build();
+			.build());
 	
-	public static DataBody bodyOfSingleSms = DataBody.builder()
+	public static List<DataBody> bodyOfSingleSms = Arrays.asList(DataBody.builder()
 			.title("SMS Single Test Header")
 			.body("SMS Single Test Body Msg")
-			.build();
+			.build());
 	
-	public static DataBody bodyOfMultiplePush = DataBody.builder()
+	public static  List<DataBody> bodyOfMultiplePush = Arrays.asList(DataBody.builder()
 			.title("Push Multiple Test Header")
 			.body("Push Mutilple Test Body Msg")
-			.build();
+			.build());
 	
-	public static DataBody bodyOfSinglePush = DataBody.builder()
+	public static List<DataBody> bodyOfSinglePush = Arrays.asList(DataBody.builder()
 			.title("Push Single Test Header")
 			.body("Push Single Test Body Msg")
-			.build();
+			.build());
 	
 	public static MsgFromKafkaVo voForMultipleSMS =  MsgFromKafkaVo.builder()
 			.key(KafkaKeyEnum.SMS)
-			.payload(Arrays.asList(bodyOfMultipleSms))
-			.type(TypeOfSending.MULTIPLE)
+			.payload(bodyOfMultipleSms)
+			.type(MsgType.SMS)
+			.kind(TypeOfSending.MULTIPLE)
+			.actionUrl(actionUrl)
+			.timeOfDelievery(time)
 			.build();
 	
 	public static MsgFromKafkaVo voForSingleSMS =  MsgFromKafkaVo.builder()
 			.key(KafkaKeyEnum.SMS)
-			.payload(Arrays.asList(bodyOfSingleSms))
-			.type(TypeOfSending.SINGLE)
+			.payload(bodyOfSingleSms)
+			.type(MsgType.SMS)
+			.kind(TypeOfSending.SINGLE)
+			.actionUrl(actionUrl)
+			.timeOfDelievery(time)
 			.build();
 	
 	public static MsgFromKafkaVo voForMultiplePush =  MsgFromKafkaVo.builder()
 			.key(KafkaKeyEnum.ANDROID)
-			.payload(Arrays.asList(bodyOfMultiplePush))
-			.type(TypeOfSending.MULTIPLE)
+			.payload(bodyOfMultiplePush)
+			.type(MsgType.APP_PUSH)
+			.kind(TypeOfSending.MULTIPLE)
+			.actionUrl(actionUrl)
+			.timeOfDelievery(time)
 			.build();
 	
 	public static MsgFromKafkaVo voForSinglePush =  MsgFromKafkaVo.builder()
 			.key(KafkaKeyEnum.ANDROID)
-			.payload(Arrays.asList(bodyOfSinglePush))
-			.type(TypeOfSending.SINGLE)
+			.payload(bodyOfSinglePush)
+			.type(MsgType.APP_PUSH)
+			.kind(TypeOfSending.SINGLE)
+			.actionUrl(actionUrl)
+			.timeOfDelievery(time)
 			.build();
 	
 	
 	public static MsgFromKafkaVo voForAndroid =  MsgFromKafkaVo.builder()
 				.key(KafkaKeyEnum.ANDROID)
-				.payload(Arrays.asList(bodyOfSinglePush))
-				.type(TypeOfSending.SINGLE)
+				.payload(bodyOfSinglePush)
+				.type(MsgType.APP_PUSH)
+				.kind(TypeOfSending.SINGLE)
+				.actionUrl(actionUrl)
+				.timeOfDelievery(time)
 				.build();
 	
 	public static MsgFromKafkaVo voForIOS =  MsgFromKafkaVo.builder()
 				.key(KafkaKeyEnum.IOS)
-				.payload(Arrays.asList(bodyOfSinglePush))
-				.type(TypeOfSending.SINGLE)
+				.payload(bodyOfSinglePush)
+				.type(MsgType.APP_PUSH)
+				.actionUrl(actionUrl)
+				.timeOfDelievery(time)
 				.build();
 	
 	public static MsgFromKafkaVo voForSMS =  MsgFromKafkaVo.builder()
 				.key(KafkaKeyEnum.SMS)
-				.payload(Arrays.asList(bodyOfMultipleSms))
-				.type(TypeOfSending.MULTIPLE)
+				.payload(bodyOfMultipleSms)
+				.type(MsgType.SMS)
+				.kind(TypeOfSending.MULTIPLE)
+				.actionUrl(actionUrl)
+				.timeOfDelievery(time)
 				.build();
 	
 	public static UserInfoOnPush userInfoOnPushWithYes = new UserInfoOnPush(true);

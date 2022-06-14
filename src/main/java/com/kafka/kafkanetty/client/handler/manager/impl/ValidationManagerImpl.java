@@ -61,7 +61,7 @@ public class ValidationManagerImpl implements ValidationManager {
 	@Override
 	public void validSingleUserInfo(MsgFromKafkaVo vo) 
 			throws UserInfoInvalidException, UserNotAllowNotificationException {
-		
+	
 		
 		UserInfoOnPush info = mapper.getIfSendYnByUserNo(vo);
 		

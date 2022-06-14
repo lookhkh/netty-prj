@@ -1,7 +1,9 @@
 package com.kafka.kafkanetty.client.test.manager;
 
 import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.times;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -42,13 +44,19 @@ public class DynamicHandlerMngTest {
 	UserInfoOnPush userInfoOnPush = TestUtil.userInfoOnPushWithYes;
 	UserInfoOnPush userInfoOnPushWithNo = TestUtil.userInfoOnPushWithNo;
 
+	@AfterEach
+	public void cleanUp() {
+		Mockito.reset(mapper);
+
+		Mockito.reset(mongo);
+	}
 	
 	@Test
 	@DisplayName("SMS 대량 발송 테스트")
 	public void test() {
 	
 		manager.consume(voForMultipleSMS);
-		Mockito.verify(smsMulti, atLeast(1)).send(voForMultipleSMS);
+		Mockito.verify(smsMulti, times(1)).send(voForMultipleSMS);
 		
 	
 	}
@@ -58,7 +66,7 @@ public class DynamicHandlerMngTest {
 	public void test1() {
 	
 		manager.consume(voForSingleSMS);
-		Mockito.verify(smsSingle, atLeast(1)).send(voForSingleSMS);
+		Mockito.verify(smsSingle, times(1)).send(voForSingleSMS);
 
 		
 	
@@ -69,7 +77,7 @@ public class DynamicHandlerMngTest {
 	public void test2() {
 	
 		manager.consume(voForMultiplePush);
-		Mockito.verify(pushMulti, atLeast(1)).send(voForMultiplePush);
+		Mockito.verify(pushMulti, times(1)).send(voForMultiplePush);
 
 	
 	}
@@ -81,7 +89,7 @@ public class DynamicHandlerMngTest {
 		Mockito.when(mapper.getIfSendYnByUserNo(voForSinglePush)).thenReturn(userInfoOnPush);
 	
 		manager.consume(voForSinglePush);
-		Mockito.verify(pushSingle, atLeast(1)).send(voForSinglePush);
+		Mockito.verify(pushSingle, times(1)).send(voForSinglePush);
 
 	}
 	
@@ -91,7 +99,7 @@ public class DynamicHandlerMngTest {
 		Mockito.when(mapper.getIfSendYnByUserNo(voForSinglePush)).thenReturn(userInfoOnPushWithNo);
 		ResultOfPush result =  manager.consume(voForSinglePush);
 
-		Mockito.verify(mongo, atLeast(1)).insertDbHistory(result);
+		Mockito.verify(mongo, times(1)).insertDbHistory(result);
 	}
 	
 	
@@ -105,7 +113,7 @@ public class DynamicHandlerMngTest {
 		
 		ResultOfPush result = manager.consume(voForSinglePush);
 		
-		Mockito.verify(mongo, atLeast(1)).insertDbHistory(result);
+		Mockito.verify(mongo, times(1)).insertDbHistory(result);
 
 
 	}

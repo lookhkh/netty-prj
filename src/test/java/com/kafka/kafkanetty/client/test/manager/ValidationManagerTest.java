@@ -23,6 +23,7 @@ import com.kafka.kafkanetty.kafka.mongo.TempMongodbTemplate;
 
 import util.TestUtil;
 
+@DisplayName("msg 파싱 벨리데이션 매니저 테스트")
 public class ValidationManagerTest {
 
 	SmsPushMapper mapper = TestUtil.mapper;
@@ -35,7 +36,8 @@ public class ValidationManagerTest {
 	@AfterEach
 	public void cleanUp() {
 		Mockito.reset(mongo);
-	}
+		Mockito.reset(mapper);
+}
 
 	@Test
 	@DisplayName("User 정보가 Invalid할 경우, 실패한 User 정보를 몽고DB에 입력한다.")
