@@ -4,38 +4,34 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kafka.kafkanetty.exception.InvalidMsgFormatException;
-import com.kafka.kafkanetty.kafka.model.DataBody;
-import com.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
-import com.kafka.kafkanetty.kafka.model.enums.KafkaKeyEnum;
-import com.kafka.kafkanetty.kafka.model.enums.MsgType;
-import com.kafka.kafkanetty.kafka.model.enums.TypeOfSending;
-import com.kafka.kafkanetty.kafka.parser.KafkaMsgParser;
-import com.kafka.kafkanetty.kafka.parser.KafkaMsgParserImpl;
+import com.kt.onnuipay.kafka.kafkanetty.kafka.model.DataBody;
+import com.kt.onnuipay.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
+import com.kt.onnuipay.kafka.kafkanetty.kafka.model.enums.KafkaKeyEnum;
+import com.kt.onnuipay.kafka.kafkanetty.kafka.model.enums.MsgType;
+import com.kt.onnuipay.kafka.kafkanetty.kafka.model.enums.TypeOfSending;
+import com.kt.onnuipay.kafka.kafkanetty.kafka.parser.KafkaMsgParser;
+import com.kt.onnuipay.kafka.kafkanetty.kafka.parser.KafkaMsgParserImpl;
 
+import util.DataBodys;
+import util.MsgFromKafkaAndroid;
 import util.TestUtil;
 
 @DisplayName("메세지 파서 테스트")
 public class MsgParserTest {
 
 	ObjectMapper mapper = new ObjectMapper();
-	List<DataBody> bodyOfMultiplePush = TestUtil.bodyOfMultiplePush;
-	MsgFromKafkaVo vo = TestUtil.voForAndroid;
+	List<DataBody> bodyOfMultiplePush = DataBodys.bodyOfWithValidHeaderAndBody;
 	
 	KafkaMsgParser parser = new KafkaMsgParserImpl(mapper);
 

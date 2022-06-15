@@ -5,11 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.kafka.kafkanetty.client.handler.manager.SendManager;
-import com.kafka.kafkanetty.client.handler.manager.impl.hanlder.PushSingleManager;
-import com.kafka.kafkanetty.client.handler.manager.impl.hanlder.SmsSingleManager;
-import com.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
+import com.kt.onnuipay.client.handler.manager.SendManager;
+import com.kt.onnuipay.kafka.kafkanetty.client.handler.manager.impl.hanlder.SmsSingleManager;
+import com.kt.onnuipay.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
 
+import util.MsgFromKafkaSmss;
 import util.TestUtil;
 
 
@@ -32,9 +32,9 @@ public class SMSHandlerTestClass {
 	
 	SendManager mng = new SmsSingleManager();
 	
-	MsgFromKafkaVo voForMultipleSMS = TestUtil.voForMultipleSMS;
+	MsgFromKafkaVo voForMultipleSMS = MsgFromKafkaSmss.voForMultipleSMSWithValidDataBody;
 	
-	MsgFromKafkaVo voForSingleSMS = TestUtil.voForSingleSMS;
+	MsgFromKafkaVo voForSingleSMS = MsgFromKafkaSmss.voForSingleSmsWithValidDataBody;
 	
 	
 	

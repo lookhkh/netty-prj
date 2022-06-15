@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kafka.kafkanetty.client.handler.NettyHttpRequestHandler;
+import com.kt.onnuipay.kafka.kafkanetty.client.handler.NettyHttpRequestHandler;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;

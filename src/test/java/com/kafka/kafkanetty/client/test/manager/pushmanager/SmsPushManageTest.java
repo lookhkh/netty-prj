@@ -1,5 +1,7 @@
 package com.kafka.kafkanetty.client.test.manager.pushmanager;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.AfterEach;
@@ -8,16 +10,25 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import com.google.firebase.messaging.FirebaseMessaging;
-import com.kafka.kafkanetty.client.handler.manager.SendManager;
-import com.kafka.kafkanetty.client.handler.manager.SendPushManager;
-import com.kafka.kafkanetty.client.handler.manager.vo.UserInfoOnPush;
-import com.kafka.kafkanetty.client.handler.mapper.SmsPushMapper;
-import com.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
-import com.kafka.kafkanetty.kafka.model.ResultOfPush;
-import com.kafka.kafkanetty.kafka.model.push.AndroidVo;
-import com.kafka.kafkanetty.kafka.model.push.IOSVo;
+import com.kt.onnuipay.client.handler.manager.SendManager;
+import com.kt.onnuipay.client.handler.manager.SendPushManager;
+import com.kt.onnuipay.kafka.kafkanetty.client.handler.manager.impl.SendPushManagerImpl;
+import com.kt.onnuipay.kafka.kafkanetty.client.handler.manager.vo.UserInfoOnPush;
+import com.kt.onnuipay.kafka.kafkanetty.client.handler.mapper.SmsPushMapper;
+import com.kt.onnuipay.kafka.kafkanetty.kafka.model.DataBody;
+import com.kt.onnuipay.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
+import com.kt.onnuipay.kafka.kafkanetty.kafka.model.ResultOfPush;
+import com.kt.onnuipay.kafka.kafkanetty.kafka.model.push.AndroidVo;
+import com.kt.onnuipay.kafka.kafkanetty.kafka.model.push.IOSVo;
+import com.kt.onnuipay.kafka.kafkanetty.kafka.model.push.MobileAbstractVo;
 
+import util.AndroidVos;
+import util.IOSVos;
+import util.MsgFromKafkaAndroid;
+import util.MsgFromKafkaIOS;
+import util.MsgFromKafkaSmss;
 import util.TestUtil;
+import util.UserInfos;
 
 /**
  * @implNote com.kafka.kafkanetty.client.handler.manager.SendPushManager 테스트 케이스 모음 <br>
@@ -30,24 +41,25 @@ import util.TestUtil;
 public class SmsPushManageTest {
 
 
-	SendPushManager manager = Mockito.mock(SendPushManager.class);
-	
+	SendPushManager managerMock = Mockito.mock(SendPushManager.class);
+	SendPushManager manager = new SendPushManagerImpl();
+
 	FirebaseMessaging instance = TestUtil.instance;
 	SmsPushMapper mapper = TestUtil.mapper;
 
 	SendManager mng = TestUtil.pushSingle;
 	
-	MsgFromKafkaVo voForSinglePushAndroid =  TestUtil.voForSinglePush;
-	MsgFromKafkaVo voForSinglePushIos =  TestUtil.voForIOS;
+	MsgFromKafkaVo voForSinglePushAndroid =  MsgFromKafkaAndroid.voForSinglePushWithValidDataBody;
+	MsgFromKafkaVo voForSinglePushIos =  MsgFromKafkaIOS.voForSinglePushWithValidDataBody;
 
-	MsgFromKafkaVo voForSingleSMS = TestUtil.voForSingleSMS;
+	MsgFromKafkaVo voForSingleSMS = MsgFromKafkaSmss.voForSingleSmsWithValidDataBody;
 	
-	AndroidVo androidVo = TestUtil.androidVo;
-	IOSVo iosVo = TestUtil.iosVo;
+	AndroidVo androidVoMock = AndroidVos.androidVoMock;
+	IOSVo iosVoMock = IOSVos.iosVoMock;
 	
-	UserInfoOnPush userInfoOnPushWithYesForNotification = TestUtil.userInfoOnPushWithYes;
+	UserInfoOnPush userInfoOnPushWithYesForNotification = UserInfos.userInfoOnPushWithYes;
 
-	UserInfoOnPush userInfoOnPushWithNoForNotification = TestUtil.userInfoOnPushWithNo;
+	UserInfoOnPush userInfoOnPushWithNoForNotification = UserInfos.userInfoOnPushWithNo;
 
 	@AfterEach
 	public void cleanUp() {
@@ -55,44 +67,56 @@ public class SmsPushManageTest {
 }
 
 	@Test
-	@DisplayName("MsgFromKafka Vo 객체를 Android 전송 용 객체로 Parsing 한다. - DB 모델 확정에 따른 추가 개발 후 진행")
+	@DisplayName("MsgFromKafka Vo 객체를 Android 전송 용 객체로 Parsing 한다.")
 	public void test() {
-		assertTrue(false);
-		manager.parseAndroid(voForSinglePushAndroid);
+		AndroidVo vo =  manager.parseAndroid(voForSinglePushAndroid);
+		
+		seeIfDataBodyInMobileVoIsSameWithOrginalMobileVO(vo);
+
 	}
-	
+
 	@Test
 	@DisplayName("MsgFromKafka Vo 객체를 IOS 전송 용 객체로 Parsing 한다.  - DB 모델 확정에 따른 추가 개발 후 진행")
 	public void test2() {
-		assertTrue(false);
-		manager.parseIos(voForSinglePushIos);
+		IOSVo vo =  manager.parseIos(voForSinglePushAndroid);
+		
+		seeIfDataBodyInMobileVoIsSameWithOrginalMobileVO(vo);
 
 	}
+	
+	private void seeIfDataBodyInMobileVoIsSameWithOrginalMobileVO(MobileAbstractVo vo) {
+		
+		DataBody data = vo.getVo().getPayload().get(0);
+
+		
+		assertNotNull(vo);
+		assertEquals(data.getTitle(), vo.getTitle());
+		assertEquals(data.getBody(), vo.getBody());
+	}
+	
 	
 	@Test
 	@DisplayName("AndroidVo를 fcm으로 보내고 성공 메시지를 받는다.")
 	public void test3() {
-		ResultOfPush result =  manager.sendPush(instance, androidVo);
+		ResultOfPush result =  managerMock.sendPush(instance, androidVoMock);
 	}
 	
 	@Test
 	@DisplayName("AndroidVo를 fcm으로 보내고 실패 메시지를 받는다.")
 	public void test3_1() {
-		ResultOfPush result = manager.sendPush(instance, androidVo);
+		ResultOfPush result = managerMock.sendPush(instance, androidVoMock);
 	}
 	
 	@Test
 	@DisplayName("IOSVo를 fcm으로 보내고 성공 메시지를 받는다.")
 	public void test4() {
-		ResultOfPush result = manager.sendPush(instance, iosVo);
-		
+		ResultOfPush result = managerMock.sendPush(instance, iosVoMock);
 	}
 	
 	@Test
 	@DisplayName("IOSVo를 fcm으로 보내고 실패 메시지를 받는다.")
 	public void test4_1() {
-		ResultOfPush result = manager.sendPush(instance, iosVo);
-		
+		ResultOfPush result = managerMock.sendPush(instance, iosVoMock);
 	}
 	
 }

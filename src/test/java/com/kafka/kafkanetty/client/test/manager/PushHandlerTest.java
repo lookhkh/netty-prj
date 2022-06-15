@@ -1,25 +1,23 @@
 package com.kafka.kafkanetty.client.test.manager;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
 import com.google.firebase.messaging.FirebaseMessaging;
-import com.kafka.kafkanetty.client.handler.manager.SendManager;
-import com.kafka.kafkanetty.client.handler.manager.ValidationManager;
-import com.kafka.kafkanetty.client.handler.manager.impl.hanlder.PushSingleManager;
-import com.kafka.kafkanetty.client.handler.manager.vo.UserInfoOnPush;
-import com.kafka.kafkanetty.client.handler.mapper.SmsPushMapper;
-import com.kafka.kafkanetty.exception.UserInfoInvalidException;
-import com.kafka.kafkanetty.exception.UserNotAllowNotificationException;
-import com.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
+import com.kt.onnuipay.client.handler.manager.SendManager;
+import com.kt.onnuipay.client.handler.manager.ValidationManager;
+import com.kt.onnuipay.kafka.kafkanetty.client.handler.manager.vo.UserInfoOnPush;
+import com.kt.onnuipay.kafka.kafkanetty.client.handler.mapper.SmsPushMapper;
+import com.kt.onnuipay.kafka.kafkanetty.exception.UserInfoInvalidException;
+import com.kt.onnuipay.kafka.kafkanetty.exception.UserNotAllowNotificationException;
+import com.kt.onnuipay.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
 
+import util.MsgFromKafkaAndroid;
+import util.MsgFromKafkaSmss;
 import util.TestUtil;
 
 /**
@@ -42,13 +40,13 @@ public class PushHandlerTest {
 
 	SendManager mng = TestUtil.pushSingle;
 	
-	MsgFromKafkaVo voForMultiplePush =  TestUtil.voForMultiplePush;
+	MsgFromKafkaVo voForMultipleAndroidPush =  MsgFromKafkaAndroid.voForMultiplePushWithValidDataBody;
 	
-	MsgFromKafkaVo voForSinglePush =  TestUtil.voForSinglePush;
+	MsgFromKafkaVo voForSingleAndroidPush =  MsgFromKafkaAndroid.voForSinglePushWithValidDataBody;
 	
-	MsgFromKafkaVo voForMultipleSMS = TestUtil.voForMultipleSMS;
+	MsgFromKafkaVo voForMultipleSMS = MsgFromKafkaSmss.voForMultipleSMSWithValidDataBody;
 	
-	MsgFromKafkaVo voForSingleSMS = TestUtil.voForSingleSMS;
+	MsgFromKafkaVo voForSingleSMS = MsgFromKafkaSmss.voForSingleSmsWithValidDataBody;
 	
 	UserInfoOnPush userInfoOnPushWithYesForNotification = TestUtil.userInfoOnPushWithYes;
 
@@ -66,8 +64,8 @@ public class PushHandlerTest {
 	public void test2() {
 		
 	
-	 Mockito.doThrow(UserNotAllowNotificationException.class).when(validMng).validSingleUserInfo(voForSinglePush);
-	  assertThrows(UserNotAllowNotificationException.class,()->mng.send(voForSinglePush)); 
+	 Mockito.doThrow(UserNotAllowNotificationException.class).when(validMng).validSingleUserInfo(voForSingleAndroidPush.getTarget().get(0));
+	  assertThrows(UserNotAllowNotificationException.class,()->mng.send(voForSingleAndroidPush)); 
 
 	}
 	
@@ -77,8 +75,8 @@ public class PushHandlerTest {
 	public void test2_1() {
 		
 	
-	 Mockito.doThrow(UserInfoInvalidException.class).when(validMng).validSingleUserInfo(voForSinglePush);
-	  assertThrows(UserInfoInvalidException.class,()->mng.send(voForSinglePush)); 
+	 Mockito.doThrow(UserInfoInvalidException.class).when(validMng).validSingleUserInfo(voForSingleAndroidPush.getTarget().get(0));
+	  assertThrows(UserInfoInvalidException.class,()->mng.send(voForSingleAndroidPush)); 
 
 	}
 	
