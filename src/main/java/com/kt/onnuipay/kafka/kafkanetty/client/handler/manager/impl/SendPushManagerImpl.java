@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
@@ -33,7 +34,7 @@ import com.kt.onnuipay.kafka.kafkanetty.kafka.model.push.MobileAbstractVo;
  */
 
 
-@Component
+//@Component
 public class SendPushManagerImpl extends PushManagerAbstract {
 
 	@Autowired

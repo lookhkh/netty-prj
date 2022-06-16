@@ -4,17 +4,21 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.assertj.core.internal.bytebuddy.asm.Advice.Thrown;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kt.onnuipay.kafka.kafkanetty.exception.DataBodyInvalidException;
+import com.kt.onnuipay.kafka.kafkanetty.exception.JsonDataProcessingWrapperException;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.DataBody;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.enums.KafkaKeyEnum;
@@ -63,10 +67,7 @@ public class MsgParserTest {
 	@DisplayName("SMS, 제목 30bytes 이상일 경우, 내용 2000 미만일 경우, 파싱에 실패한다.")
 	public void test3() throws JsonProcessingException {
 
-		Map<Boolean, List<DataBody>> result  = extracted(KafkaKeyEnum.SMS, DataBody.builder().title("title is too long for the limit of 20bytes").body("body").build());
-		
-		assertNull(result.get(true));
-		assertEquals(result.get(false).size(), 1);
+		assertThrows(DataBodyInvalidException.class, ()-> extracted(KafkaKeyEnum.SMS, DataBody.builder().title("title is too long for the limit of 20bytes").body("body").build()));
 
 	}
 	
@@ -76,10 +77,8 @@ public class MsgParserTest {
 		String tooLongBody = "abc".repeat(2000);
 
 
-		Map<Boolean, List<DataBody>> result = extracted(KafkaKeyEnum.SMS, DataBody.builder().title("title").body(tooLongBody).build());
-		
-		assertNull(result.get(true));
-		assertEquals(result.get(false).size(), 1);
+		assertThrows(DataBodyInvalidException.class, ()->extracted(KafkaKeyEnum.SMS, DataBody.builder().title("title").body(tooLongBody).build()));
+
 
 	}
 	
@@ -102,13 +101,9 @@ public class MsgParserTest {
 		
 
 		
-		Map<Boolean, List<DataBody>> result = extracted(KafkaKeyEnum.ANDROID,DataBody.builder().title("title").body("body".repeat(55)).build());
+		assertThrows(DataBodyInvalidException.class, ()->extracted(KafkaKeyEnum.ANDROID,DataBody.builder().title("title").body("body".repeat(55)).build()));
 
-		assertNull(result.get(true));
-		assertEquals(result.get(false).size(), 1);
-		
-		assertEquals(result.get(false).get(0).getBody(), "body".repeat(55));
-
+	
 	}
 	
 	@Test
@@ -122,7 +117,7 @@ public class MsgParserTest {
 		}
 		
 		System.out.println("body".repeat(50).getBytes().length);
-		
+		assertTrue(tokens.size()> 500 );
 		
 		
 		MsgFromKafkaVo vo = MsgFromKafkaVo.builder()
@@ -135,9 +130,8 @@ public class MsgParserTest {
 								.target(tokens)
 								.type(MsgType.APP_PUSH)
 								.build();
-		Map<Boolean, List<DataBody>> result =  vo.validateDataBodys();
+		assertThrows(DataBodyInvalidException.class, ()->vo.validateDataBodys());
 		
-		assertEquals(result.get(false).size(), 1);
 		
 		//assertEquals(result.get(false).get(0).getBody(), "body");
 
@@ -146,7 +140,7 @@ public class MsgParserTest {
 	@Test
 	@DisplayName("parser에 잘못된 형식의 데이터를 집어넣을 경우 IllegalArgumentException이 터진다.")
 	public void test52() {
-		assertThrows(IllegalArgumentException.class, () -> parser.parse("hi"));
+		assertThrows(JsonDataProcessingWrapperException.class, () -> parser.parse("hi"));
 	}
 	
 	@Test
@@ -166,7 +160,7 @@ public class MsgParserTest {
 				.kind(TypeOfSending.SINGLE)
 				.build();
 		
-		String value = mapper.writeValueAsString(MsgFromKafkaAndroid.voForSinglePushWithValidDataBody);
+		String value = mapper.writeValueAsString(test);
 		System.out.println(value);
 		MsgFromKafkaVo convertedVoFromJsonString = parser.parse(value);
 		

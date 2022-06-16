@@ -59,26 +59,26 @@ public class PushHandlerTest {
 
 	}
 	
-	@Test
-	@DisplayName("PushSingleManager에 넣은 사용자가 수신 여부를 N로 할 경우 vailidationMng가 던진 UserNotAllowNotification을 잡지 않고 위로 던진다")
-	public void test2() {
-		
-	
-	 Mockito.doThrow(UserNotAllowNotificationException.class).when(validMng).validSingleUserInfo(voForSingleAndroidPush.getTarget().get(0));
-	  assertThrows(UserNotAllowNotificationException.class,()->mng.send(voForSingleAndroidPush)); 
-
-	}
-	
-
-	@Test
-	@DisplayName("PushSingleManager에 넣은 사용자의 정보가 invalid 할 경우, vailidationMng가 던진 UserInfoInvalidException을 잡지 않고 위로 던진다")
-	public void test2_1() {
-		
-	
-	 Mockito.doThrow(UserInfoInvalidException.class).when(validMng).validSingleUserInfo(voForSingleAndroidPush.getTarget().get(0));
-	  assertThrows(UserInfoInvalidException.class,()->mng.send(voForSingleAndroidPush)); 
-
-	}
-	
+//	@Test
+//	@DisplayName("PushSingleManager에 넣은 사용자가 수신 여부를 N로 할 경우 vailidationMng가 던진 UserNotAllowNotification을 잡지 않고 위로 던진다")
+//	public void test2() {
+//		
+//	
+//	 Mockito.doThrow(UserNotAllowNotificationException.class).when(validMng).validSingleUserInfo(voForSingleAndroidPush.getTarget().get(0));
+//	  assertThrows(UserNotAllowNotificationException.class,()->mng.send(voForSingleAndroidPush)); 
+//
+//	}
+//	
+//
+//	@Test
+//	@DisplayName("PushSingleManager에 넣은 사용자의 정보가 invalid 할 경우, vailidationMng가 던진 UserInfoInvalidException을 잡지 않고 위로 던진다")
+//	public void test2_1() {
+//		
+//	
+//	 Mockito.doThrow(UserInfoInvalidException.class).when(validMng).validSingleUserInfo(voForSingleAndroidPush.getTarget().get(0));
+//	  assertThrows(UserInfoInvalidException.class,()->mng.send(voForSingleAndroidPush)); 
+//
+//	}
+//	
 
 }

@@ -2,6 +2,7 @@ package util;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 import org.mockito.Mockito;
 
@@ -106,7 +107,8 @@ public class TestUtil {
 	
 	public static DynamicHandlerManager m = Mockito.mock(DynamicHandlerManager.class);
 	public static KafkaMsgParser parser = Mockito.mock(KafkaMsgParser.class);
-	public static AckMessageListener listener = new AckMessageListener(new DispatcherControllerImpl(parser, m));
+	public static ExecutorService serviceMock = Mockito.mock(ExecutorService.class);
+	public static AckMessageListener listener = new AckMessageListener(new DispatcherControllerImpl(parser, m),serviceMock);
 
 
 }

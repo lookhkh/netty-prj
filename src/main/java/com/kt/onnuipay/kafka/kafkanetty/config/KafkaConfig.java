@@ -4,10 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -16,6 +18,7 @@ import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.DispatcherController;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.listener.AckMessageListener;
 
@@ -41,25 +44,28 @@ import lombok.AllArgsConstructor;
  *  intended publication of such software.
  */
 
-@AllArgsConstructor
+
 @Configuration
 @EnableKafka
 public class KafkaConfig {
 
 
-	@Autowired
 	private final Environment env;
 	
-	@Autowired
 	private final DispatcherController controller;
 	
-	@Bean("single")
-	public ExecutorService getDefault() {
-		ExecutorService service =  Executors.newFixedThreadPool(100);
-		return service;
-		
-	}
+	@Qualifier("single")
+	private final ExecutorService exex;
 	
+	
+
+	public KafkaConfig(Environment env, DispatcherController controller, @Qualifier("single") ExecutorService exex) {
+		this.env = env;
+		this.controller = controller;
+		this.exex = exex;
+	}
+
+
 	@Bean
 	public ConcurrentKafkaListenerContainerFactory<String, String> kafkaContainerFactory(){
 		
@@ -75,11 +81,9 @@ public class KafkaConfig {
 		
 	}
 	
-	
-
 
 	public AckMessageListener ackMessageListener() {
-		return new AckMessageListener(controller);
+		return new AckMessageListener(controller,exex);
 	}
 	
 	
@@ -93,7 +97,7 @@ public class KafkaConfig {
 		config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 		config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 		config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-
+		
 		return new DefaultKafkaConsumerFactory<>(config);
 	}
 	

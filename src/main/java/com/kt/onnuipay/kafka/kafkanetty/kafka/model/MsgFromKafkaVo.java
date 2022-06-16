@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.kt.onnuipay.kafka.kafkanetty.exception.DataBodyInvalidException;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.enums.KafkaKeyEnum;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.enums.MsgType;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.enums.TypeOfSending;
@@ -105,6 +106,9 @@ public class MsgFromKafkaVo{
 		String title = payload.getTitle();
 		String body = payload.getBody();
 		
+		String errorMsg = "databody format is wrong header :"+title+" body :"+body;
+		
+		
 		int lengthOfTitle = title.getBytes(Charset.forName("utf-8")).length;
 		int lengthOfBody = body.getBytes(Charset.forName("utf-8")).length ;
 		
@@ -112,13 +116,17 @@ public class MsgFromKafkaVo{
 		
 		if(this.getTypeValue() == 2) {
 			
-			return lengthOfTitle<=30 
-					&& lengthOfBody  <= 2000;	
+			 if(!(lengthOfTitle<=30 
+					&& lengthOfBody  <= 2000)) 
+				 throw new DataBodyInvalidException(errorMsg,this);	
 		}else {
 			
-			return lengthOfTitle <= 30 && lengthOfBody<=200 && target.size() <= 500; 
+			if(!(lengthOfTitle <= 30 && lengthOfBody<=200 && target.size() <= 500))
+				 throw new DataBodyInvalidException(errorMsg,this); 
 			
 		}
+		
+		return true;
 	}
 	
 	public Map<Boolean, List<DataBody>> validateDataBodys() {

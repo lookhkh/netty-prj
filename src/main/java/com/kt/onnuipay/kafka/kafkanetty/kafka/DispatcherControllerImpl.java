@@ -2,7 +2,10 @@ package com.kt.onnuipay.kafka.kafkanetty.kafka;
 
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
+import com.kt.onnuipay.kafka.kafkanetty.exception.DataBodyInvalidException;
 import com.kt.onnuipay.kafka.kafkanetty.exception.InvalidMsgFormatException;
+import com.kt.onnuipay.kafka.kafkanetty.exception.JsonDataProcessingWrapperException;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.ResultOfPush;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.parser.KafkaMsgParser;
@@ -34,33 +37,54 @@ public class DispatcherControllerImpl implements DispatcherController{
 	
 	@Override
 	public ResultOfPush route(String msg) {
+		
+		ResultOfPush result = null;
+		
 		try {
 			log.debug("Controller recived msg {}",msg);
 			
 			MsgFromKafkaVo vo = parser.parse(msg);
 			
-			ResultOfPush result =  manager.consume(vo);
+			result =  manager.consume(vo);
 			
-			log.debug("result is => {}",result);
 			
 			/**
 			 * TODO 수동 커밋, 자동 커밋에 따라 추가 로직 필요 220610 조현일
 			 * 
 			 * **/
-			
+			log.info("result is => {}",result);
+
 			return result;
-		} catch(InvalidMsgFormatException e) {
+		} catch(DataBodyInvalidException e) {
+
+			log.warn("MessageBody is Invalid",e);
+
+			result= ResultOfPush.builder()
+					.id("")
+					.vo(e.getErrorVo())
+					.success(false)
+					.reason(e)
+					.build();
 			
-			log.warn("Message format is not appropriate");
+			log.info("result is => {}",result);
+			return result;
+
+		}catch(JsonDataProcessingWrapperException | InvalidMsgFormatException e) {
+			log.warn("can`t parsing msg into JSON ",e.getMessage());
 			
-			return ResultOfPush.builder()
-						.id("")
-						.vo(null)
-						.success(false)
-						.build();
+			result= ResultOfPush.builder()
+					.id("")
+					.vo(null)
+					.success(false)
+					.reason(e)
+					.build();
 			
+			log.info("result is => {}",result);
+
+			return result;
+
+
 		}
-		
 	
 
 	}

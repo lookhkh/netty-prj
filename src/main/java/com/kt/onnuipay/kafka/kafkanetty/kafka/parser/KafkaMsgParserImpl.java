@@ -6,8 +6,10 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kt.onnuipay.kafka.kafkanetty.exception.JsonDataProcessingWrapperException;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.DataBody;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
 
@@ -32,14 +34,15 @@ public class KafkaMsgParserImpl implements KafkaMsgParser {
 		try {
 			convertedValue = mapper.readValue(msg, MsgFromKafkaVo.class);
 			
-		} catch (JsonProcessingException e) {
+		} catch (JacksonException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			throw new IllegalArgumentException("Message Json Parsing error",e);
+			throw new JsonDataProcessingWrapperException("Message Json Parsing error",e);
 		} 
 		
 		
 			Map<Boolean, List<DataBody>> result = convertedValue.validateDataBodys();
+			
 			
 			result.getOrDefault(false, Arrays.asList())
 				.stream()

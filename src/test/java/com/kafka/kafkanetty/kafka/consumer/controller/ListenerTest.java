@@ -15,7 +15,7 @@ public class ListenerTest {
 
 	DynamicHandlerManager m = TestUtil.m;
 	KafkaMsgParser parser = TestUtil.parser;
-	AckMessageListener listener = new AckMessageListener(new DispatcherControllerImpl(parser, m));
+	AckMessageListener listener = TestUtil.listener;
 	
 	
 	@Test
