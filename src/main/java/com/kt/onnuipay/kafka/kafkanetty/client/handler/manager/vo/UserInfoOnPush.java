@@ -27,7 +27,6 @@ public class UserInfoOnPush {
 
 	private boolean pushYn;
 	
-	
 	public boolean getPushYn() {
 
 		return this.pushYn;

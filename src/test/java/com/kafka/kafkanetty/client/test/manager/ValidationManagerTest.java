@@ -21,9 +21,10 @@ import com.kt.onnuipay.kafka.kafkanetty.exception.UserInfoInvalidException;
 import com.kt.onnuipay.kafka.kafkanetty.exception.UserNotAllowNotificationException;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.ResultOfPush;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.push.MobileAbstractVo;
+import com.kt.onnuipay.kafka.kafkanetty.kafka.model.enums.TypeOfSending;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.mongo.TempMongodbTemplate;
 
+import util.DataBodys;
 import util.MsgFromKafkaAndroid;
 import util.TestUtil;
 
@@ -36,6 +37,14 @@ public class ValidationManagerTest {
 	ValidationManager validMng = new ValidationManagerImpl(mapper,mongo);
 	
 	MsgFromKafkaVo voOfAndroidPushWithSingle = MsgFromKafkaAndroid.voForSinglePushWithValidDataBody;
+	MsgFromKafkaVo voForAndroidWithMutliple = MsgFromKafkaAndroid.voForMultiplePushWithValidDataBody;
+	
+	String prefixForInvalid = "i";
+	String prefixForNoUser = "n";
+	String prefixForValid = "v";
+	
+	List<String> mockTargets = Arrays.asList(prefixForNoUser+"noUserInfo-test4",prefixForInvalid+"invalidUser1-test4",prefixForInvalid+"invalidUser2-test4",prefixForInvalid+"invalidUser3-test4",prefixForValid+"validUser1-test4",prefixForValid+"validUser2-test4",prefixForValid+"validUser3-test4");
+
 	
 	@AfterEach
 	public void cleanUp() {
@@ -103,35 +112,15 @@ public class ValidationManagerTest {
 	@DisplayName("다수의 registrations lists의 수신 여부를 확인한 이후, y를 한 유저 정보만 남긴다")
 	public void test4() {
 		
-		String[] list = {"noUserInfo-test4","invalidUser1-test4","invalidUser2-test4","invalidUser3-test4","validUser1-test4","validUser2-test4","validUser3-test4"};
-		UserInfoOnPush resultOfQueryWithOk = Mockito.mock(UserInfoOnPush.class);
-		UserInfoOnPush resultOfQueryWithNo = Mockito.mock(UserInfoOnPush.class);
 
 		int cnt = 0;
 		
-		for(String item : list) {
+		for(String item : mockTargets) {
 			
-			if(item.startsWith("i")) {
-				Mockito.when(mapper.getIfSendYnByUserNo(item)).thenReturn(resultOfQueryWithNo);
-				Mockito.when(resultOfQueryWithNo.validation()).thenReturn(true);
-				Mockito.when(resultOfQueryWithNo.getPushYn()).thenReturn(false);
-				
-			}else if(item.startsWith("n")){
-				
-				Mockito.when(mapper.getIfSendYnByUserNo(item)).thenReturn(resultOfQueryWithNo);
-				Mockito.when(resultOfQueryWithNo.validation()).thenReturn(false);
-				Mockito.when(resultOfQueryWithNo.getPushYn()).thenReturn(false);
-				
-				
-			}else {
-				
-				Mockito.when(mapper.getIfSendYnByUserNo(item)).thenReturn(resultOfQueryWithOk);
-				Mockito.when(resultOfQueryWithOk.validation()).thenReturn(true);
-				Mockito.when(resultOfQueryWithOk.getPushYn()).thenReturn(true);
-				
-			}
+			givenCondition(item);
+			
 			try {
-			validMng.validSingleUserInfo(item);
+				validMng.validSingleUserInfo(item);
 			}catch(RuntimeException e) {
 				cnt++;
 			}
@@ -139,20 +128,56 @@ public class ValidationManagerTest {
 		
 		assertEquals(cnt, 4);
 	}
+
 	
 	@Test
 	@DisplayName("다수의 registrations lists의 수신 여부를 확인한 이후, y를 한 유저 정보만 남긴다 - multi")
 	public void test5() {
-		List<String> mockTargets =  Arrays.asList("noUserInfo-test4","invalidUser1-test4","invalidUser2-test4","invalidUser3-test4","validUser1-test4","validUser2-test4","validUser3-test4");
-		MsgFromKafkaVo vo = MsgFromKafkaVo
-			.builder()
-			.target(mockTargets)
-			.build();
+		
+		long size = mockTargets.stream().filter(a->a.startsWith("v")).count();
+		
+		
+		MsgFromKafkaVo mockVo = TestUtil.createMsgVoForSMS(DataBodys.bodyOfWithValidHeaderAndBody, TypeOfSending.MULTIPLE, mockTargets);
+
+		for(String mock : mockTargets) {
+			givenCondition(mock);
+
+		}
+		
+		mockVo =  validMng.validMultiUserInfo(mockVo);
+		long result = mockVo.getTarget().stream().filter(a->a.startsWith("v")).count();
+		
+		assertEquals(mockVo.getTarget().size(), size);
+		assertEquals(size, result);
+		System.out.println(mockVo);
+		
+	}
+	
+	private void givenCondition(String item) {
+		
 		
 		UserInfoOnPush resultOfQueryWithOk = Mockito.mock(UserInfoOnPush.class);
 		UserInfoOnPush resultOfQueryWithNo = Mockito.mock(UserInfoOnPush.class);
-	
-		validMng.validMultiUserInfo(vo);
 		
+		if(item.startsWith("i")) {
+			Mockito.when(mapper.getIfSendYnByUserNo(item)).thenReturn(resultOfQueryWithNo);
+			Mockito.when(resultOfQueryWithNo.validation()).thenReturn(true);
+			Mockito.when(resultOfQueryWithNo.getPushYn()).thenReturn(false);
+			
+		}else if(item.startsWith("n")){
+			
+			Mockito.when(mapper.getIfSendYnByUserNo(item)).thenReturn(resultOfQueryWithNo);
+			Mockito.when(resultOfQueryWithNo.validation()).thenReturn(false);
+			Mockito.when(resultOfQueryWithNo.getPushYn()).thenReturn(false);
+			
+			
+		}else {
+			
+			Mockito.when(mapper.getIfSendYnByUserNo(item)).thenReturn(resultOfQueryWithOk);
+			Mockito.when(resultOfQueryWithOk.validation()).thenReturn(true);
+			Mockito.when(resultOfQueryWithOk.getPushYn()).thenReturn(true);
+			
+		}
 	}
+	
 }

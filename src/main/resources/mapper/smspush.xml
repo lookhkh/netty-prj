@@ -2,10 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.kafka.kafkanetty.client.handler.mapper.SmsPushMapper">
-    <select id="getIfSendYnByUserNo" resultType="Integer">
-        SELECT * from dual
-</select>
+<mapper namespace="com.kt.onnuipay.kafka.kafkanetty.client.handler.mapper.SmsPushMapper">
+    <select id="getIfSendYnByUserNo" resultType="com.kt.onnuipay.kafka.kafkanetty.client.handler.manager.vo.UserInfoOnPush">
+		select * from usert limit 1
+	</select>
 
 
 </mapper>

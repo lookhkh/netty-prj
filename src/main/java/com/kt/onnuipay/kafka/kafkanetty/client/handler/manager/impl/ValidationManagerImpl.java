@@ -55,7 +55,7 @@ public class ValidationManagerImpl implements ValidationManager {
 		int numberOfsanitizedTarget = 0;
 		/**
 		 * TODO VO로부터 UserRegistration Tokens를 가져온 이후, 각각 밸리데이션 진행 후 실패한 리스트는 에러 처리
-		 * 아래는 Example code 220613 조현일
+		 * TODO 대량 메시지 발송 벨리데이션 시, 각각을 하나씩 처리하면 부하가 심하기 때문에, Batch로 처리하도록 로직 작성 필요 220616 조현일
 		 * **/
 		/* ------------------------------------------- */
 		List<String> list = vo.getTarget();
@@ -64,7 +64,7 @@ public class ValidationManagerImpl implements ValidationManager {
 		for(String userToken : list) {
 			try {
 				
-				validSingleUserInfo(userToken);
+				this.validSingleUserInfo(userToken);
 				sanitizedTargetList.add(userToken);
 				
 			}catch(UserNotAllowNotificationException | UserInfoInvalidException e){
@@ -75,6 +75,7 @@ public class ValidationManagerImpl implements ValidationManager {
 		
 		
 		log.warn("Original number of target lists -> {}, number of sanitizedTargetList -> {}",originNumberOfTargetLists, numberOfsanitizedTarget);
+		
 		vo.setTarget(sanitizedTargetList);
 		
 		
@@ -100,7 +101,7 @@ public class ValidationManagerImpl implements ValidationManager {
 									.reason( new UserInfoInvalidException("Validation Result -> invalid "+info, info))
 									.build());
 			
-			throw new UserInfoInvalidException("infomation of {} is invalid", info);
+			throw new UserInfoInvalidException("infomation is invalid "+info,info);
 		}
 		
 		if(!info.getPushYn()) {

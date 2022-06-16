@@ -15,6 +15,8 @@ import org.springframework.context.ApplicationContext;
  *  intended publication of such software.
  */
 
+import com.kt.onnuipay.kafka.kafkanetty.client.handler.mapper.SmsPushMapper;
+
 @SpringBootApplication
 public class KafkaNettyApplication {
 

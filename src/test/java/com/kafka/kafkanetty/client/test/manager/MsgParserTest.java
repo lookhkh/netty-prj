@@ -33,7 +33,7 @@ public class MsgParserTest {
 	ObjectMapper mapper = new ObjectMapper();
 	List<DataBody> bodyOfMultiplePush = DataBodys.bodyOfWithValidHeaderAndBody;
 	
-	KafkaMsgParser parser = new KafkaMsgParserImpl(mapper);
+	KafkaMsgParser parser = new KafkaMsgParserImpl();
 
 	
 	
@@ -166,8 +166,8 @@ public class MsgParserTest {
 				.kind(TypeOfSending.SINGLE)
 				.build();
 		
-		String value = mapper.writeValueAsString(test);
-		
+		String value = mapper.writeValueAsString(MsgFromKafkaAndroid.voForSinglePushWithValidDataBody);
+		System.out.println(value);
 		MsgFromKafkaVo convertedVoFromJsonString = parser.parse(value);
 		
 		assertAll(

@@ -18,16 +18,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class KafkaMsgParserImpl implements KafkaMsgParser {
 
-	private final ObjectMapper mapper;
+	private final ObjectMapper mapper =  new ObjectMapper();
 	
-	
-	
-	
-	
-	public KafkaMsgParserImpl(ObjectMapper mapper) {
-		this.mapper = new ObjectMapper();
-	}
-
 
 
 
