@@ -14,8 +14,13 @@ import com.kt.onnuipay.kafka.kafkanetty.kafka.model.push.IOSVo;
 
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 
+ * TEST를 위한 MOCK Manager
+ * 
+ * **/
+
 @Slf4j
-@Primary
 @Component
 public class TempTestSendPushManager extends PushManagerAbstract {
 
