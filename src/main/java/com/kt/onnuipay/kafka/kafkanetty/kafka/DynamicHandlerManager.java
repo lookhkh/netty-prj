@@ -80,6 +80,8 @@ public class DynamicHandlerManager {
 			}
 			
 			mongo.insertDbHistory(result);
+			
+			return result;
 
 			
 		} 
@@ -92,10 +94,11 @@ public class DynamicHandlerManager {
 									.success(false)
 									.reason(e.getCause())
 									.build());
+			
+			throw new RuntimeException("unknown error happend",e);
 
 			
 		}
-		return result;
 		
 		
 

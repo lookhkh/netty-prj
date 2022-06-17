@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import com.kt.onnuipay.client.handler.manager.ValidationManager;
@@ -36,7 +37,7 @@ import lombok.extern.slf4j.Slf4j;
  *  approval of kt corp, and the copyright notice above does not evidence any actual or
  *  intended publication of such software.
  */
-
+@Profile(value = {"default","local","prod"})
 @Service
 @AllArgsConstructor
 @Slf4j

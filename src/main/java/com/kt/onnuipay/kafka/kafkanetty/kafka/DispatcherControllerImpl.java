@@ -2,7 +2,6 @@ package com.kt.onnuipay.kafka.kafkanetty.kafka;
 
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.kt.onnuipay.kafka.kafkanetty.exception.DataBodyInvalidException;
 import com.kt.onnuipay.kafka.kafkanetty.exception.InvalidMsgFormatException;
 import com.kt.onnuipay.kafka.kafkanetty.exception.JsonDataProcessingWrapperException;
@@ -66,7 +65,6 @@ public class DispatcherControllerImpl implements DispatcherController{
 					.reason(e)
 					.build();
 			
-			log.info("result is => {}",result);
 			return result;
 
 		}catch(JsonDataProcessingWrapperException | InvalidMsgFormatException e) {
@@ -79,11 +77,23 @@ public class DispatcherControllerImpl implements DispatcherController{
 					.reason(e)
 					.build();
 			
-			log.info("result is => {}",result);
 
 			return result;
 
 
+		}catch(Exception e) {
+			log.error("Unknown Error Happend ",e);
+			
+			result= ResultOfPush.builder()
+					.id("")
+					.vo(null)
+					.success(false)
+					.reason(e)
+					.build();
+			
+
+			return result;
+			
 		}
 	
 

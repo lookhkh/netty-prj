@@ -1,6 +1,7 @@
 package com.kt.onnuipay.kafka.kafkanetty.client.handler.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.springframework.context.annotation.Profile;
 
 import com.kt.onnuipay.kafka.kafkanetty.client.handler.manager.vo.UserInfoOnPush;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
@@ -19,6 +20,7 @@ import com.kt.onnuipay.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
  */
 
 @Mapper
+@Profile(value={"default","local","prod"})
 public interface SmsPushMapper {
 
 	/**

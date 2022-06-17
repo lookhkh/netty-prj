@@ -3,9 +3,12 @@ package util;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.stream.Collectors;
 
 import org.mockito.Mockito;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.kt.onnuipay.client.handler.manager.SendManager;
 import com.kt.onnuipay.client.handler.manager.SendPushManager;
@@ -32,7 +35,7 @@ import com.kt.onnuipay.kafka.kafkanetty.kafka.parser.KafkaMsgParser;
 public class TestUtil {
 
 
-
+	
 	
 	/***************                 Test VO                   ***********/
 	
@@ -109,6 +112,42 @@ public class TestUtil {
 	public static KafkaMsgParser parser = Mockito.mock(KafkaMsgParser.class);
 	public static ExecutorService serviceMock = Mockito.mock(ExecutorService.class);
 	public static AckMessageListener listener = new AckMessageListener(new DispatcherControllerImpl(parser, m),serviceMock);
+
+
+	
+	public static List<String> getDatas(){
+		ObjectMapper ob = new ObjectMapper();
+
+		List<MsgFromKafkaVo> vo = Arrays.asList(
+				MsgFromKafkaAndroid.voForAndroidWithInvalidHeaderAndInvalidBody,
+				MsgFromKafkaAndroid.voForMultiplePushWithValidDataBody,
+				MsgFromKafkaAndroid.voForSinglePushWithInvalidHeader,
+				MsgFromKafkaAndroid.voForSinglePushWithValidDataBody,
+				MsgFromKafkaIOS.voForIOSWithInvalidHeaderAndInvalidBody,
+				MsgFromKafkaIOS.voForMultiplePushWithValidDataBody,
+				MsgFromKafkaIOS.voForSinglePushWithInvalidBody,
+				MsgFromKafkaIOS.voForSinglePushWithInvalidHeader,
+				MsgFromKafkaIOS.voForSinglePushWithValidDataBody,
+				MsgFromKafkaSmss.voForMultipleSMSWithInValidDataBodyWithInvalidBody,
+				MsgFromKafkaSmss.voForMultipleSMSWithInValidDataBodyWithInvalidHeader,
+				MsgFromKafkaSmss.voForMultipleSMSWithValidDataBody,
+				MsgFromKafkaSmss.voForSingleSMSWithInValidDataBodyIwthInValidHeader,
+				MsgFromKafkaSmss.voForSingleSMSWithInvalidHeaderAndInvalidBody,
+				MsgFromKafkaSmss.voForSingleSmsWithValidDataBody
+				);
+		
+		return vo.stream().map(item -> {
+			try {
+				String data =  ob.writeValueAsString(vo);
+				return data;
+			} catch (JsonProcessingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return null;
+			}
+		}).filter(a->a!=null).collect(Collectors.toList());
+		
+	}
 
 
 }

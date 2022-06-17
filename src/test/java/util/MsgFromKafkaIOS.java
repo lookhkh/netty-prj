@@ -16,6 +16,6 @@ public class MsgFromKafkaIOS {
 	
 	public static MsgFromKafkaVo voForIOSWithInvalidHeaderAndInvalidBody =  TestUtil.createMsgVoForIOS(DataBodys.bodyOfInvalidHeaderAndInValidBody,TypeOfSending.SINGLE, Options.target );
 			
-	public static MsgFromKafkaVo voForSinglePushWithValidDataBody = TestUtil.createMsgVoForIOS(DataBodys.bodyOfWithValidHeaderAndBody, TypeOfSending.SINGLE, Options.targets);
+	public static MsgFromKafkaVo voForSinglePushWithValidDataBody = TestUtil.createMsgVoForIOS(DataBodys.bodyOfWithValidHeaderAndBody, TypeOfSending.SINGLE, Options.target);
 	
 }

@@ -20,8 +20,6 @@ import org.springframework.context.ApplicationContext;
  */
 import org.springframework.context.annotation.Bean;
 
-import com.kt.onnuipay.kafka.kafkanetty.client.handler.mapper.SmsPushMapper;
-
 @SpringBootApplication
 public class KafkaNettyApplication {
 

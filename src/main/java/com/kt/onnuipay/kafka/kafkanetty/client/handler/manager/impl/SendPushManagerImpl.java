@@ -33,8 +33,7 @@ import com.kt.onnuipay.kafka.kafkanetty.kafka.model.push.MobileAbstractVo;
  *  approval of kt corp, and the copyright notice above does not evidence any actual or
  *  intended publication of such software.
  */
-
-@Primary
+@Profile(value= {"default", "local","prod"})
 @Component
 public class SendPushManagerImpl extends PushManagerAbstract {
 
