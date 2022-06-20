@@ -2,22 +2,20 @@ package com.kafka.kafkanetty.client.test.manager;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
-import org.assertj.core.internal.bytebuddy.asm.Advice.Thrown;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Mockito;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kt.onnuipay.kafka.kafkanetty.exception.DataBodyInvalidException;
+import com.google.api.gax.rpc.OutOfRangeException;
 import com.kt.onnuipay.kafka.kafkanetty.exception.JsonDataProcessingWrapperException;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.DataBody;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
@@ -29,7 +27,6 @@ import com.kt.onnuipay.kafka.kafkanetty.kafka.parser.KafkaMsgParserImpl;
 
 import util.DataBodys;
 import util.MsgFromKafkaAndroid;
-import util.TestUtil;
 
 @DisplayName("메세지 파서 테스트")
 public class MsgParserTest {
@@ -39,106 +36,10 @@ public class MsgParserTest {
 	
 	KafkaMsgParser parser = new KafkaMsgParserImpl();
 
-	
-	
-	@Test
-	@DisplayName("SMS, 제목 30bytes 미만, 내용 2000 미만일 경우, 성공적으로 파싱된다.")
-	public void test() throws JsonProcessingException {
-		
-		Map<Boolean, List<DataBody>> result = extracted(KafkaKeyEnum.SMS,DataBody.builder().title("title").body("body").build());
-		
-		assertEquals(result.get(true).size(), 1);
-
-	}
-
+	MsgFromKafkaVo vo = MsgFromKafkaAndroid.voForSinglePushWithValidDataBody;
 	
 	@Test
-	@DisplayName("SMS, 제목 30bytes 미만, 내용 200 이상일 경우, 성공적으로 파싱된다.")
-	public void test1_1() throws JsonProcessingException {
-
-
-		Map<Boolean, List<DataBody>> result = extracted(KafkaKeyEnum.SMS,DataBody.builder().title("title").body("body".repeat(55)).build());
-		
-		assertEquals(result.get(true).size(), 1);
-
-	}
-	
-	@Test
-	@DisplayName("SMS, 제목 30bytes 이상일 경우, 내용 2000 미만일 경우, 파싱에 실패한다.")
-	public void test3() throws JsonProcessingException {
-
-		assertThrows(DataBodyInvalidException.class, ()-> extracted(KafkaKeyEnum.SMS, DataBody.builder().title("title is too long for the limit of 20bytes").body("body").build()));
-
-	}
-	
-	@Test
-	@DisplayName("SMS, 제목 30bytes 미만일 경우, 내용 2000 이상일 경우, 파싱에 실패한다.")
-	public void test2() throws JsonProcessingException {
-		String tooLongBody = "abc".repeat(2000);
-
-
-		assertThrows(DataBodyInvalidException.class, ()->extracted(KafkaKeyEnum.SMS, DataBody.builder().title("title").body(tooLongBody).build()));
-
-
-	}
-	
-	@Test
-	@DisplayName("PUSH, 제목 30bytes 미만일 경우, 내용 200미만일 경우 파싱에 성공한다.")
-	public void test4() throws JsonProcessingException {
-
-		
-		Map<Boolean, List<DataBody>> result = extracted(KafkaKeyEnum.ANDROID,DataBody.builder().title("title").body("body").build());
-		
-		assertEquals(result.get(true).size(), 1);
-
-	}
-	
-	@Test
-	@DisplayName("PUSH, 제목 30bytes 미만일 경우, 내용 200이상일 경우 파싱에 실패한다.")
-	public void test4_1() throws JsonProcessingException {
-
-		System.out.println("body".repeat(50).getBytes().length);
-		
-
-		
-		assertThrows(DataBodyInvalidException.class, ()->extracted(KafkaKeyEnum.ANDROID,DataBody.builder().title("title").body("body".repeat(55)).build()));
-
-	
-	}
-	
-	@Test
-	@DisplayName("PUSH, 제목 30bytes 미만일 경우, 내용 200 bytes미만일 경우, 토큰의 수가 500 초과이면 파싱에 실패한다.")
-	public void test4_2() throws JsonProcessingException {
-
-		List<String> tokens = new ArrayList<>();
-		
-		for(int i=0; i<502; i++) {
-			tokens.add(String.valueOf(i));
-		}
-		
-		System.out.println("body".repeat(50).getBytes().length);
-		assertTrue(tokens.size()> 500 );
-		
-		
-		MsgFromKafkaVo vo = MsgFromKafkaVo.builder()
-								.sender("123abc")
-								.actionUrl("www.log.com")
-								.isScheduled(false)
-								.key(KafkaKeyEnum.ANDROID)
-								.timeOfDelievery("2022-06-06 22:05:44")
-								.payload(bodyOfMultiplePush)
-								.target(tokens)
-								.type(MsgType.APP_PUSH)
-								.build();
-		assertThrows(DataBodyInvalidException.class, ()->vo.validateDataBodys());
-		
-		
-		//assertEquals(result.get(false).get(0).getBody(), "body");
-
-	}
-	
-	@Test
-	@DisplayName("parser에 잘못된 형식의 데이터를 집어넣을 경우 IllegalArgumentException이 터진다.")
+	@DisplayName("parser에 잘못된 형식의 데이터를 집어넣을 경우 JsonDataProcessingWrapperException이 터진다.")
 	public void test52() {
 		assertThrows(JsonDataProcessingWrapperException.class, () -> parser.parse("hi"));
 	}
@@ -147,48 +48,39 @@ public class MsgParserTest {
 	@DisplayName("올바른 JSON String이 들어온 경우, 파싱에 성공하며, MsgFromKafka VO를 반환한다.")
 	public void test53() throws JsonProcessingException  {
 		
-		MsgFromKafkaVo test = MsgFromKafkaVo.builder()
-				.sender("123abc")
-				.actionUrl("www.log.com")
-				.isScheduled(false)
-				.key(KafkaKeyEnum.ANDROID)
-				.timeOfDelievery("2022-06-06")
-				.payload(bodyOfMultiplePush)
-				.target(Arrays.asList("hi"))
-				.type(MsgType.APP_PUSH)
-				
-				.kind(TypeOfSending.SINGLE)
-				.build();
 		
-		String value = mapper.writeValueAsString(test);
+		
+		String value = mapper.writeValueAsString(vo);
 		System.out.println(value);
 		MsgFromKafkaVo convertedVoFromJsonString = parser.parse(value);
 		
 		assertAll(
-				()->assertEquals(convertedVoFromJsonString.getActionUrl(), test.getActionUrl()),
-				()->assertEquals(convertedVoFromJsonString.getCodeOfType(), test.getCodeOfType()),
-				()->assertEquals(convertedVoFromJsonString.getSender(), test.getSender()),
-				()->assertEquals(convertedVoFromJsonString.getTimeOfDelievery(), test.getTimeOfDelievery()),
-				()->assertEquals(convertedVoFromJsonString.getTypeValue(), test.getTypeValue())
+				()->assertEquals(convertedVoFromJsonString.getActionUrl(), vo.getActionUrl()),
+				()->assertEquals(convertedVoFromJsonString.getCodeOfType(), vo.getCodeOfType()),
+				()->assertEquals(convertedVoFromJsonString.getSender(), vo.getSender()),
+				()->assertEquals(convertedVoFromJsonString.getTimeOfDelievery(), vo.getTimeOfDelievery()),
+				()->assertEquals(convertedVoFromJsonString.getTypeValue(), vo.getTypeValue())
 				);
 		
 		
 	}
 	
-	private Map<Boolean, List<DataBody>> extracted(KafkaKeyEnum key, DataBody b) {
-		MsgFromKafkaVo vo = MsgFromKafkaVo.builder()
-								.sender("123abc")
-								.actionUrl("www.log.com")
-								.isScheduled(false)
-								.key(key)
-								.timeOfDelievery("2022-06-06")
-								.payload(Arrays.asList(b))
-								.target(Arrays.asList("abc"))
-								.type(MsgType.APP_PUSH)
-								.build();
-		Map<Boolean, List<DataBody>> result =  vo.validateDataBodys();
-		return result;
+	@SuppressWarnings("unchecked")
+	@Test
+	@DisplayName("파서에서 어떤 예상치 못한 에러가 터져도, RuntimeException으로 래핑하여 위로 던진다.")
+	public void test3() throws JsonProcessingException {
+		ObjectMapper mockingMapper = Mockito.mock(ObjectMapper.class);
+		KafkaMsgParser parserWithMocking = new KafkaMsgParserImpl();
+		parserWithMocking.setObjectMapper(mockingMapper);
+		
+		String value = mapper.writeValueAsString(vo);
+
+		
+		Mockito.when(parserWithMocking.parse(value)).thenThrow(IllegalArgumentException.class, NullPointerException.class, IndexOutOfBoundsException.class);
+		assertThrows(RuntimeException.class, ()-> parserWithMocking.parse(ArgumentMatchers.anyString()));
+
 	}
+	
 	
 	
 	

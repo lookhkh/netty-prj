@@ -14,51 +14,49 @@ import com.kt.onnuipay.kafka.kafkanetty.kafka.model.DataBody;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
 
 import lombok.AllArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
 public class KafkaMsgParserImpl implements KafkaMsgParser {
 
-	private final ObjectMapper mapper =  new ObjectMapper();
+	private ObjectMapper mapper = new ObjectMapper();
 	
-
-
-
-
+	
 		@Override
 		public MsgFromKafkaVo parse(String msg)   {
 		
-		MsgFromKafkaVo convertedValue = null;
-		
-		try {
-			convertedValue = mapper.readValue(msg, MsgFromKafkaVo.class);
+		log.info("MsgParser Recived {}",msg);
 			
-		} catch (JacksonException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new JsonDataProcessingWrapperException("Message Json Parsing error",e);
-		} 
+		return tryConvertMsgOrThrow(msg); 
 		
-		
-			Map<Boolean, List<DataBody>> result = convertedValue.validateDataBodys();
-			
-			
-			result.getOrDefault(false, Arrays.asList())
-				.stream()
-				.forEach(data -> log.warn("MalFormed Msg Type {}",data));
-			/**
-			 * TODO MalFormed Msg 데이터 HIST에 저장하는 로직 추가 220614 조현일
-			 * 
-			 * **/
-			
-			convertedValue.setPayload(result.getOrDefault(true, Arrays.asList()));
-			
-			return convertedValue; 
-			
-		
-		
-		
+
 		}
+		
+		@Override
+		public void setObjectMapper(ObjectMapper mapper) {
+			this.mapper = mapper;
+		}
+
+
+		private MsgFromKafkaVo tryConvertMsgOrThrow(String msg) {
+			
+			MsgFromKafkaVo convertedValue = null;
+			
+			try {
+				convertedValue = mapper.readValue(msg, MsgFromKafkaVo.class);
+				
+			} catch (JacksonException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				throw new JsonDataProcessingWrapperException("Message Json Parsing error",e);
+			} catch(Exception e) {
+				throw new RuntimeException("Unknown Error Happend originMsgIs=> "+msg,e);
+			}
+			return convertedValue;
+		}
+		
+		
 
 }

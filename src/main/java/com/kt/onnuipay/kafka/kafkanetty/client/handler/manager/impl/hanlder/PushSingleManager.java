@@ -6,11 +6,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.kt.onnuipay.client.handler.manager.SendManager;
 import com.kt.onnuipay.client.handler.manager.SendPushManager;
-import com.kt.onnuipay.client.handler.manager.ValidationManager;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.ResultOfPush;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.push.AndroidVo;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.push.IOSVo;
 
 import lombok.AllArgsConstructor;
 import lombok.Setter;
@@ -43,14 +40,10 @@ public class PushSingleManager implements SendManager {
 	
 	private final FirebaseMessaging instance;
 	private final SendPushManager manager;
-	private final ValidationManager validMng;
 
 	@Override
-	@Transactional
 	public ResultOfPush send(MsgFromKafkaVo vo) {
 		log.info("PushSingleSendManager received {}",vo);
-
-		validMng.validSingleUserInfo(vo.getTarget().get(0));
 				
 		return manager.execute(instance,vo);
 

@@ -1,9 +1,13 @@
 package com.kt.onnuipay.kafka.kafkanetty.kafka;
 
+import java.sql.SQLException;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.kt.onnuipay.client.handler.manager.SendManager;
+import com.kt.onnuipay.kafka.kafkanetty.exception.RunTimeExceptionWrapper;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.ResultOfPush;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.mongo.TempMongodbTemplate;
@@ -39,70 +43,62 @@ public class DynamicHandlerManager {
 	@Qualifier(value = "push-multiple-manager")
 	private final SendManager pushMultipleSend;
 	
-	TempMongodbTemplate mongo;
 	
 	
 	public DynamicHandlerManager(
 			@Qualifier(value = "sms-single-manager") SendManager smsSingleMng, 
 			@Qualifier(value = "sms-multiple-manager") SendManager smsMultipleMng,	
 			@Qualifier(value = "push-single-manager") SendManager pushSingleSend,
-			@Qualifier(value = "push-multiple-manager") SendManager pushMultipleSend, 
-			TempMongodbTemplate mongo) {
+			@Qualifier(value = "push-multiple-manager") SendManager pushMultipleSend) {
 		this.smsSingleMng = smsSingleMng;
 		this.smsMultipleMng = smsMultipleMng;
 		this.pushSingleSend = pushSingleSend;
 		this.pushMultipleSend = pushMultipleSend;
-		this.mongo = mongo;
 	}
 
 	
 	
 	public ResultOfPush consume(MsgFromKafkaVo vo) {
 		
-		ResultOfPush result = null;
-		
+		log.info("DynamicHanlder recived {}",vo);
+				
 		try {
-		
-			if(vo.getCodeOfType() ==0 && vo.getTypeValue() == 2) { //단건 
-				result = smsSingleMng.send(vo);
-			}
-			
-			if(vo.getCodeOfType() ==1 && vo.getTypeValue() == 2) { //대량 SMS
-				result = smsMultipleMng.send(vo);
-			}
-			
-			if(vo.getCodeOfType() ==0 && vo.getTypeValue() != 2) { //단건 PUSH, 스켈레톤 구상 완료
-				result = pushSingleSend.send(vo);
-			}
-			
-			if(vo.getCodeOfType() ==1 && vo.getTypeValue() != 2) { //대량 PUSH
-				result = pushMultipleSend.send(vo);
-			}
-			
-			mongo.insertDbHistory(result);
-			
-			return result;
-
-			
-		} 
-		
-		catch(Exception e) {
-			
-			log.info("{}, unknown error happend",e.getMessage(),e);
-			
-			mongo.insertDbHistory(ResultOfPush.builder()
-									.success(false)
-									.reason(e.getCause())
-									.build());
-			
-			throw new RuntimeException("unknown error happend",e);
+					
+			return getInstance(vo).send(vo);
 
 			
 		}
-		
-		
 
+		catch(Exception e) {
+			
+			log.error("{}, unknown error happend == recivedVo => ",e.getMessage(),vo,e);
+
+			throw new RunTimeExceptionWrapper("unknown error happend",vo,e);
+
+		}
+	}
+
+	
+	
+	private SendManager getInstance(MsgFromKafkaVo vo) {
+		if(vo.getCodeOfType() ==0 && vo.getTypeValue() == 2) { //단건 
+			return smsSingleMng;
+		}
 		
+		if(vo.getCodeOfType() ==1 && vo.getTypeValue() == 2) { //대량 SMS
+			return smsMultipleMng;
+		}
+		
+		if(vo.getCodeOfType() ==0 && vo.getTypeValue() != 2) { //단건 PUSH, 스켈레톤 구상 완료
+			return pushSingleSend;
+		}
+		
+		if(vo.getCodeOfType() ==1 && vo.getTypeValue() != 2) { //대량 PUSH
+			return pushMultipleSend;
+		}
+		
+		throw new IllegalArgumentException("해당하는 SendManager 객체를 찾을 수 없다 => "+vo);
+					
 	}
 
 	

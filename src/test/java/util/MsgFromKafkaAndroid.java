@@ -11,12 +11,12 @@ import com.kt.onnuipay.kafka.kafkanetty.kafka.model.enums.TypeOfSending;
 
 public class MsgFromKafkaAndroid {
 
-	public static MsgFromKafkaVo voForMultiplePushWithValidDataBody = TestUtil.createMsgVo(KafkaKeyEnum.ANDROID , DataBodys.bodyOfWithValidHeaderAndBody, MsgType.APP_PUSH, TypeOfSending.MULTIPLE, Options.targets);
+	public static MsgFromKafkaVo voForMultiplePushWithValidDataBody = TestUtil.createMsgVoForMultiAndroid(DataBodys.bodyOfWithValidHeaderAndBody);
 	
-	public static MsgFromKafkaVo voForSinglePushWithInvalidHeader =  TestUtil.createMsgVoForAndroid(DataBodys.bodyOfInvalidHeaderAndValidBody, TypeOfSending.SINGLE, Options.target);
+	public static MsgFromKafkaVo voForSinglePushWithInvalidHeader =  TestUtil.createMsgVoForSingleAndroid(DataBodys.bodyOfInvalidHeaderAndValidBody);
 	
-	public static MsgFromKafkaVo voForAndroidWithInvalidHeaderAndInvalidBody = TestUtil.createMsgVoForAndroid(DataBodys.bodyOfInvalidHeaderAndInValidBody, TypeOfSending.SINGLE, Options.target ) ;
+	public static MsgFromKafkaVo voForAndroidWithInvalidHeaderAndInvalidBody = TestUtil.createMsgVoForSingleAndroid(DataBodys.bodyOfInvalidHeaderAndInValidBody) ;
 	
-	public static MsgFromKafkaVo voForSinglePushWithValidDataBody = TestUtil.createMsgVoForAndroid( DataBodys.bodyOfWithValidHeaderAndBody, TypeOfSending.SINGLE, Options.target );
+	public static MsgFromKafkaVo voForSinglePushWithValidDataBody = TestUtil.createMsgVoForSingleAndroid( DataBodys.bodyOfWithValidHeaderAndBody);
 }
 //strong

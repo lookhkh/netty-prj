@@ -1,19 +1,12 @@
 package com.kafka.kafkanetty.client.test.manager;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.kt.onnuipay.client.handler.manager.SendManager;
-import com.kt.onnuipay.client.handler.manager.ValidationManager;
-import com.kt.onnuipay.kafka.kafkanetty.client.handler.manager.vo.UserInfoOnPush;
 import com.kt.onnuipay.kafka.kafkanetty.client.handler.mapper.SmsPushMapper;
-import com.kt.onnuipay.kafka.kafkanetty.exception.UserInfoInvalidException;
-import com.kt.onnuipay.kafka.kafkanetty.exception.UserNotAllowNotificationException;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
 
 import util.MsgFromKafkaAndroid;
@@ -36,7 +29,6 @@ public class PushHandlerTest {
 	FirebaseMessaging instance = TestUtil.instance;
 	SmsPushMapper mapper = TestUtil.mapper;
 	
-	ValidationManager validMng = TestUtil.validMngSpy;
 
 	SendManager mng = TestUtil.pushSingle;
 	
@@ -48,9 +40,7 @@ public class PushHandlerTest {
 	
 	MsgFromKafkaVo voForSingleSMS = MsgFromKafkaSmss.voForSingleSmsWithValidDataBody;
 	
-	UserInfoOnPush userInfoOnPushWithYesForNotification = TestUtil.userInfoOnPushWithYes;
 
-	UserInfoOnPush userInfoOnPushWithNoForNotification = TestUtil.userInfoOnPushWithNo;
 
 	
 	@AfterEach

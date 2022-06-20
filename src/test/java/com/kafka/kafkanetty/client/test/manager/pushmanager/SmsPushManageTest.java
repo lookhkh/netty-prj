@@ -2,7 +2,6 @@ package com.kafka.kafkanetty.client.test.manager.pushmanager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,7 +12,6 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.kt.onnuipay.client.handler.manager.SendManager;
 import com.kt.onnuipay.client.handler.manager.SendPushManager;
 import com.kt.onnuipay.kafka.kafkanetty.client.handler.manager.impl.SendPushManagerImpl;
-import com.kt.onnuipay.kafka.kafkanetty.client.handler.manager.vo.UserInfoOnPush;
 import com.kt.onnuipay.kafka.kafkanetty.client.handler.mapper.SmsPushMapper;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.DataBody;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
@@ -28,7 +26,6 @@ import util.MsgFromKafkaAndroid;
 import util.MsgFromKafkaIOS;
 import util.MsgFromKafkaSmss;
 import util.TestUtil;
-import util.UserInfos;
 
 /**
  * @implNote com.kafka.kafkanetty.client.handler.manager.SendPushManager 테스트 케이스 모음 <br>
@@ -57,9 +54,7 @@ public class SmsPushManageTest {
 	AndroidVo androidVoMock = AndroidVos.androidVoMock;
 	IOSVo iosVoMock = IOSVos.iosVoMock;
 	
-	UserInfoOnPush userInfoOnPushWithYesForNotification = UserInfos.userInfoOnPushWithYes;
 
-	UserInfoOnPush userInfoOnPushWithNoForNotification = UserInfos.userInfoOnPushWithNo;
 
 	@AfterEach
 	public void cleanUp() {

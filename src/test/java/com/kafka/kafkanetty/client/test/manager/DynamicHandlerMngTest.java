@@ -1,16 +1,26 @@
 package com.kafka.kafkanetty.client.test.manager;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
 
+import java.net.UnknownHostException;
+
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
+import com.google.firebase.FirebaseException;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.kt.onnuipay.client.handler.manager.SendManager;
-import com.kt.onnuipay.kafka.kafkanetty.client.handler.manager.vo.UserInfoOnPush;
 import com.kt.onnuipay.kafka.kafkanetty.client.handler.mapper.SmsPushMapper;
+import com.kt.onnuipay.kafka.kafkanetty.exception.RunTimeExceptionWrapper;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.DynamicHandlerManager;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.ResultOfPush;
@@ -20,20 +30,28 @@ import util.MsgFromKafkaAndroid;
 import util.MsgFromKafkaSmss;
 import util.TestUtil;
 
+/**
+ * 1. MSG 타입 및 종류(안드로이드? IOS? SMS? / 단건 발송? 멀티발송?)에 따라, 해당하는 핸들러로 메시지를 라우팅한다.
+ * 2. 하위 개체들이 핸들링하지 못한 에러가 발생한 경우, 에러를 RuntimeException으로 Wrapping한 이후, dispatchController에서 처리하도록 한다.
+ * 3. 결과를 DispatchController로 반환한다.
+ * 
+ * 
+ * **/
+
 @DisplayName("MSG 타입(SMS, PUSH), 종류(대량, 단건)에 따라 목적으로 하는 객체가 Invoked 하는지")
 public class DynamicHandlerMngTest {
 	
-	FirebaseMessaging instance = TestUtil.instance;
-	SmsPushMapper mapper = TestUtil.mapper;
-
-	SendManager smsSingle = TestUtil.smsSingle;
-	SendManager smsMulti = TestUtil.smsMulti;
-	SendManager pushSingle = TestUtil.pushSingle;
-	SendManager pushMulti = TestUtil.pushMulti;
-	TempMongodbTemplate mongo = TestUtil.mongo;
+	FirebaseMessaging mockFirebaseInstance = TestUtil.instance;
+	SmsPushMapper mockForMapper = TestUtil.mapper;
 	
-
-	DynamicHandlerManager manager =  new DynamicHandlerManager(smsSingle, smsMulti, pushSingle, pushMulti,mongo);
+	SendManager smsSingle = Mockito.mock(TestUtil.smsSingle.getClass());
+	SendManager smsMulti = Mockito.mock(TestUtil.smsMulti.getClass());
+	SendManager pushSingle = Mockito.mock(TestUtil.pushSingle.getClass());
+	SendManager pushMulti = Mockito.mock(TestUtil.pushMulti.getClass());
+	TempMongodbTemplate mongo = Mockito.mock(TestUtil.mockingMongo.getClass());
+	
+	
+	DynamicHandlerManager manager;
 	
 	MsgFromKafkaVo voForMultipleSMS = MsgFromKafkaSmss.voForMultipleSMSWithValidDataBody;
 	
@@ -43,36 +61,40 @@ public class DynamicHandlerMngTest {
 	
 	MsgFromKafkaVo voForSingleAndroidPush =  MsgFromKafkaAndroid.voForSinglePushWithValidDataBody;
 	
-	
-	
-	UserInfoOnPush userInfoOnPush = TestUtil.userInfoOnPushWithYes;
-	UserInfoOnPush userInfoOnPushWithNo = TestUtil.userInfoOnPushWithNo;
+	ResultOfPush successResult = TestUtil.createSuccessResultOfPushGivenVo(voForSingleAndroidPush,true);
+	ResultOfPush failResult = TestUtil.createFailResultOfPushGivenVo(voForSingleAndroidPush,true, new RuntimeException());
 
-	@AfterEach
+
+	@BeforeEach
 	public void cleanUp() {
-		Mockito.reset(mapper);
 
-		Mockito.reset(mongo);
+		
+		TestUtil.resetMockingObj(
+				this.mockForMapper, 
+				this.mockFirebaseInstance, 
+				this.mongo, 
+				this.smsSingle,
+				this.smsMulti,
+				this.pushSingle,
+				this.pushMulti
+				);
+
+		this.manager =  new DynamicHandlerManager(smsSingle, smsMulti, pushSingle, pushMulti);
 	}
 	
 	@Test
 	@DisplayName("SMS 대량 발송 테스트")
 	public void test() {
-	
 		checkIfSendInvokedAccordingToTheTypeOfVo(manager, voForMultipleSMS, smsMulti);
-		
-	
 	}
 
-
-	
 	@Test
 	@DisplayName("SMS 단건 발송 테스트")
 	public void test1() {
 	
 		
 		checkIfSendInvokedAccordingToTheTypeOfVo(manager, voForSingleSMS, smsSingle);		
-	
+
 	}
 	
 	@Test
@@ -88,59 +110,50 @@ public class DynamicHandlerMngTest {
 	@DisplayName("Android PUSH 단건 발송 테스트")
 	public void test3() {
 		
-		seeIfSendManagerInVokedWhenPassedValidVo(manager, voForSingleAndroidPush,pushSingle,mapper,userInfoOnPush);
+		checkIfSendInvokedAccordingToTheTypeOfVo(manager, voForSingleAndroidPush,pushSingle);
 
 	}
-
-	
 	
 	@Test
-	@DisplayName("요청받은 USER가 Notification을 수신하지 않는 경우 UserNotAllowNotificationException 에러와 함께 해당 메시지 이력을 몽고DB에 저장한다.")
+	@DisplayName("dynamicmanager는 senderManager이 반환한 result를 그대로 반환한다.")
 	public void test4() {
 		
+		Mockito.when(pushSingle.send(voForSingleAndroidPush)).thenReturn(successResult);
+		ResultOfPush p =  manager.consume(voForSingleAndroidPush);
 		
-		seeIfUserNotAllowToGetNotified(manager, voForSingleAndroidPush, pushSingle, mapper, mongo, userInfoOnPushWithNo);
+		assertNotNull(p);
+		assertTrue(p.isSuccess());
+		assertEquals(successResult, p);
 	}
-
-	
 	
 	@Test
-	@DisplayName("DB에서 불러온 유저정보가 Invalid 한 경우, UserInfoInvalidException 에러와 함께 해당 메시지 이력을 몽고DB에 저장한다.")
-	public void test5() {
+	@DisplayName("dynamicmanager는 senderManager에서 에러가 발생할 시, 에러 정보를 담은 fail Result를 반환한다.")
+	public void test4_1() {
 		
+		Mockito.when(pushSingle.send(voForSingleAndroidPush)).thenReturn(TestUtil.createFailResultOfPushGivenVo(voForMultipleAndroidPush, false, new Exception()));
+		ResultOfPush p =  manager.consume(voForSingleAndroidPush);
 		
-		
-		UserInfoOnPush mock =  Mockito.mock(UserInfoOnPush.class);
-		
-		Mockito.when(mock.validation()).thenReturn(false);
-
-		seeIfUserNotAllowToGetNotified(manager, voForSingleAndroidPush, pushSingle, mapper, mongo,mock);
-
-
-
+		assertNotNull(p);
+		assertFalse(p.isSuccess());
+		assertTrue(p.getReason() instanceof Exception);
 	}
 	
-	
-
+	@Test
+	@DisplayName("dynamicmanager는 senderManager에서 에러가 발생했는데, 해당 객체에서 핸들링하지 못한 경우, 에러를 RunTimeExceptionWrapper로 감싸서 위로 던진다")
+	public void test4_2() {
 		
-	private void seeIfUserNotAllowToGetNotified(DynamicHandlerManager manager, MsgFromKafkaVo vo, SendManager sendMng, SmsPushMapper mapper, TempMongodbTemplate mongo, UserInfoOnPush info) {
-		Mockito.when(mapper.getIfSendYnByUserNo(vo.getTarget().get(0))).thenReturn(info);
-		
-		ResultOfPush result =  manager.consume(vo);
-
-		Mockito.verify(mongo, times(1)).insertDbHistory(result);
+		Mockito.when(pushSingle.send(voForSingleAndroidPush)).thenThrow(IllegalArgumentException.class);
+		RunTimeExceptionWrapper t = assertThrows(RunTimeExceptionWrapper.class, ()->manager.consume(voForSingleAndroidPush));
+		assertEquals(voForSingleAndroidPush, t.getVo());
 	}
 	
+
+
 		
 	private void checkIfSendInvokedAccordingToTheTypeOfVo(DynamicHandlerManager manager, MsgFromKafkaVo vo, SendManager sendMng) {
 		manager.consume(vo);
 		Mockito.verify(sendMng, times(1)).send(vo);
 	}
 	
-	private void seeIfSendManagerInVokedWhenPassedValidVo(DynamicHandlerManager manager, MsgFromKafkaVo vo, SendManager sendMng, SmsPushMapper mapper, UserInfoOnPush push) {
-		Mockito.when(mapper.getIfSendYnByUserNo(vo.getTarget().get(0))).thenReturn(push);
-	
-		checkIfSendInvokedAccordingToTheTypeOfVo(manager,vo,sendMng);
-	}
 	
 }

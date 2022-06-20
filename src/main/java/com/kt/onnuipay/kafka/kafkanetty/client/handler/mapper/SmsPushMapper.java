@@ -3,9 +3,6 @@ package com.kt.onnuipay.kafka.kafkanetty.client.handler.mapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.context.annotation.Profile;
 
-import com.kt.onnuipay.kafka.kafkanetty.client.handler.manager.vo.UserInfoOnPush;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
-
 
 /*
  * KT OnnuriPay version 1.0
@@ -28,6 +25,5 @@ public interface SmsPushMapper {
 	 * @return 대상이 되는 유저가 APP 수신을 설정했는지 확인하기 위한 VO 객체
 	 * 
 	 * **/
-	UserInfoOnPush getIfSendYnByUserNo(String userToken);
 
 }

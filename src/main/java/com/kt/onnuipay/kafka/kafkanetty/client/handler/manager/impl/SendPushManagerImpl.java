@@ -138,8 +138,19 @@ public class SendPushManagerImpl extends PushManagerAbstract {
 					    .id(e.getMessage())
 					    .success(false)
 					    .vo(vo.getVo())
+					    .reason(e)
 					    .build();
 			
+		} catch(Exception e) {
+			
+			result = ResultOfPush.builder()
+				    .id(e.getMessage())
+				    .success(false)
+				    .vo(vo.getVo())
+				    .reason(e)
+				    .build();
+		
+		
 		}
 		
 		return result;

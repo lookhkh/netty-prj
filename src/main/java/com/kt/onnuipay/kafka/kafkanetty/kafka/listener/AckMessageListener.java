@@ -45,13 +45,8 @@ public class AckMessageListener  {
 
 	@KafkaListener(topics = "hello.kafka", groupId = "spring-boot", containerFactory = "kafkaListenerContainerFactory")
 	public void listen(@Payload String msg) {
-		log.warn("{} came from broker"+msg);
-		service.submit(new Callable<ResultOfPush>() {
-			@Override
-			public ResultOfPush call() throws Exception {
-				return dispatch.route(msg);
-			}
-		});
-		
+		log.info("{} came from broker"+msg);
+		service.submit(()->dispatch.route(msg));
+
 	}
 }
