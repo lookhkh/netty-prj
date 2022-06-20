@@ -34,7 +34,6 @@ public class KafkaMsgParserImpl implements KafkaMsgParser {
 
 		}
 		
-		@Override
 		public void setObjectMapper(ObjectMapper mapper) {
 			this.mapper = mapper;
 		}

@@ -41,5 +41,4 @@ public interface KafkaMsgParser {
 	 * @throws JsonDataProcessingWrapperException JSON Parsing 실패 시, RuntimeException을 extend 한 wrapper Error를 던진다
 	 */
 	public MsgFromKafkaVo parse(String msg) throws JsonDataProcessingWrapperException;
-	public void setObjectMapper(ObjectMapper mapper);
 }

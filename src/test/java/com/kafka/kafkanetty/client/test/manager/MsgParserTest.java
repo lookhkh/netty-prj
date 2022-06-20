@@ -70,7 +70,7 @@ public class MsgParserTest {
 	@DisplayName("파서에서 어떤 예상치 못한 에러가 터져도, RuntimeException으로 래핑하여 위로 던진다.")
 	public void test3() throws JsonProcessingException {
 		ObjectMapper mockingMapper = Mockito.mock(ObjectMapper.class);
-		KafkaMsgParser parserWithMocking = new KafkaMsgParserImpl();
+		KafkaMsgParserImpl parserWithMocking = new KafkaMsgParserImpl();
 		parserWithMocking.setObjectMapper(mockingMapper);
 		
 		String value = mapper.writeValueAsString(vo);
