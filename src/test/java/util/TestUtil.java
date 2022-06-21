@@ -20,12 +20,8 @@ import com.kt.onnuipay.kafka.kafkanetty.client.handler.mapper.SmsPushMapper;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.DispatcherControllerImpl;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.DynamicHandlerManager;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.listener.AckMessageListener;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.DataBody;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.ResultOfPush;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.enums.KafkaKeyEnum;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.enums.MsgType;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.enums.TypeOfSending;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.mongo.TempMongodbTemplate;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.parser.KafkaMsgParser;
 
@@ -42,67 +38,8 @@ public class TestUtil {
 		}
 	}
 
-	public static MsgFromKafkaVo createMsgVo(KafkaKeyEnum key, List<DataBody> databody, MsgType type, TypeOfSending sending, List<String> target) {
-		
-		return MsgFromKafkaVo.builder()
-				.key(key)
-				.payload(databody)
-				.type(type)
-				.kind(sending)
-				.actionUrl(Options.actionUrl)
-				.timeOfDelievery(Options.time)
-				.target(target)
-				.sender(Options.sender)
-				.build();
-	}
-	
-	public static MsgFromKafkaVo createMsgVoForSingleAndroid(
-			List<DataBody> dataBody) {
-
-		return createMsgVo(KafkaKeyEnum.ANDROID, dataBody, MsgType.APP_PUSH, TypeOfSending.SINGLE ,Options.target);
-	}
 	
 	
-	public static MsgFromKafkaVo createMsgVoForMultiAndroid(
-			List<DataBody> dataBody) {
-
-		return createMsgVo(KafkaKeyEnum.ANDROID, dataBody, MsgType.APP_PUSH, TypeOfSending.MULTIPLE, Options.targets);
-	}
-	
-	
-	
-	public static MsgFromKafkaVo createMsgVoForSingleIOS(
-			List<DataBody> dataBody) {
-
-		return createMsgVo(KafkaKeyEnum.IOS, dataBody, MsgType.APP_PUSH, TypeOfSending.SINGLE,Options.target);
-	}
-	
-	public static MsgFromKafkaVo createMsgVoForMultipleIOS(
-			List<DataBody> dataBody) {
-
-		return createMsgVo(KafkaKeyEnum.IOS, dataBody, MsgType.APP_PUSH,TypeOfSending.MULTIPLE ,Options.targets);
-	}
-	
-	
-	public static MsgFromKafkaVo createMsgVoForSingleSMS(
-			List<DataBody> dataBody) {
-
-		return createMsgVo(KafkaKeyEnum.SMS, dataBody, MsgType.SMS, TypeOfSending.SINGLE, Options.target);
-	}
-	
-
-	public static MsgFromKafkaVo createMsgVoForMultiSMS(
-			List<DataBody> dataBody) {
-
-		return createMsgVo(KafkaKeyEnum.SMS, dataBody, MsgType.SMS, TypeOfSending.MULTIPLE, Options.targets);
-	}
-	
-	
-	
-
-
-	/***************                 Test VO                   ***********/
-
 	/***************                 Test Mock                   ***********/
 	public static FirebaseMessaging instance = Mockito.mock(FirebaseMessaging.class);
 	
@@ -137,22 +74,15 @@ public class TestUtil {
 	public static List<String> getDatas(){
 		ObjectMapper ob = new ObjectMapper();
 
-		List<MsgFromKafkaVo> vo = Arrays.asList(
-				MsgFromKafkaAndroid.voForAndroidWithInvalidHeaderAndInvalidBody,
-				MsgFromKafkaAndroid.voForMultiplePushWithValidDataBody,
-				MsgFromKafkaAndroid.voForSinglePushWithInvalidHeader,
+		List<?> vo = Arrays.asList(
+				MsgFromKafkaAndroid.voForMultiplePush,
 				MsgFromKafkaAndroid.voForSinglePushWithValidDataBody,
-				MsgFromKafkaIOS.voForIOSWithInvalidHeaderAndInvalidBody,
-				MsgFromKafkaIOS.voForMultiplePushWithValidDataBody,
-				MsgFromKafkaIOS.voForSinglePushWithInvalidBody,
-				MsgFromKafkaIOS.voForSinglePushWithInvalidHeader,
-				MsgFromKafkaIOS.voForSinglePushWithValidDataBody,
-				MsgFromKafkaSmss.voForMultipleSMSWithInValidDataBodyWithInvalidBody,
-				MsgFromKafkaSmss.voForMultipleSMSWithInValidDataBodyWithInvalidHeader,
-				MsgFromKafkaSmss.voForMultipleSMSWithValidDataBody,
-				MsgFromKafkaSmss.voForSingleSMSWithInValidDataBodyIwthInValidHeader,
-				MsgFromKafkaSmss.voForSingleSMSWithInvalidHeaderAndInvalidBody,
-				MsgFromKafkaSmss.voForSingleSmsWithValidDataBody
+				MsgFromKafkaIOS.voForMultipleIOSPush,
+				MsgFromKafkaIOS.voForSingleIOSPush,
+				MsgFromKafkaSmss.voForMultipleSMSWithLMSy,
+				MsgFromKafkaSmss.voForMultipleSMSWithSMS,
+				MsgFromKafkaSmss.voForSingleSmsWithLMS,
+				MsgFromKafkaSmss.voForSingleSmsWithSMS
 				);
 		
 		return vo.stream().map(item -> {

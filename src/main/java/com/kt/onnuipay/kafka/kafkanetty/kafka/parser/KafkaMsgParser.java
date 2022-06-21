@@ -5,6 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kt.onnuipay.kafka.kafkanetty.exception.JsonDataProcessingWrapperException;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
 
+import datavo.msg.MessageWrapper;
+import datavo.msg.MultiMessageWrapper;
+import datavo.msg.SingleMessageWrapper;
+
 
 /**
  * 
@@ -37,8 +41,12 @@ public interface KafkaMsgParser {
 	/**
 	 * 
 	 * @param msg Kafka Broker로부터 가져온 JSON String
-	 * @return MsgFromKafkaVo Parsing 결과 VO
-	 * @throws JsonDataProcessingWrapperException JSON Parsing 실패 시, RuntimeException을 extend 한 wrapper Error를 던진다
+	 * @return 
+	 * @return SingleMessageWrapper Parsing 결과 VO
+	 * @throws JsonDataProcessingWrapperException JSON Parsing 실패 시, RuntimeException을 extend 한 JsonDataProcessingWrapperException를 던진다
 	 */
-	public MsgFromKafkaVo parse(String msg) throws JsonDataProcessingWrapperException;
+	public <T> T parse(String msg, Class<T> target) throws JsonDataProcessingWrapperException;
+
+
+	
 }

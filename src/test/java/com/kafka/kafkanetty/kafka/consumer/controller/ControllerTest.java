@@ -27,6 +27,8 @@ import com.kt.onnuipay.kafka.kafkanetty.kafka.model.ResultOfPush;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.mongo.TempMongodbTemplate;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.parser.KafkaMsgParser;
 
+import datavo.msg.MultiMessageWrapper;
+import datavo.msg.SingleMessageWrapper;
 import util.MsgFromKafkaAndroid;
 import util.MsgFromKafkaIOS;
 import util.MsgFromKafkaSmss;
@@ -51,17 +53,19 @@ public class ControllerTest {
 	
 	
 	
-	MsgFromKafkaVo voForSingleAndroidPush =  MsgFromKafkaAndroid.voForSinglePushWithValidDataBody;
-	MsgFromKafkaVo voForMultipleAndroidPush =  MsgFromKafkaAndroid.voForMultiplePushWithValidDataBody;
+	SingleMessageWrapper voForSingleAndroidPush =  MsgFromKafkaAndroid.voForSinglePushWithValidDataBody;
+	MultiMessageWrapper voForMultipleAndroidPush =  MsgFromKafkaAndroid.voForMultiplePush;
 
 	
-	MsgFromKafkaVo voForSingleIOSPush =  MsgFromKafkaIOS.voForSinglePushWithValidDataBody;
-	MsgFromKafkaVo voForMultipleIOSPush =  MsgFromKafkaIOS.voForMultiplePushWithValidDataBody;
+	SingleMessageWrapper voForSingleIOSPush =  MsgFromKafkaIOS.voForSingleIOSPush;
+	MultiMessageWrapper voForMultipleIOSPush =  MsgFromKafkaIOS.voForMultipleIOSPush;
 
 	
-	MsgFromKafkaVo voForMultipleSMS =  MsgFromKafkaSmss.voForMultipleSMSWithValidDataBody;
-	MsgFromKafkaVo voForSingleSMS =  MsgFromKafkaSmss.voForSingleSmsWithValidDataBody;
+	SingleMessageWrapper voForMultipleSMS =  MsgFromKafkaSmss.voForSingleSmsWithSMS;
+	MultiMessageWrapper voForSingleSMS =  MsgFromKafkaSmss.voForMultipleSMSWithSMS;
 
+	SingleMessageWrapper voForMultipleLMS =  MsgFromKafkaSmss.voForSingleSmsWithLMS;
+	MultiMessageWrapper voForSingleLMS =  MsgFromKafkaSmss.voForMultipleSMSWithLMS;
 
 
 	String jsonForSingleAndroidPush;
@@ -90,28 +94,7 @@ public class ControllerTest {
 
 	}
 
-	@Test
-	@DisplayName("메시지 전송 타입 테스트 : 0=> 단건 전송 | 1=> 대량 발송 / 메시지 Key => 안드로이드 0 | IOS 1 | SMS 2 ")
-	public void test() throws JsonProcessingException {
-		assertEquals(voForSingleAndroidPush.getCodeOfType(), 0); 
-		assertEquals(voForSingleAndroidPush.getTypeValue(), 0); 
-
-		assertEquals(voForMultipleAndroidPush.getCodeOfType(), 1); 
-		assertEquals(voForSingleAndroidPush.getTypeValue(), 0); 
-
-		
-		assertEquals(voForMultipleSMS.getCodeOfType(), 1); 
-		assertEquals(voForMultipleSMS.getTypeValue(), 2); 
-		
-		assertEquals(voForSingleSMS.getCodeOfType(), 0); 
-		assertEquals(voForMultipleSMS.getTypeValue(), 2); 
-
-
-		
-		assertEquals(voForSingleIOSPush.getTypeValue(), 1); 
-		assertEquals(voForMultipleIOSPush.getCodeOfType(), 1); 
-
-	}
+	
 	
 	@Test
 	@DisplayName("ANDROID 단건 MSG 수신 후 push 후 성공 반환하며, 이력을 DB에 저장한다.")

@@ -7,15 +7,12 @@ import com.kt.onnuipay.kafka.kafkanetty.kafka.model.enums.KafkaKeyEnum;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.enums.MsgType;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.enums.TypeOfSending;
 
+import datavo.msg.MultiMessageWrapper;
+import datavo.msg.SingleMessageWrapper;
+
 public class MsgFromKafkaIOS {
-	public static MsgFromKafkaVo voForMultiplePushWithValidDataBody = TestUtil.createMsgVoForMultipleIOS(DataBodys.bodyOfWithValidHeaderAndBody);
+	public static MultiMessageWrapper voForMultipleIOSPush = MultiMessageWrapperBuilders.createMultiMessageWrapper(MetaDataBuilders.buildAndroidMultiMetaData(false), MultiMessageWrapperBuilders.createDefaultMultiMessageBuilder(Notifications.noti, Options.targets));
 	
-	public static MsgFromKafkaVo voForSinglePushWithInvalidHeader =  TestUtil.createMsgVoForSingleIOS(DataBodys.bodyOfInvalidHeaderAndValidBody);
-		
-	public static MsgFromKafkaVo voForSinglePushWithInvalidBody = TestUtil.createMsgVoForSingleIOS(DataBodys.bodyOfSmsWithValidHeaderAndInvalidBody);
-	
-	public static MsgFromKafkaVo voForIOSWithInvalidHeaderAndInvalidBody =  TestUtil.createMsgVoForSingleIOS(DataBodys.bodyOfInvalidHeaderAndInValidBody);
-			
-	public static MsgFromKafkaVo voForSinglePushWithValidDataBody = TestUtil.createMsgVoForSingleIOS(DataBodys.bodyOfWithValidHeaderAndBody);
+	public static SingleMessageWrapper voForSingleIOSPush = SingleMessageWrapperBuildes.createSingleMessageWrapper(MetaDataBuilders.buildIOSSingleMetaData(false), SingleMessageWrapperBuildes.createDefaultSingleMessageBuilder(Notifications.noti, Options.token, Options.topic));
 	
 }

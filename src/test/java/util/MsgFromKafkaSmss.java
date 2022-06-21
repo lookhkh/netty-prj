@@ -1,21 +1,35 @@
 package util;
 
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.enums.KafkaKeyEnum;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.enums.MsgType;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.enums.TypeOfSending;
+import datavo.enums.MsgType;
+import datavo.msg.MultiMessageWrapper;
+import datavo.msg.SingleMessageWrapper;
 
 public class MsgFromKafkaSmss {
 
-	public static MsgFromKafkaVo voForMultipleSMSWithValidDataBody = TestUtil.createMsgVoForMultiSMS(DataBodys.bodyOfWithValidHeaderAndBody);
+	public static MultiMessageWrapper voForMultipleSMSWithSMS = MultiMessageWrapperBuilders
+																			.createMultiMessageWrapper(
+																					MetaDataBuilders
+																						.buildSMSMultiMetaData(false, datavo.enums.MsgType.SMS), 
+																					MultiMessageWrapperBuilders
+																					.createDefaultMultiMessageBuilder(Notifications.noti,Options.targets)
+																				);
 	
-	public static MsgFromKafkaVo voForMultipleSMSWithInValidDataBodyWithInvalidHeader =  TestUtil.createMsgVoForMultiSMS(DataBodys.bodyOfInvalidHeaderAndValidBody); 
+	public static MultiMessageWrapper voForMultipleSMSWithLMS = MultiMessageWrapperBuilders
+																			.createMultiMessageWrapper(
+																					MetaDataBuilders
+																						.buildSMSMultiMetaData(false, datavo.enums.MsgType.LMS), 
+																					MultiMessageWrapperBuilders
+																					.createDefaultMultiMessageBuilder(Notifications.noti,Options.targets)
+																				);
 	
-	public static MsgFromKafkaVo voForMultipleSMSWithInValidDataBodyWithInvalidBody = TestUtil.createMsgVoForMultiSMS(DataBodys.bodyOfSmsWithValidHeaderAndInvalidBody);
 	
-	public static MsgFromKafkaVo voForSingleSMSWithInvalidHeaderAndInvalidBody =  TestUtil.createMsgVoForSingleSMS(DataBodys.bodyOfInvalidHeaderAndInValidBody);
-	
-	public static MsgFromKafkaVo voForSingleSMSWithInValidDataBodyIwthInValidHeader = TestUtil.createMsgVoForSingleSMS(DataBodys.bodyOfInvalidHeaderAndInValidBody);
 
-	public static MsgFromKafkaVo voForSingleSmsWithValidDataBody = TestUtil.createMsgVoForSingleSMS(DataBodys.bodyOfWithValidHeaderAndBody);
+	public static SingleMessageWrapper voForSingleSmsWithSMS = SingleMessageWrapperBuildes.createSingleMessageWrapper(
+																	MetaDataBuilders.buildSMSSingleMetaData(false, MsgType.SMS), 
+																	SingleMessageWrapperBuildes.createDefaultSingleMessageBuilder(Notifications.noti, Options.token, Options.topic));
+	
+	
+	public static SingleMessageWrapper voForSingleSmsWithLMS = SingleMessageWrapperBuildes.createSingleMessageWrapper(
+																		MetaDataBuilders.buildSMSSingleMetaData(false, MsgType.LMS), 
+																		SingleMessageWrapperBuildes.createDefaultSingleMessageBuilder(Notifications.noti, Options.token, Options.topic));
 }

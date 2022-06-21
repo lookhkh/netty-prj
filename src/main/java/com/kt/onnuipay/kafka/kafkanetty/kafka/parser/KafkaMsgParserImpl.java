@@ -1,61 +1,51 @@
 package com.kt.onnuipay.kafka.kafkanetty.kafka.parser;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.core.JacksonException;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.firebase.database.util.JsonMapper;
 import com.kt.onnuipay.kafka.kafkanetty.exception.JsonDataProcessingWrapperException;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.DataBody;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
 
-import lombok.AllArgsConstructor;
-import lombok.Setter;
+import datavo.MetaData;
+import datavo.msg.MessageWrapper;
+import datavo.msg.SingleMessageWrapper;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
 public class KafkaMsgParserImpl implements KafkaMsgParser {
 
-	private ObjectMapper mapper = new ObjectMapper();
+	ObjectMapper mapper = new ObjectMapper();
+	
+	@Override
+	public <T> T parse(String msg, Class<T> target) throws JsonDataProcessingWrapperException {
+		log.info("MsgParser Recived Msg {}",msg);
+
+		
+		SingleMessageWrapper wr =  (SingleMessageWrapper)tryConvertMsgOrThrow(msg);
+		System.out.println(wr);
+	
+		return null;
+	}
 	
 	
-		@Override
-		public MsgFromKafkaVo parse(String msg)   {
-		
-		log.info("MsgParser Recived {}",msg);
-			
-		return tryConvertMsgOrThrow(msg); 
-		
+	
+	
 
-		}
-		
-		public void setObjectMapper(ObjectMapper mapper) {
-			this.mapper = mapper;
-		}
-
-
-		private MsgFromKafkaVo tryConvertMsgOrThrow(String msg) {
+	private Object tryConvertMsgOrThrow(String msg) {
 			
-			MsgFromKafkaVo convertedValue = null;
-			
-			try {
-				convertedValue = mapper.readValue(msg, MsgFromKafkaVo.class);
+		try {
+			return  mapper.convertValue(msg, SingleMessageWrapper.class);
 				
-			} catch (JacksonException e) {
-				// TODO Auto-generated catch block
+			} catch (IllegalArgumentException e) {
 				e.printStackTrace();
 				throw new JsonDataProcessingWrapperException("Message Json Parsing error",e);
-			} catch(Exception e) {
+			} 
+			catch(Exception e) {
+				e.printStackTrace();
 				throw new RuntimeException("Unknown Error Happend originMsgIs=> "+msg,e);
 			}
-			return convertedValue;
 		}
-		
-		
-
 }

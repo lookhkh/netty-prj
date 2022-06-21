@@ -91,49 +91,4 @@ public class MsgFromKafkaVo{
 		// TODO Auto-generated method stub
 		return this.key.getTypeCode();
 	}
-	
-	/**
-	 * @implSpec <p> 제목 30bytes 제한 <br/> 
-	 * 				내용 if sms -> up to 2000 bytes <br/>
-	 *                     push -> up to 200 bytes <br/>
-	 *                     
-	 *              Tokens lists size up to 500 
-	 * </p>
-	 * 
-	 * **/
-	@JsonIgnore
-	private boolean validateDataBody(DataBody payload) {
-		String title = payload.getTitle();
-		String body = payload.getBody();
-		
-		String errorMsg = "databody format is wrong header :"+title+" body :"+body;
-		
-		
-		int lengthOfTitle = title.getBytes(Charset.forName("utf-8")).length;
-		int lengthOfBody = body.getBytes(Charset.forName("utf-8")).length ;
-		
-	
-		
-		if(this.getTypeValue() == 2) {
-			
-			 if(!(lengthOfTitle<=30 
-					&& lengthOfBody  <= 2000)) 
-				 throw new DataBodyInvalidException(errorMsg,this);	
-		}else {
-			
-			if(!(lengthOfTitle <= 30 && lengthOfBody<=200 && target.size() <= 500))
-				 throw new DataBodyInvalidException(errorMsg,this); 
-			
-		}
-		
-		return true;
-	}
-	
-	public Map<Boolean, List<DataBody>> validateDataBodys() {
-		return this.payload.stream()
-				.collect(Collectors.groupingBy(item -> this.validateDataBody(item)));
-	}
-	
-	
-
 }
