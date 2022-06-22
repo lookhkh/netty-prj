@@ -9,6 +9,7 @@ import com.kt.onnuipay.client.handler.manager.SendPushManager;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.ResultOfPush;
 
+import datavo.msg.MessageWrapper;
 import lombok.AllArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +43,7 @@ public class PushSingleManager implements SendManager {
 	private final SendPushManager manager;
 
 	@Override
-	public ResultOfPush send(MsgFromKafkaVo vo) {
+	public ResultOfPush send(MessageWrapper vo) {
 		log.info("PushSingleSendManager received {}",vo);
 				
 		return manager.execute(instance,vo);

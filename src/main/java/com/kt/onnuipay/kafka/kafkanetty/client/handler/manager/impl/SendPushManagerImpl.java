@@ -22,6 +22,8 @@ import com.kt.onnuipay.kafka.kafkanetty.kafka.model.push.AndroidVo;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.push.IOSVo;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.push.MobileAbstractVo;
 
+import datavo.msg.MessageWrapper;
+
 /*
  * KT OnnuriPay version 1.0
  *
@@ -42,11 +44,10 @@ public class SendPushManagerImpl extends PushManagerAbstract {
 	
 	
 	@Override
-	public ResultOfPush sendPush(FirebaseMessaging instance, AndroidVo smsVo) {
+	public ResultOfPush sendPush(FirebaseMessaging instance, MessageWrapper vo) {
 		
 		ResultOfPush result;
 		
-		Object msg = convertMobileVoToMessage(smsVo);
 		
 		if(env !=null) {
 			List<String> list = Arrays
@@ -54,13 +55,13 @@ public class SendPushManagerImpl extends PushManagerAbstract {
 								.collect(Collectors.toList());
 			
 			if(list.contains("prod")) {
-				result = send(instance, msg, false,  smsVo);
+				result = send(instance, vo, false);
 			}else {
-				result = send(instance, msg,true,  smsVo);
+				result = send(instance, vo,true);
 			}
 			
 		}else {
-			result = send(instance, msg, true,  smsVo);	
+			result = send(instance, vo,false);	
 		}
 			
 	
@@ -70,18 +71,7 @@ public class SendPushManagerImpl extends PushManagerAbstract {
 
 
 	
-	@Override
-	public ResultOfPush sendPush(FirebaseMessaging instance, IOSVo smsVo) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	
-	/**
-	 * TODO VO를 변환하는 로직 작성 220610 조현일
-	 * 
-	 * **/
-	
+
 
 
 
@@ -94,33 +84,33 @@ public class SendPushManagerImpl extends PushManagerAbstract {
 	 * 
 	 * **/
 	@VisibleForTesting
-	private ResultOfPush send(FirebaseMessaging instance, Object msg, boolean dryRun, MobileAbstractVo vo) {
+	private ResultOfPush send(FirebaseMessaging instance, MessageWrapper msg, boolean dryRun) {
 		ResultOfPush result = null;
 		
 		try {
 			
-			if(!vo.isSingle()) {
+			if(msg.getTypeValue() != 0) {
 				
 				/**
 				 * TODO Multicast send 기능 구현
 				 * 
 				 * **/
 				
-				BatchResponse results =  instance.sendMulticast((MulticastMessage) msg);
+				BatchResponse results =  instance.sendMulticast((MulticastMessage) msg.getMessage());
 				result = ResultOfPush.builder()
-							.id(null)
+							.id(msg.getMetaData().getSender())
 							.success(true)
-							.vo(vo.getVo())
+							.vo(msg)
 							.build();
 			}else {
 				
 			
 			
-			String successfullId = instance.send((Message) msg,dryRun);
+			String successfullId = instance.send((Message) msg.getMessage(),dryRun);
 			result = ResultOfPush.builder()
 						.id(successfullId)
 						.success(true)
-						.vo(vo.getVo())
+						.vo(msg)
 						.build();
 			}
 						
@@ -137,7 +127,7 @@ public class SendPushManagerImpl extends PushManagerAbstract {
 			result = ResultOfPush.builder()
 					    .id(e.getMessage())
 					    .success(false)
-					    .vo(vo.getVo())
+					    .vo(msg)
 					    .reason(e)
 					    .build();
 			
@@ -146,7 +136,7 @@ public class SendPushManagerImpl extends PushManagerAbstract {
 			result = ResultOfPush.builder()
 				    .id(e.getMessage())
 				    .success(false)
-				    .vo(vo.getVo())
+				    .vo(msg)
 				    .reason(e)
 				    .build();
 		

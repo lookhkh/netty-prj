@@ -7,27 +7,21 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
 
-import java.net.UnknownHostException;
-
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 
-import com.google.firebase.FirebaseException;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.kafka.kafkanetty.kafka.consumer.controller.TestVos;
 import com.kt.onnuipay.client.handler.manager.SendManager;
 import com.kt.onnuipay.kafka.kafkanetty.client.handler.mapper.SmsPushMapper;
 import com.kt.onnuipay.kafka.kafkanetty.exception.RunTimeExceptionWrapper;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.DynamicHandlerManager;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.ResultOfPush;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.mongo.TempMongodbTemplate;
 
-import util.MsgFromKafkaAndroid;
-import util.MsgFromKafkaSmss;
+import datavo.msg.MessageWrapper;
 import util.TestUtil;
 
 /**
@@ -53,16 +47,10 @@ public class DynamicHandlerMngTest {
 	
 	DynamicHandlerManager manager;
 	
-	MsgFromKafkaVo voForMultipleSMS = MsgFromKafkaSmss.voForMultipleSMSWithValidDataBody;
-	
-	MsgFromKafkaVo voForSingleSMS = MsgFromKafkaSmss.voForSingleSMSWithInValidDataBodyIwthInValidHeader;
-	
-	MsgFromKafkaVo voForMultipleAndroidPush =  MsgFromKafkaAndroid.voForMultiplePushWithValidDataBody;
-	
-	MsgFromKafkaVo voForSingleAndroidPush =  MsgFromKafkaAndroid.voForSinglePushWithValidDataBody;
-	
-	ResultOfPush successResult = TestUtil.createSuccessResultOfPushGivenVo(voForSingleAndroidPush,true);
-	ResultOfPush failResult = TestUtil.createFailResultOfPushGivenVo(voForSingleAndroidPush,true, new RuntimeException());
+	TestVos vos = TestVos.getTestVos();	
+
+	ResultOfPush successResult = TestUtil.createSuccessResultOfPushGivenVo(vos.getVoForSingleAndroidPush(),true);
+	ResultOfPush failResult = TestUtil.createFailResultOfPushGivenVo(vos.getVoForSingleAndroidPush(),true, new RuntimeException());
 
 
 	@BeforeEach
@@ -85,15 +73,14 @@ public class DynamicHandlerMngTest {
 	@Test
 	@DisplayName("SMS 대량 발송 테스트")
 	public void test() {
-		checkIfSendInvokedAccordingToTheTypeOfVo(manager, voForMultipleSMS, smsMulti);
+		checkIfSendInvokedAccordingToTheTypeOfVo(manager, vos.getVoForMultipleSMS(), smsMulti);
 	}
 
 	@Test
 	@DisplayName("SMS 단건 발송 테스트")
 	public void test1() {
 	
-		
-		checkIfSendInvokedAccordingToTheTypeOfVo(manager, voForSingleSMS, smsSingle);		
+		checkIfSendInvokedAccordingToTheTypeOfVo(manager, vos.getVoForSingleSMS(), smsSingle);		
 
 	}
 	
@@ -101,7 +88,7 @@ public class DynamicHandlerMngTest {
 	@DisplayName("Android PUSH 대량 발송 테스트")
 	public void test2() {
 	
-		checkIfSendInvokedAccordingToTheTypeOfVo(manager, voForMultipleAndroidPush,pushMulti);		
+		checkIfSendInvokedAccordingToTheTypeOfVo(manager,vos.getVoForMultipleAndroidPush(),pushMulti);		
 
 
 	}
@@ -110,7 +97,7 @@ public class DynamicHandlerMngTest {
 	@DisplayName("Android PUSH 단건 발송 테스트")
 	public void test3() {
 		
-		checkIfSendInvokedAccordingToTheTypeOfVo(manager, voForSingleAndroidPush,pushSingle);
+		checkIfSendInvokedAccordingToTheTypeOfVo(manager, vos.getVoForSingleAndroidPush(),pushSingle);
 
 	}
 	
@@ -118,8 +105,8 @@ public class DynamicHandlerMngTest {
 	@DisplayName("dynamicmanager는 senderManager이 반환한 result를 그대로 반환한다.")
 	public void test4() {
 		
-		Mockito.when(pushSingle.send(voForSingleAndroidPush)).thenReturn(successResult);
-		ResultOfPush p =  manager.consume(voForSingleAndroidPush);
+		Mockito.when(pushSingle.send(vos.getVoForSingleAndroidPush())).thenReturn(successResult);
+		ResultOfPush p =  manager.consume(vos.getVoForSingleAndroidPush());
 		
 		assertNotNull(p);
 		assertTrue(p.isSuccess());
@@ -130,8 +117,8 @@ public class DynamicHandlerMngTest {
 	@DisplayName("dynamicmanager는 senderManager에서 에러가 발생할 시, 에러 정보를 담은 fail Result를 반환한다.")
 	public void test4_1() {
 		
-		Mockito.when(pushSingle.send(voForSingleAndroidPush)).thenReturn(TestUtil.createFailResultOfPushGivenVo(voForMultipleAndroidPush, false, new Exception()));
-		ResultOfPush p =  manager.consume(voForSingleAndroidPush);
+		Mockito.when(pushSingle.send(vos.getVoForSingleAndroidPush())).thenReturn(TestUtil.createFailResultOfPushGivenVo(vos.getVoForSingleAndroidPush(), false, new Exception()));
+		ResultOfPush p =  manager.consume(vos.getVoForSingleAndroidPush());
 		
 		assertNotNull(p);
 		assertFalse(p.isSuccess());
@@ -142,17 +129,17 @@ public class DynamicHandlerMngTest {
 	@DisplayName("dynamicmanager는 senderManager에서 에러가 발생했는데, 해당 객체에서 핸들링하지 못한 경우, 에러를 RunTimeExceptionWrapper로 감싸서 위로 던진다")
 	public void test4_2() {
 		
-		Mockito.when(pushSingle.send(voForSingleAndroidPush)).thenThrow(IllegalArgumentException.class);
-		RunTimeExceptionWrapper t = assertThrows(RunTimeExceptionWrapper.class, ()->manager.consume(voForSingleAndroidPush));
-		assertEquals(voForSingleAndroidPush, t.getVo());
+		Mockito.when(pushSingle.send(vos.getVoForSingleAndroidPush())).thenThrow(IllegalArgumentException.class);
+		RunTimeExceptionWrapper t = assertThrows(RunTimeExceptionWrapper.class, ()->manager.consume(vos.getVoForSingleAndroidPush()));
+		assertEquals(vos.getVoForSingleAndroidPush(), t.getVo());
 	}
 	
 
 
 		
-	private void checkIfSendInvokedAccordingToTheTypeOfVo(DynamicHandlerManager manager, MsgFromKafkaVo vo, SendManager sendMng) {
-		manager.consume(vo);
-		Mockito.verify(sendMng, times(1)).send(vo);
+	private void checkIfSendInvokedAccordingToTheTypeOfVo(DynamicHandlerManager manager, MessageWrapper messageWrapper, SendManager sendMng) {
+		manager.consume(messageWrapper);
+		Mockito.verify(sendMng, times(1)).send(messageWrapper);
 	}
 	
 	

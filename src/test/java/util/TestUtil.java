@@ -25,6 +25,11 @@ import com.kt.onnuipay.kafka.kafkanetty.kafka.model.ResultOfPush;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.mongo.TempMongodbTemplate;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.parser.KafkaMsgParser;
 
+import datavo.msg.MessageWrapper;
+import datavo.testUtils.MsgFromKafkaAndroid;
+import datavo.testUtils.MsgFromKafkaIOS;
+import datavo.testUtils.MsgFromKafkaSmss;
+
 public class TestUtil {
 
 
@@ -79,10 +84,10 @@ public class TestUtil {
 				MsgFromKafkaAndroid.voForSinglePushWithValidDataBody,
 				MsgFromKafkaIOS.voForMultipleIOSPush,
 				MsgFromKafkaIOS.voForSingleIOSPush,
-				MsgFromKafkaSmss.voForMultipleSMSWithLMSy,
-				MsgFromKafkaSmss.voForMultipleSMSWithSMS,
+				MsgFromKafkaSmss.voForMultipleSMSWithLMS,
 				MsgFromKafkaSmss.voForSingleSmsWithLMS,
-				MsgFromKafkaSmss.voForSingleSmsWithSMS
+				MsgFromKafkaSmss.voForSingleSmsWithSMS,
+				MsgFromKafkaSmss.voForMultipleSMSWithSMS
 				);
 		
 		return vo.stream().map(item -> {
@@ -98,22 +103,22 @@ public class TestUtil {
 		
 	}
 
-	public static ResultOfPush createResultOfPushGivenVo(MsgFromKafkaVo vo, boolean result, Throwable t) {
+	public static ResultOfPush createResultOfPushGivenVo(MessageWrapper vo, boolean result, Throwable t) {
 		// TODO Auto-generated method stub
 		return ResultOfPush.builder()
-					.id(vo.getSender())
+					.id(vo.getMetaData().getSender())
 					.reason(t)
 					.success(result)
 					.vo(vo)
 					.build();
 	}
 	
-	public static ResultOfPush createSuccessResultOfPushGivenVo(MsgFromKafkaVo vo, boolean result) {
+	public static ResultOfPush createSuccessResultOfPushGivenVo(MessageWrapper vo, boolean result) {
 		// TODO Auto-generated method stub
 		return createResultOfPushGivenVo(vo,true,null);
 	}
 	
-	public static ResultOfPush createFailResultOfPushGivenVo(MsgFromKafkaVo vo, boolean result, Throwable t) {
+	public static ResultOfPush createFailResultOfPushGivenVo(MessageWrapper vo, boolean result, Throwable t) {
 		// TODO Auto-generated method stub
 		return createResultOfPushGivenVo(vo,false,t);
 	}

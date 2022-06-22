@@ -3,6 +3,8 @@ package com.kt.onnuipay.client.handler.manager;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.ResultOfPush;
 
+import datavo.msg.MessageWrapper;
+
 /*
  * KT OnnuriPay version 1.0
  *
@@ -17,7 +19,7 @@ import com.kt.onnuipay.kafka.kafkanetty.kafka.model.ResultOfPush;
 
 public interface SendManager {
 
-	public ResultOfPush send(MsgFromKafkaVo vo);
+	public ResultOfPush send(MessageWrapper vo);
 
 
 	

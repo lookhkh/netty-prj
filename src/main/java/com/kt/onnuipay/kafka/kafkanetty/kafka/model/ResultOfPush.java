@@ -1,5 +1,6 @@
 package com.kt.onnuipay.kafka.kafkanetty.kafka.model;
 
+import datavo.msg.MessageWrapper;
 import lombok.Builder;
 import lombok.Data;
 
@@ -21,11 +22,11 @@ public class ResultOfPush {
 	
 	private final boolean success; 
 	private final String id;
-	private final MsgFromKafkaVo vo;
+	private final MessageWrapper vo;
 	private final Throwable reason;
 
 	@Builder
-	public ResultOfPush(boolean success, String id, MsgFromKafkaVo vo, Throwable reason) {
+	public ResultOfPush(boolean success, String id, MessageWrapper vo, Throwable reason) {
 		this.success = success;
 		this.id = id;
 		this.vo = vo;

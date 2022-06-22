@@ -5,12 +5,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.mockito.Mockito;
 
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.kafka.kafkanetty.kafka.consumer.controller.TestVos;
 import com.kt.onnuipay.client.handler.manager.SendManager;
 import com.kt.onnuipay.kafka.kafkanetty.client.handler.mapper.SmsPushMapper;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
 
-import util.MsgFromKafkaAndroid;
-import util.MsgFromKafkaSmss;
 import util.TestUtil;
 
 /**
@@ -32,14 +30,7 @@ public class PushHandlerTest {
 
 	SendManager mng = TestUtil.pushSingle;
 	
-	MsgFromKafkaVo voForMultipleAndroidPush =  MsgFromKafkaAndroid.voForMultiplePushWithValidDataBody;
-	
-	MsgFromKafkaVo voForSingleAndroidPush =  MsgFromKafkaAndroid.voForSinglePushWithValidDataBody;
-	
-	MsgFromKafkaVo voForMultipleSMS = MsgFromKafkaSmss.voForMultipleSMSWithValidDataBody;
-	
-	MsgFromKafkaVo voForSingleSMS = MsgFromKafkaSmss.voForSingleSmsWithValidDataBody;
-	
+	TestVos vos = TestVos.getTestVos();	
 
 
 	

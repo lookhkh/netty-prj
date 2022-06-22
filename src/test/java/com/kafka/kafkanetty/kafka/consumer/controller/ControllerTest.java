@@ -19,19 +19,17 @@ import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kt.onnuipay.kafka.kafkanetty.exception.JsonDataProcessingWrapperException;
 import com.kt.onnuipay.kafka.kafkanetty.exception.RunTimeExceptionWrapper;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.DispatcherController;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.DispatcherControllerImpl;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.DynamicHandlerManager;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.ResultOfPush;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.mongo.TempMongodbTemplate;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.parser.KafkaMsgParser;
 
-import datavo.msg.MultiMessageWrapper;
-import datavo.msg.SingleMessageWrapper;
-import util.MsgFromKafkaAndroid;
-import util.MsgFromKafkaIOS;
-import util.MsgFromKafkaSmss;
+import datavo.msg.MessageWrapper;
+import datavo.msg.util.MessageUtils;
+import datavo.testUtils.MsgFromKafkaAndroid;
+import datavo.testUtils.MsgFromKafkaIOS;
+import datavo.testUtils.MsgFromKafkaSmss;
 import util.TestUtil;
 
 /*
@@ -44,53 +42,25 @@ import util.TestUtil;
 @DisplayName("메시지 수신 후 파싱 및 알맞은 객체 호출")
 public class ControllerTest {
 
-	DynamicHandlerManager mockingDynamicHanlder = TestUtil.mockingDynamicHanlder;
-	KafkaMsgParser mockingParser = TestUtil.mockingParser;
-	TempMongodbTemplate mockingMongo = TestUtil.mongo;
-		
-	DispatcherController controller;
-	ObjectMapper mapper = new ObjectMapper();
-	
-	
-	
-	SingleMessageWrapper voForSingleAndroidPush =  MsgFromKafkaAndroid.voForSinglePushWithValidDataBody;
-	MultiMessageWrapper voForMultipleAndroidPush =  MsgFromKafkaAndroid.voForMultiplePush;
+	TestVos data = new TestVos(TestUtil.mockingDynamicHanlder, TestUtil.mockingParser, TestUtil.mongo, new ObjectMapper(), MsgFromKafkaAndroid.voForSinglePushWithValidDataBody,
+			MsgFromKafkaAndroid.voForMultiplePush, MsgFromKafkaIOS.voForSingleIOSPush, MsgFromKafkaIOS.voForMultipleIOSPush, MsgFromKafkaSmss.voForSingleSmsWithSMS, MsgFromKafkaSmss.voForMultipleSMSWithSMS, MsgFromKafkaSmss.voForSingleSmsWithLMS,
+			MsgFromKafkaSmss.voForMultipleSMSWithLMS);
 
 	
-	SingleMessageWrapper voForSingleIOSPush =  MsgFromKafkaIOS.voForSingleIOSPush;
-	MultiMessageWrapper voForMultipleIOSPush =  MsgFromKafkaIOS.voForMultipleIOSPush;
 
-	
-	SingleMessageWrapper voForMultipleSMS =  MsgFromKafkaSmss.voForSingleSmsWithSMS;
-	MultiMessageWrapper voForSingleSMS =  MsgFromKafkaSmss.voForMultipleSMSWithSMS;
-
-	SingleMessageWrapper voForMultipleLMS =  MsgFromKafkaSmss.voForSingleSmsWithLMS;
-	MultiMessageWrapper voForSingleLMS =  MsgFromKafkaSmss.voForMultipleSMSWithLMS;
-
-
-	String jsonForSingleAndroidPush;
-	String jsonForSingleIOSPush;
-	String jsonForSingleSMS;
-	String jsonForMultiAndroidPush;
-	String jsonForMultiIOSPush;
-	String jsonForMultiSMS;
-	
-
-	String a = "1";
-	
 	@BeforeEach
 	public void init() throws JsonProcessingException {
-		jsonForSingleAndroidPush = mapper.writeValueAsString(voForSingleAndroidPush);
-		jsonForSingleIOSPush = mapper.writeValueAsString(voForSingleIOSPush);
-		jsonForSingleSMS = mapper.writeValueAsString(voForMultipleSMS);
-		jsonForMultiAndroidPush = mapper.writeValueAsString(voForMultipleAndroidPush);
-		jsonForMultiIOSPush = mapper.writeValueAsString(voForMultipleIOSPush);
-		jsonForMultiSMS = mapper.writeValueAsString(voForMultipleSMS);
+		data.jsonForSingleAndroidPush = MessageUtils.toJson(data.voForSingleAndroidPush, MessageWrapper.class);
+		data.jsonForSingleIOSPush = MessageUtils.toJson(data.voForSingleIOSPush, MessageWrapper.class);
+		data.jsonForSingleSMS = MessageUtils.toJson(data.voForMultipleSMS, MessageWrapper.class);
+		data.jsonForMultiAndroidPush = MessageUtils.toJson(data.voForMultipleAndroidPush, MessageWrapper.class);
+		data.jsonForMultiIOSPush = MessageUtils.toJson(data.voForMultipleIOSPush, MessageWrapper.class);
+		data.jsonForMultiSMS = MessageUtils.toJson(data.voForMultipleSMS, MessageWrapper.class);
 		
-		this.mockingDynamicHanlder = Mockito.mock(DynamicHandlerManager.class);
-		this.mockingParser = Mockito.mock(KafkaMsgParser.class);
-		this.mockingMongo = Mockito.mock(TempMongodbTemplate.class);
-		controller = new DispatcherControllerImpl(mockingParser,mockingDynamicHanlder,mockingMongo);
+		this.data.mockingDynamicHanlder = Mockito.mock(DynamicHandlerManager.class);
+		this.data.mockingParser = Mockito.mock(KafkaMsgParser.class);
+		this.data.mockingMongo = Mockito.mock(TempMongodbTemplate.class);
+		data.controller = new DispatcherControllerImpl(data.mockingParser,data.mockingDynamicHanlder,data.mockingMongo);
 
 	}
 
@@ -100,7 +70,7 @@ public class ControllerTest {
 	@DisplayName("ANDROID 단건 MSG 수신 후 push 후 성공 반환하며, 이력을 DB에 저장한다.")
 	public void test1() throws DatabindException, IOException {
 		
-		controllerTestCondition(jsonForSingleAndroidPush,voForSingleAndroidPush,true);
+		controllerTestCondition(data.jsonForSingleAndroidPush,data.voForSingleAndroidPush,true);
 	}
 
 	
@@ -108,7 +78,7 @@ public class ControllerTest {
 	@DisplayName("ANDROID Multi MSG 수신 후 push 후 성공 반환, 이력을 DB에 저장한다.")
 	public void test1_1() throws DatabindException, IOException {
 		
-		controllerTestCondition(jsonForMultiAndroidPush,voForMultipleAndroidPush,true);
+		controllerTestCondition(data.jsonForMultiAndroidPush,data.voForMultipleAndroidPush,true);
 
 	}
 	
@@ -117,7 +87,7 @@ public class ControllerTest {
 	@DisplayName("IOS 단건 MSG 수신 후 push 후 성공 반환, 이력을 DB에 저장한다.")
 	public void test1_2() throws DatabindException, IOException {
 		
-		controllerTestCondition(jsonForSingleIOSPush,voForSingleIOSPush,true);
+		controllerTestCondition(data.jsonForSingleIOSPush,data.voForSingleIOSPush,true);
 
 	}
 	
@@ -125,7 +95,7 @@ public class ControllerTest {
 	@DisplayName("IOS Multi MSG 수신 후 push 후 성공 반환, 이력을 DB에 저장한다.")
 	public void test1_3() throws DatabindException, IOException {
 		
-		controllerTestCondition(jsonForMultiIOSPush,voForMultipleIOSPush,true);
+		controllerTestCondition(data.jsonForMultiIOSPush,data.voForMultipleIOSPush,true);
 
 	}
 	
@@ -133,7 +103,7 @@ public class ControllerTest {
 	@DisplayName("SMS 단건 MSG 수신 후 push 후 성공 반환, 이력을 DB에 저장한다.")
 	public void test1_4() throws DatabindException, IOException {
 		
-		controllerTestCondition(jsonForSingleSMS,voForSingleSMS,true);
+		controllerTestCondition(data.jsonForSingleSMS,data.voForSingleSMS,true);
 
 	}
 	
@@ -141,7 +111,7 @@ public class ControllerTest {
 	@DisplayName("SMS Multi MSG 수신 후 push 후 성공 반환, 이력을 DB에 저장한다.")
 	public void test1_5() throws DatabindException, IOException {
 		
-		controllerTestCondition(jsonForMultiSMS,voForMultipleSMS,true);
+		controllerTestCondition(data.jsonForMultiSMS,data.voForMultipleSMS,true);
 
 		
 	}
@@ -154,7 +124,7 @@ public class ControllerTest {
 	@DisplayName("ANDROID 단건 MSG 수신 후 push 후 실패 반환, 이력을 DB에 저장한다.")
 	public void test1_6() throws DatabindException, IOException {
 		
-		controllerTestCondition(jsonForSingleAndroidPush,voForSingleAndroidPush,false);
+		controllerTestCondition(data.jsonForSingleAndroidPush,data.voForSingleAndroidPush,false);
 	}
 
 	
@@ -162,7 +132,7 @@ public class ControllerTest {
 	@DisplayName("ANDROID Multi MSG 수신 후 push 후 실패 반환, 이력을 DB에 저장한다.")
 	public void test1_7() throws DatabindException, IOException {
 		
-		controllerTestCondition(jsonForMultiAndroidPush,voForMultipleAndroidPush,false);
+		controllerTestCondition(data.jsonForMultiAndroidPush,data.voForMultipleAndroidPush,false);
 
 	}
 	
@@ -171,7 +141,7 @@ public class ControllerTest {
 	@DisplayName("IOS 단건 MSG 수신 후 push 후 실패 반환, 이력을 DB에 저장한다.")
 	public void test1_8() throws DatabindException, IOException {
 		
-		controllerTestCondition(jsonForSingleIOSPush,voForSingleIOSPush,false);
+		controllerTestCondition(data.jsonForSingleIOSPush,data.voForSingleIOSPush,false);
 
 	}
 	
@@ -179,7 +149,7 @@ public class ControllerTest {
 	@DisplayName("IOS Multi MSG 수신 후 push 후 실패 반환, 이력을 DB에 저장한다.")
 	public void test1_9() throws DatabindException, IOException {
 		
-		controllerTestCondition(jsonForMultiIOSPush,voForMultipleIOSPush,false);
+		controllerTestCondition(data.jsonForMultiIOSPush,data.voForMultipleIOSPush,false);
 
 	}
 	
@@ -187,7 +157,7 @@ public class ControllerTest {
 	@DisplayName("SMS 단건 MSG 수신 후 push 후 실패 반환, 이력을 DB에 저장한다.")
 	public void test1_10() throws DatabindException, IOException {
 		
-		controllerTestCondition(jsonForSingleSMS,voForSingleSMS,false);
+		controllerTestCondition(data.jsonForSingleSMS,data.voForSingleSMS,false);
 
 	}
 	
@@ -195,7 +165,7 @@ public class ControllerTest {
 	@DisplayName("SMS Multi MSG 수신 후 push 후 실패 반환, 이력을 DB에 저장한다.")
 	public void test1_11() throws DatabindException, IOException {
 		
-		controllerTestCondition(jsonForMultiSMS,voForMultipleSMS,false);
+		controllerTestCondition(data.jsonForMultiSMS,data.voForMultipleSMS,false);
 
 		
 	}
@@ -211,12 +181,12 @@ public class ControllerTest {
 	@DisplayName("수신한 메시지의 포맷이 부적절한 경우 실패를 반환")
 	public void test2() throws DatabindException, IOException {
 		
-		Mockito.when(mockingParser.parse(ArgumentMatchers.anyString())).thenThrow(JsonDataProcessingWrapperException.class);
+		Mockito.when(data.mockingParser.parse(ArgumentMatchers.anyString())).thenThrow(JsonDataProcessingWrapperException.class);
 		
-		ResultOfPush p =  controller.route(ArgumentMatchers.anyString());
+		ResultOfPush p =  data.controller.route(ArgumentMatchers.anyString());
 		
 		assertFalse(p.isSuccess());
-		Mockito.verify(mockingMongo, Mockito.only()).insertDbHistory(p);
+		Mockito.verify(data.mockingMongo, Mockito.only()).insertDbHistory(p);
 		assertNull(p.getVo());
 
 	}
@@ -225,17 +195,17 @@ public class ControllerTest {
 	@DisplayName("내부에서 처리못한 Exception이 터진 경우, 실패를 반환하며, DB에 이력을 저장한다.")
 	public void test3() {
 		
-		RunTimeExceptionWrapper t = new RunTimeExceptionWrapper("", voForMultipleIOSPush, new Exception(""));
+		RunTimeExceptionWrapper t = new RunTimeExceptionWrapper("", data.voForMultipleIOSPush, new Exception(""));
 		
-		Mockito.when(mockingParser.parse(jsonForMultiIOSPush)).thenReturn(voForMultipleIOSPush);
-		Mockito.when(mockingDynamicHanlder.consume(voForMultipleIOSPush)).thenThrow(t);
+		Mockito.when(data.mockingParser.parse(data.jsonForMultiIOSPush)).thenReturn(data.voForMultipleIOSPush);
+		Mockito.when(data.mockingDynamicHanlder.consume(data.voForMultipleIOSPush)).thenThrow(t);
 
-		ResultOfPush p =  controller.route(jsonForMultiIOSPush);
+		ResultOfPush p =  data.controller.route(data.jsonForMultiIOSPush);
 		
 		assertNotNull(p);
 		
 		assertFalse(p.isSuccess());
-		Mockito.verify(mockingMongo, Mockito.only()).insertDbHistory(p);
+		Mockito.verify(data.mockingMongo, Mockito.only()).insertDbHistory(p);
 		assertNotNull(p.getVo());
 		
 		assertEquals(t.getVo(), p.getVo());
@@ -243,12 +213,12 @@ public class ControllerTest {
 	
 	
 	
-	private void controllerTestCondition(String json, MsgFromKafkaVo resultVo, boolean result) {
-		Mockito.when(mockingParser.parse(json)).thenReturn(resultVo);
-		Mockito.when(mockingDynamicHanlder.consume(resultVo)).thenReturn(createResultObj(resultVo,result));
+	private void controllerTestCondition(String json, MessageWrapper voForSingleAndroidPush2, boolean result) {
+		Mockito.when(data.mockingParser.parse(json)).thenReturn(voForSingleAndroidPush2);
+		Mockito.when(data.mockingDynamicHanlder.consume(voForSingleAndroidPush2)).thenReturn(createResultObj(voForSingleAndroidPush2,result));
 		
 		
-		ResultOfPush p =  controller.route(json);
+		ResultOfPush p =  data.controller.route(json);
 		
 		if(result) {
 			assertTrue(p.isSuccess());
@@ -257,16 +227,16 @@ public class ControllerTest {
 			assertFalse(p.isSuccess());
 
 		}
-		Mockito.verify(mockingMongo, Mockito.only()).insertDbHistory(p);
-		assertEquals(p.getVo(), resultVo);
+		Mockito.verify(data.mockingMongo, Mockito.only()).insertDbHistory(p);
+		assertEquals(p.getVo(), voForSingleAndroidPush2);
 	}
 	
-	private ResultOfPush createResultObj(MsgFromKafkaVo vo, boolean result) {
+	private ResultOfPush createResultObj(MessageWrapper voForSingleAndroidPush2, boolean result) {
 		return 	
 				ResultOfPush.builder()
 				.id("test")
 				.success(result)
-				.vo(vo)
+				.vo(voForSingleAndroidPush2)
 				.build();
 	}
 	

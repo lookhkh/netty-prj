@@ -9,6 +9,7 @@ import com.kt.onnuipay.kafka.kafkanetty.kafka.model.ResultOfPush;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.mongo.TempMongodbTemplate;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.parser.KafkaMsgParser;
 
+import datavo.msg.MessageWrapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,7 +44,7 @@ public class DispatcherControllerImpl implements DispatcherController{
 		try {
 			log.info("Controller recived msg {}",msg);
 			
-			MsgFromKafkaVo vo = parser.parse(msg);
+			MessageWrapper vo = parser.parse(msg);
 			
 			result =  manager.consume(vo);
 			

@@ -3,8 +3,9 @@ package com.kt.onnuipay.kafka.kafkanetty.client.handler.manager.impl.hanlder;
 import org.springframework.stereotype.Component;
 
 import com.kt.onnuipay.client.handler.manager.SendManager;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.ResultOfPush;
+
+import datavo.msg.MessageWrapper;
 
 
 /*
@@ -23,7 +24,7 @@ import com.kt.onnuipay.kafka.kafkanetty.kafka.model.ResultOfPush;
 public class SmsSingleManager implements SendManager {
 
 	@Override
-	public ResultOfPush send(MsgFromKafkaVo vo) {
+	public ResultOfPush send(MessageWrapper vo) {
 		return null;
 		// TODO Auto-generated method stub
 		

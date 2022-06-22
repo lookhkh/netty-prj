@@ -12,6 +12,7 @@ import com.kt.onnuipay.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.ResultOfPush;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.mongo.TempMongodbTemplate;
 
+import datavo.msg.MessageWrapper;
 import lombok.extern.slf4j.Slf4j;
 
 /*
@@ -58,7 +59,7 @@ public class DynamicHandlerManager {
 
 	
 	
-	public ResultOfPush consume(MsgFromKafkaVo vo) {
+	public ResultOfPush consume(MessageWrapper vo) {
 		
 		log.info("DynamicHanlder recived {}",vo);
 				
@@ -80,7 +81,10 @@ public class DynamicHandlerManager {
 
 	
 	
-	private SendManager getInstance(MsgFromKafkaVo vo) {
+	private SendManager getInstance(MessageWrapper vo) {
+		
+		log.debug("멀티1/단건0 -> {}, and0 / ios1 / sms2 -> {}",vo.getCodeOfType(),vo.getTypeValue());
+		
 		if(vo.getCodeOfType() ==0 && vo.getTypeValue() == 2) { //단건 
 			return smsSingleMng;
 		}

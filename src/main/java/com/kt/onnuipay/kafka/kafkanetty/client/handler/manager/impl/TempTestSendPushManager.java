@@ -13,6 +13,7 @@ import com.kt.onnuipay.kafka.kafkanetty.kafka.model.push.AndroidVo;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.push.IOSVo;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.push.MobileAbstractVo;
 
+import datavo.msg.MessageWrapper;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -25,19 +26,14 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class TempTestSendPushManager extends PushManagerAbstract {
 
+
 	@Override
-	public ResultOfPush sendPush(FirebaseMessaging instance, AndroidVo smsVo) {
-		return execute(instance, smsVo);
-		
-		
-			}
-	
-	@Override
-	public ResultOfPush sendPush(FirebaseMessaging instance, IOSVo smsVo) {
-		return execute(instance, smsVo);
+	public ResultOfPush sendPush(FirebaseMessaging instance, MessageWrapper smsVo) {
+		// TODO Auto-generated method stub
+		return this.execute(instance, smsVo);
 	}
 
-	private ResultOfPush execute(FirebaseMessaging instance, MobileAbstractVo smsVo) {
+	public ResultOfPush execute(FirebaseMessaging instance, MessageWrapper smsVo) {
 		log.info("{},{}",smsVo,instance);
 		log.info(" = ======= =================================================================================================== ");
 		log.info(" = ======= ==================================Mocking for Waiting for the response from server=============================================== ");
@@ -54,9 +50,9 @@ public class TempTestSendPushManager extends PushManagerAbstract {
 		
 		
 			return ResultOfPush.builder()
-					.id(smsVo.getVo().getSender())
+					.id(smsVo.getMetaData().getSender())
 					.success(true)
-					.vo(smsVo.getVo())
+					.vo(smsVo)
 					.build();
 
 		}

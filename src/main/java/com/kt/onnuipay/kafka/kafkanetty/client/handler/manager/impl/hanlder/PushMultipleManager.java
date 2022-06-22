@@ -5,9 +5,9 @@ import org.springframework.stereotype.Component;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.kt.onnuipay.client.handler.manager.SendManager;
 import com.kt.onnuipay.client.handler.manager.SendPushManager;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.ResultOfPush;
 
+import datavo.msg.MessageWrapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 /**
@@ -36,7 +36,7 @@ public class PushMultipleManager implements SendManager {
 	private final SendPushManager manager;
 
 	@Override
-	public ResultOfPush send(MsgFromKafkaVo vo) {
+	public ResultOfPush send(MessageWrapper vo) {
 
 		log.info("pushMultipleManager received {}",vo);
 		

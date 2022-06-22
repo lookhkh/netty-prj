@@ -6,6 +6,8 @@ import com.kt.onnuipay.kafka.kafkanetty.kafka.model.ResultOfPush;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.push.AndroidVo;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.push.IOSVo;
 
+import datavo.msg.MessageWrapper;
+
 
 /**
  * @apiNote FirebaseMsgInstance와 각 Vo를 통하여 데이터를 실제로 보내는 역할을 한다.
@@ -14,13 +16,9 @@ import com.kt.onnuipay.kafka.kafkanetty.kafka.model.push.IOSVo;
 public interface SendPushManager {
 
 
-	public AndroidVo parseAndroid(MsgFromKafkaVo vo);
 
-	public IOSVo parseIos(MsgFromKafkaVo vo);
+	public ResultOfPush sendPush(FirebaseMessaging instance, MessageWrapper smsVo);
 
-	public ResultOfPush sendPush(FirebaseMessaging instance, AndroidVo smsVo);
-
-	public ResultOfPush sendPush(FirebaseMessaging instance, IOSVo smsVo);
 
 	
 	/**
@@ -28,7 +26,7 @@ public interface SendPushManager {
 	 * @param FirebaseMessaging FCM과 통신할 수 있는 객체
 	 * @return ResultOfPush 통신 결과
 	 */
-	public ResultOfPush execute(FirebaseMessaging instance, MsgFromKafkaVo vo);
+	public ResultOfPush execute(FirebaseMessaging instance, MessageWrapper vo);
 
 	
 
