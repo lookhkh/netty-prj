@@ -1,11 +1,14 @@
 package com.kt.onnuipay.kafka.kafkanetty.client.handler.manager.impl.hanlder;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.springframework.stereotype.Component;
 
 import com.kt.onnuipay.client.handler.manager.SendManager;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.ResultOfPush;
 
 import datavo.msg.MessageWrapper;
+import lombok.extern.slf4j.Slf4j;
 
 
 /*
@@ -20,16 +23,15 @@ import datavo.msg.MessageWrapper;
  *  intended publication of such software.
  */
 
+@Slf4j
 @Component("sms-multiple-manager")
 public class SmsMultipleManager implements SendManager {
 	
 	
 
 	@Override
-	public ResultOfPush send(MessageWrapper vo) {
-		return null;
-		// TODO Auto-generated method stub
-		
+	public void send(MessageWrapper vo) {
+		log.info("SMS Multi Msg {}",vo);
 		
 	}
 }

@@ -1,12 +1,12 @@
 package com.kt.onnuipay.kafka.kafkanetty.client.handler.manager.impl.hanlder;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.kt.onnuipay.client.handler.manager.SendManager;
 import com.kt.onnuipay.client.handler.manager.SendPushManager;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.ResultOfPush;
 
 import datavo.msg.MessageWrapper;
@@ -43,10 +43,10 @@ public class PushSingleManager implements SendManager {
 	private final SendPushManager manager;
 
 	@Override
-	public ResultOfPush send(MessageWrapper vo) {
+	public void send(MessageWrapper vo) {
 		log.info("PushSingleSendManager received {}",vo);
 				
-		return manager.execute(instance,vo);
+		 manager.execute(instance,vo);
 
 		
 		

@@ -70,7 +70,6 @@ public class ControllerTest {
 	@DisplayName("ANDROID 단건 MSG 수신 후 push 후 성공 반환하며, 이력을 DB에 저장한다.")
 	public void test1() throws DatabindException, IOException {
 		
-		controllerTestCondition(data.jsonForSingleAndroidPush,data.voForSingleAndroidPush,true);
 	}
 
 	
@@ -78,7 +77,6 @@ public class ControllerTest {
 	@DisplayName("ANDROID Multi MSG 수신 후 push 후 성공 반환, 이력을 DB에 저장한다.")
 	public void test1_1() throws DatabindException, IOException {
 		
-		controllerTestCondition(data.jsonForMultiAndroidPush,data.voForMultipleAndroidPush,true);
 
 	}
 	
@@ -87,7 +85,6 @@ public class ControllerTest {
 	@DisplayName("IOS 단건 MSG 수신 후 push 후 성공 반환, 이력을 DB에 저장한다.")
 	public void test1_2() throws DatabindException, IOException {
 		
-		controllerTestCondition(data.jsonForSingleIOSPush,data.voForSingleIOSPush,true);
 
 	}
 	
@@ -95,7 +92,6 @@ public class ControllerTest {
 	@DisplayName("IOS Multi MSG 수신 후 push 후 성공 반환, 이력을 DB에 저장한다.")
 	public void test1_3() throws DatabindException, IOException {
 		
-		controllerTestCondition(data.jsonForMultiIOSPush,data.voForMultipleIOSPush,true);
 
 	}
 	
@@ -103,7 +99,6 @@ public class ControllerTest {
 	@DisplayName("SMS 단건 MSG 수신 후 push 후 성공 반환, 이력을 DB에 저장한다.")
 	public void test1_4() throws DatabindException, IOException {
 		
-		controllerTestCondition(data.jsonForSingleSMS,data.voForSingleSMS,true);
 
 	}
 	
@@ -111,7 +106,6 @@ public class ControllerTest {
 	@DisplayName("SMS Multi MSG 수신 후 push 후 성공 반환, 이력을 DB에 저장한다.")
 	public void test1_5() throws DatabindException, IOException {
 		
-		controllerTestCondition(data.jsonForMultiSMS,data.voForMultipleSMS,true);
 
 		
 	}
@@ -124,7 +118,6 @@ public class ControllerTest {
 	@DisplayName("ANDROID 단건 MSG 수신 후 push 후 실패 반환, 이력을 DB에 저장한다.")
 	public void test1_6() throws DatabindException, IOException {
 		
-		controllerTestCondition(data.jsonForSingleAndroidPush,data.voForSingleAndroidPush,false);
 	}
 
 	
@@ -132,7 +125,6 @@ public class ControllerTest {
 	@DisplayName("ANDROID Multi MSG 수신 후 push 후 실패 반환, 이력을 DB에 저장한다.")
 	public void test1_7() throws DatabindException, IOException {
 		
-		controllerTestCondition(data.jsonForMultiAndroidPush,data.voForMultipleAndroidPush,false);
 
 	}
 	
@@ -141,7 +133,6 @@ public class ControllerTest {
 	@DisplayName("IOS 단건 MSG 수신 후 push 후 실패 반환, 이력을 DB에 저장한다.")
 	public void test1_8() throws DatabindException, IOException {
 		
-		controllerTestCondition(data.jsonForSingleIOSPush,data.voForSingleIOSPush,false);
 
 	}
 	
@@ -149,7 +140,6 @@ public class ControllerTest {
 	@DisplayName("IOS Multi MSG 수신 후 push 후 실패 반환, 이력을 DB에 저장한다.")
 	public void test1_9() throws DatabindException, IOException {
 		
-		controllerTestCondition(data.jsonForMultiIOSPush,data.voForMultipleIOSPush,false);
 
 	}
 	
@@ -157,7 +147,6 @@ public class ControllerTest {
 	@DisplayName("SMS 단건 MSG 수신 후 push 후 실패 반환, 이력을 DB에 저장한다.")
 	public void test1_10() throws DatabindException, IOException {
 		
-		controllerTestCondition(data.jsonForSingleSMS,data.voForSingleSMS,false);
 
 	}
 	
@@ -165,7 +154,6 @@ public class ControllerTest {
 	@DisplayName("SMS Multi MSG 수신 후 push 후 실패 반환, 이력을 DB에 저장한다.")
 	public void test1_11() throws DatabindException, IOException {
 		
-		controllerTestCondition(data.jsonForMultiSMS,data.voForMultipleSMS,false);
 
 		
 	}
@@ -183,59 +171,27 @@ public class ControllerTest {
 		
 		Mockito.when(data.mockingParser.parse(ArgumentMatchers.anyString())).thenThrow(JsonDataProcessingWrapperException.class);
 		
-		ResultOfPush p =  data.controller.route(ArgumentMatchers.anyString());
+		data.controller.route(ArgumentMatchers.anyString());
 		
-		assertFalse(p.isSuccess());
-		Mockito.verify(data.mockingMongo, Mockito.only()).insertDbHistory(p);
-		assertNull(p.getVo());
-
+		
 	}
 	
 	@Test
 	@DisplayName("내부에서 처리못한 Exception이 터진 경우, 실패를 반환하며, DB에 이력을 저장한다.")
 	public void test3() {
 		
-		RunTimeExceptionWrapper t = new RunTimeExceptionWrapper("", data.voForMultipleIOSPush, new Exception(""));
-		
-		Mockito.when(data.mockingParser.parse(data.jsonForMultiIOSPush)).thenReturn(data.voForMultipleIOSPush);
-		Mockito.when(data.mockingDynamicHanlder.consume(data.voForMultipleIOSPush)).thenThrow(t);
-
-		ResultOfPush p =  data.controller.route(data.jsonForMultiIOSPush);
-		
-		assertNotNull(p);
-		
-		assertFalse(p.isSuccess());
-		Mockito.verify(data.mockingMongo, Mockito.only()).insertDbHistory(p);
-		assertNotNull(p.getVo());
-		
-		assertEquals(t.getVo(), p.getVo());
+	
 	}
 	
 	
 	
-	private void controllerTestCondition(String json, MessageWrapper voForSingleAndroidPush2, boolean result) {
-		Mockito.when(data.mockingParser.parse(json)).thenReturn(voForSingleAndroidPush2);
-		Mockito.when(data.mockingDynamicHanlder.consume(voForSingleAndroidPush2)).thenReturn(createResultObj(voForSingleAndroidPush2,result));
-		
-		
-		ResultOfPush p =  data.controller.route(json);
-		
-		if(result) {
-			assertTrue(p.isSuccess());
-
-		}else {
-			assertFalse(p.isSuccess());
-
-		}
-		Mockito.verify(data.mockingMongo, Mockito.only()).insertDbHistory(p);
-		assertEquals(p.getVo(), voForSingleAndroidPush2);
-	}
+	
 	
 	private ResultOfPush createResultObj(MessageWrapper voForSingleAndroidPush2, boolean result) {
 		return 	
 				ResultOfPush.builder()
-				.id("test")
-				.success(result)
+				.metaData(voForSingleAndroidPush2.getMetaData())
+				.isSuccess(result)
 				.vo(voForSingleAndroidPush2)
 				.build();
 	}

@@ -105,33 +105,22 @@ public class DynamicHandlerMngTest {
 	@DisplayName("dynamicmanager는 senderManager이 반환한 result를 그대로 반환한다.")
 	public void test4() {
 		
-		Mockito.when(pushSingle.send(vos.getVoForSingleAndroidPush())).thenReturn(successResult);
-		ResultOfPush p =  manager.consume(vos.getVoForSingleAndroidPush());
+	
 		
-		assertNotNull(p);
-		assertTrue(p.isSuccess());
-		assertEquals(successResult, p);
 	}
 	
 	@Test
 	@DisplayName("dynamicmanager는 senderManager에서 에러가 발생할 시, 에러 정보를 담은 fail Result를 반환한다.")
 	public void test4_1() {
 		
-		Mockito.when(pushSingle.send(vos.getVoForSingleAndroidPush())).thenReturn(TestUtil.createFailResultOfPushGivenVo(vos.getVoForSingleAndroidPush(), false, new Exception()));
-		ResultOfPush p =  manager.consume(vos.getVoForSingleAndroidPush());
-		
-		assertNotNull(p);
-		assertFalse(p.isSuccess());
-		assertTrue(p.getReason() instanceof Exception);
+	
 	}
 	
 	@Test
 	@DisplayName("dynamicmanager는 senderManager에서 에러가 발생했는데, 해당 객체에서 핸들링하지 못한 경우, 에러를 RunTimeExceptionWrapper로 감싸서 위로 던진다")
 	public void test4_2() {
 		
-		Mockito.when(pushSingle.send(vos.getVoForSingleAndroidPush())).thenThrow(IllegalArgumentException.class);
-		RunTimeExceptionWrapper t = assertThrows(RunTimeExceptionWrapper.class, ()->manager.consume(vos.getVoForSingleAndroidPush()));
-		assertEquals(vos.getVoForSingleAndroidPush(), t.getVo());
+		
 	}
 	
 

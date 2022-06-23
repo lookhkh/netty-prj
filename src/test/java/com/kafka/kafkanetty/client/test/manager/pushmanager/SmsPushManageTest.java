@@ -48,23 +48,5 @@ public class SmsPushManageTest {
 
 	
 	
-	@Test
-	@DisplayName("AndroidVo를 fcm으로 보내고 성공 메시지를 받는다.")
-	public void test3() {
-		ResultOfPush result =  managerMock.sendPush(instance, vos.getVoForSingleAndroidPush());
-	}
-	
-	@Test
-	@DisplayName("AndroidVo를 fcm으로 보내고 실패 메시지를 받는다.")
-	public void test3_1() {
-		ResultOfPush result = managerMock.sendPush(instance, vos.getVoForMultipleAndroidPush());
-	}
-	
-	@Test
-	@DisplayName("IOSVo를 fcm으로 보내고 성공 메시지를 받는다.")
-	public void test4() {
-		ResultOfPush result = managerMock.sendPush(instance, vos.getVoForMultipleIOSPush());
-	}
-	
 
 }

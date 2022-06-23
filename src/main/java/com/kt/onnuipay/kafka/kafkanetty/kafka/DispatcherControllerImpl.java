@@ -1,10 +1,11 @@
 package com.kt.onnuipay.kafka.kafkanetty.kafka;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.springframework.stereotype.Component;
 
 import com.kt.onnuipay.kafka.kafkanetty.exception.JsonDataProcessingWrapperException;
 import com.kt.onnuipay.kafka.kafkanetty.exception.RunTimeExceptionWrapper;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.ResultOfPush;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.mongo.TempMongodbTemplate;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.parser.KafkaMsgParser;
@@ -35,18 +36,17 @@ public class DispatcherControllerImpl implements DispatcherController{
 	private final DynamicHandlerManager manager;
 	private final TempMongodbTemplate db;
 	
-	@SuppressWarnings("finally")
 	@Override
-	public ResultOfPush route(String msg) {
+	public void route(String msg) {
 		
-		ResultOfPush result = null;
 		
 		try {
 			log.info("Controller recived msg {}",msg);
 			
 			MessageWrapper vo = parser.parse(msg);
+						
+			manager.consume(vo);
 			
-			result =  manager.consume(vo);
 			
 			/**
 			 * TODO 수동 커밋, 자동 커밋에 따라 추가 로직 필요 220610 조현일
@@ -56,35 +56,32 @@ public class DispatcherControllerImpl implements DispatcherController{
 			 * **/
 
 		}catch(JsonDataProcessingWrapperException e) {
-			log.warn("can`t parsing this recived msg into JSON {}",e.getMessage());
+				log.warn("can`t parsing this recived msg into JSON {}",e.getMessage());
+
 			
-			result= ResultOfPush.builder()
-					.id("")
-					.vo(null)
-					.success(false)
-					.reason(e)
-					.build();
+				db.insertDbHistory(
+						ResultOfPush.builder()
+							.vo(null)
+							.metaData(null)
+							.isSuccess(false)
+							.reason(e)
+							.build());
+	
 
 
 		}catch(RunTimeExceptionWrapper e) {
 
-				log.error("Unknown Error Happend {}",((RunTimeExceptionWrapper) e).getVo(),e);
+				log.error("Unknown Error Happend {}",e.getVo(),e);
 				
-				result= ResultOfPush.builder()
-						.id("")
-						.vo(((RunTimeExceptionWrapper)e).getVo())
-						.success(false)
-						.reason(e)
-						.build();
+		
+				db.insertDbHistory(
+						ResultOfPush.builder()
+							.vo(e.getVo())
+							.metaData(null)
+							.isSuccess(false)
+							.reason(e)
+							.build());
 
 		}
-		finally {
-			log.info("result is => {}",result);
-			db.insertDbHistory(result);
-			
-			return result;
-		}
-	
-
 	}
 }

@@ -18,6 +18,6 @@ import com.kt.onnuipay.kafka.kafkanetty.kafka.model.ResultOfPush;
 public interface DispatcherController {
 
 	
-	public ResultOfPush route(String msg);
+	public void route(String msg);
 
 }

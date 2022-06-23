@@ -1,5 +1,7 @@
 package com.kt.onnuipay.kafka.kafkanetty.client.handler.manager.impl.hanlder;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.springframework.stereotype.Component;
 
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -36,11 +38,11 @@ public class PushMultipleManager implements SendManager {
 	private final SendPushManager manager;
 
 	@Override
-	public ResultOfPush send(MessageWrapper vo) {
+	public void send(MessageWrapper vo) {
 
 		log.info("pushMultipleManager received {}",vo);
 		
-		return manager.execute(instance,vo);
+		manager.execute(instance,vo);
 		
 	}
 

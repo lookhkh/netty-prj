@@ -8,9 +8,6 @@ import org.junit.jupiter.api.Test;
 import com.kafka.kafkanetty.kafka.consumer.controller.TestVos;
 import com.kt.onnuipay.client.handler.manager.SendManager;
 import com.kt.onnuipay.kafka.kafkanetty.client.handler.manager.impl.hanlder.SmsSingleManager;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
-
-import datavo.testUtils.MsgFromKafkaSmss;
 
 
 /**

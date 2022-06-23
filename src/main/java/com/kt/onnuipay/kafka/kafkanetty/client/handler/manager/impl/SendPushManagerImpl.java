@@ -1,26 +1,20 @@
 package com.kt.onnuipay.kafka.kafkanetty.client.handler.manager.impl;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.concurrent.ExecutorService;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.firebase.messaging.BatchResponse;
+import com.google.api.core.ApiFutureToListenableFuture;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
-import com.google.firebase.messaging.MulticastMessage;
+import com.kt.onnuipay.callback.FutureCallBackWrapper;
 import com.kt.onnuipay.client.handler.manager.abstracts.PushManagerAbstract;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.ResultOfPush;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.push.AndroidVo;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.push.IOSVo;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.push.MobileAbstractVo;
+import com.kt.onnuipay.kafka.kafkanetty.kafka.mongo.TempMongodbTemplate;
 
 import datavo.msg.MessageWrapper;
 
@@ -40,112 +34,50 @@ import datavo.msg.MessageWrapper;
 public class SendPushManagerImpl extends PushManagerAbstract {
 
 	@Autowired
-	private Environment env;
+	private final TempMongodbTemplate db;
+	private final ExecutorService singleExecutorService;
 	
+	
+	
+
+	public SendPushManagerImpl(TempMongodbTemplate db, @Qualifier("single") ExecutorService singleExecutorService) {
+		super();
+		this.db = db;
+		this.singleExecutorService = singleExecutorService;
+	}
+
+	@Override
+	public void sendPushForSingle(FirebaseMessaging instance, MessageWrapper vo) {
+		
+		
+		ListenableFuture<String> f =  new ApiFutureToListenableFuture<String>(
+					instance.sendAsync((Message)vo.getMessage()));
+		
+		Futures.addCallback(
+				f,new FutureCallBackWrapper<String>(vo,db), singleExecutorService);
+		
+	}
 	
 	@Override
-	public ResultOfPush sendPush(FirebaseMessaging instance, MessageWrapper vo) {
-		
-		ResultOfPush result;
-		
-		
-		if(env !=null) {
-			List<String> list = Arrays
-								.stream(env.getActiveProfiles())
-								.collect(Collectors.toList());
+	protected void sendPushForMulti(FirebaseMessaging instance, MessageWrapper vo) {
+
+		if(vo.isUnicast()) {
 			
-			if(list.contains("prod")) {
-				result = send(instance, vo, false);
-			}else {
-				result = send(instance, vo,true);
-			}
+			
 			
 		}else {
-			result = send(instance, vo,false);	
-		}
 			
-	
-		return result;
+			
+			
+		}
+
+		/**
+		 * TODO MULTI
+		 * **/
 	}
 
-
-
 	
-
-
-
-
-	/**
-	 * @apiNote profile 환경에 따라 Dry Run 여부 선택
-	 * @param instance FCM 연동 객체
-	 * @param smsVo FCM에 보낼 데이터 객체
-	 * @param dryRun FCM에 SEND할 때 테스트 여부, true 시 dryRun
-	 * @param vo send 결과에 따라 반환
-	 * 
-	 * **/
-	@VisibleForTesting
-	private ResultOfPush send(FirebaseMessaging instance, MessageWrapper msg, boolean dryRun) {
-		ResultOfPush result = null;
 		
-		try {
-			
-			if(msg.getTypeValue() != 0) {
-				
-				/**
-				 * TODO Multicast send 기능 구현
-				 * 
-				 * **/
-				
-				BatchResponse results =  instance.sendMulticast((MulticastMessage) msg.getMessage());
-				result = ResultOfPush.builder()
-							.id(msg.getMetaData().getSender())
-							.success(true)
-							.vo(msg)
-							.build();
-			}else {
-				
-			
-			
-			String successfullId = instance.send((Message) msg.getMessage(),dryRun);
-			result = ResultOfPush.builder()
-						.id(successfullId)
-						.success(true)
-						.vo(msg)
-						.build();
-			}
-						
-		} catch (FirebaseMessagingException e) {
-			
-			e.printStackTrace();
-			
-			
-			/**l
-			 * TODO Firebase 연동 규격 확인 및 상황에 따라 예외처리 혹은 return 처리 220610 조현일
-			 * 
-			 * **/
-			
-			result = ResultOfPush.builder()
-					    .id(e.getMessage())
-					    .success(false)
-					    .vo(msg)
-					    .reason(e)
-					    .build();
-			
-		} catch(Exception e) {
-			
-			result = ResultOfPush.builder()
-				    .id(e.getMessage())
-				    .success(false)
-				    .vo(msg)
-				    .reason(e)
-				    .build();
-		
-		
-		}
-		
-		return result;
-	}
-
 
 	
 }

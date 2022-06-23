@@ -19,7 +19,10 @@ import org.springframework.context.ApplicationContext;
  *  intended publication of such software.
  */
 import org.springframework.context.annotation.Bean;
-
+/**
+ * @see Thread-worker 개수 성능 테스트에 따라 조절 필요. 현재는 single - db_connection_pool에 맞춰 테스트
+ * 
+ * **/
 @SpringBootApplication
 public class KafkaNettyApplication {
 
@@ -32,11 +35,11 @@ public class KafkaNettyApplication {
 	
 	/**
 	 * TODO 스레드플 개수 지정 220616 조현일
-	 * 
+	 * - 데이터 처리 로직은 싱글쓰레드가 담당
 	 * **/
 	@Bean("single")
 	public ExecutorService getDefault() {
-		ExecutorService service =  Executors.newFixedThreadPool(100,new ThreadFactory() {
+		ExecutorService service =  Executors.newSingleThreadExecutor(new ThreadFactory() {
 			int cnt = 0;
 			@Override
 			public Thread newThread(Runnable r) {
@@ -50,5 +53,28 @@ public class KafkaNettyApplication {
 		return service;
 		
 	}
+	
+	/**
+	 * TODO 스레드플 개수 지정 220616 조현일
+	 * - 데이터 처리 로직은 싱글쓰레드가 담당
+	 * **/
+	@Bean("db-thread-pool")
+	public ExecutorService getDbHandlingThreadPoolDefault() {
+		ExecutorService service =  Executors.newFixedThreadPool(10,new ThreadFactory() {
+			int cnt = 0;
+			@Override
+			public Thread newThread(Runnable r) {
+				Thread t = new Thread(r);
+				t.setName("Thread-Wokrer-DB "+cnt);
+				cnt++;
+				return t;
+			}
+		});
+		
+		return service;
+		
+	}
+	
+	
 	
 }

@@ -1,10 +1,6 @@
 package com.kt.onnuipay.client.handler.manager;
 
 import com.google.firebase.messaging.FirebaseMessaging;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.ResultOfPush;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.push.AndroidVo;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.push.IOSVo;
 
 import datavo.msg.MessageWrapper;
 
@@ -16,19 +12,14 @@ import datavo.msg.MessageWrapper;
 public interface SendPushManager {
 
 
-
-	public ResultOfPush sendPush(FirebaseMessaging instance, MessageWrapper smsVo);
-
-
-	
 	/**
 	 * @param MsgFromKafkaVo 메시지 내용 및 대상 리스트를 포함하는 VO
 	 * @param FirebaseMessaging FCM과 통신할 수 있는 객체
 	 * @return ResultOfPush 통신 결과
 	 */
-	public ResultOfPush execute(FirebaseMessaging instance, MessageWrapper vo);
+	public void execute(FirebaseMessaging instance, MessageWrapper vo);
 
-	
+
 
 
 }

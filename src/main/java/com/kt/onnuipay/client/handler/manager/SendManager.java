@@ -1,6 +1,7 @@
 package com.kt.onnuipay.client.handler.manager;
 
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
+import java.util.concurrent.CompletableFuture;
+
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.ResultOfPush;
 
 import datavo.msg.MessageWrapper;
@@ -19,7 +20,7 @@ import datavo.msg.MessageWrapper;
 
 public interface SendManager {
 
-	public ResultOfPush send(MessageWrapper vo);
+	public void send(MessageWrapper vo);
 
 
 	

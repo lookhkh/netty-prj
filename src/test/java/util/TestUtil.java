@@ -20,12 +20,12 @@ import com.kt.onnuipay.kafka.kafkanetty.client.handler.mapper.SmsPushMapper;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.DispatcherControllerImpl;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.DynamicHandlerManager;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.listener.AckMessageListener;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.ResultOfPush;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.mongo.TempMongodbTemplate;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.parser.KafkaMsgParser;
 
 import datavo.msg.MessageWrapper;
+import datavo.testUtils.CommonTestDatas;
 import datavo.testUtils.MsgFromKafkaAndroid;
 import datavo.testUtils.MsgFromKafkaIOS;
 import datavo.testUtils.MsgFromKafkaSmss;
@@ -76,39 +76,13 @@ public class TestUtil {
 
 
 	
-	public static List<String> getDatas(){
-		ObjectMapper ob = new ObjectMapper();
-
-		List<?> vo = Arrays.asList(
-				MsgFromKafkaAndroid.voForMultiplePush,
-				MsgFromKafkaAndroid.voForSinglePushWithValidDataBody,
-				MsgFromKafkaIOS.voForMultipleIOSPush,
-				MsgFromKafkaIOS.voForSingleIOSPush,
-				MsgFromKafkaSmss.voForMultipleSMSWithLMS,
-				MsgFromKafkaSmss.voForSingleSmsWithLMS,
-				MsgFromKafkaSmss.voForSingleSmsWithSMS,
-				MsgFromKafkaSmss.voForMultipleSMSWithSMS
-				);
-		
-		return vo.stream().map(item -> {
-			try {
-				String data =  ob.writeValueAsString(vo);
-				return data;
-			} catch (JsonProcessingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				return null;
-			}
-		}).filter(a->a!=null).collect(Collectors.toList());
-		
-	}
 
 	public static ResultOfPush createResultOfPushGivenVo(MessageWrapper vo, boolean result, Throwable t) {
 		// TODO Auto-generated method stub
 		return ResultOfPush.builder()
-					.id(vo.getMetaData().getSender())
+					.metaData(vo.getMetaData())
 					.reason(t)
-					.success(result)
+					.isSuccess(result)
 					.vo(vo)
 					.build();
 	}

@@ -21,9 +21,6 @@ public class KafkaMsgParserImpl<T> implements KafkaMsgParser {
 		
 	}
 
-	
-	
-
 	private <T> T tryConvertMsgOrThrow(String msg, Class<T> type) {
 			
 		try {

@@ -1,16 +1,13 @@
 package com.kt.onnuipay.kafka.kafkanetty.kafka;
 
-import java.sql.SQLException;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.kt.onnuipay.client.handler.manager.SendManager;
 import com.kt.onnuipay.kafka.kafkanetty.exception.RunTimeExceptionWrapper;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.MsgFromKafkaVo;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.ResultOfPush;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.mongo.TempMongodbTemplate;
 
 import datavo.msg.MessageWrapper;
 import lombok.extern.slf4j.Slf4j;
@@ -59,13 +56,13 @@ public class DynamicHandlerManager {
 
 	
 	
-	public ResultOfPush consume(MessageWrapper vo) {
+	public void consume(MessageWrapper vo) {
 		
 		log.info("DynamicHanlder recived {}",vo);
 				
 		try {
 					
-			return getInstance(vo).send(vo);
+			 getInstance(vo).send(vo);
 
 			
 		}
