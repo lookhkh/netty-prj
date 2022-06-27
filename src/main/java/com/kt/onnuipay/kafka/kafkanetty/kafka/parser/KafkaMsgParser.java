@@ -40,7 +40,7 @@ public interface KafkaMsgParser {
 	 * @return SingleMessageWrapper Parsing 결과 VO
 	 * @throws JsonDataProcessingWrapperException JSON Parsing 실패 시, RuntimeException을 extend 한 JsonDataProcessingWrapperException를 던진다
 	 */
-	public MessageWrapper parse(String msg) throws JsonDataProcessingWrapperException;
+	public MessageWrapper parse(String msg) throws JsonDataProcessingWrapperException, RuntimeException;
 
 
 	

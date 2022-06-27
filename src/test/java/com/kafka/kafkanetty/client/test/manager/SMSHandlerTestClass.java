@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.kafka.kafkanetty.kafka.consumer.controller.TestVos;
 import com.kt.onnuipay.client.handler.manager.SendManager;
 import com.kt.onnuipay.kafka.kafkanetty.client.handler.manager.impl.hanlder.SmsSingleManager;
 
@@ -29,7 +28,6 @@ public class SMSHandlerTestClass {
 	
 	SendManager mng = new SmsSingleManager();
 
-	TestVos vo = TestVos.getTestVos();
 	
 	
 	

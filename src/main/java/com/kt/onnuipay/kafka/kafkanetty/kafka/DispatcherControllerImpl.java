@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import com.kt.onnuipay.kafka.kafkanetty.exception.JsonDataProcessingWrapperException;
 import com.kt.onnuipay.kafka.kafkanetty.exception.RunTimeExceptionWrapper;
+import com.kt.onnuipay.kafka.kafkanetty.kafka.dynamic.DynamicHandlerManager;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.ResultOfPush;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.mongo.TempMongodbTemplate;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.parser.KafkaMsgParser;
@@ -46,7 +47,6 @@ public class DispatcherControllerImpl implements DispatcherController{
 			MessageWrapper vo = parser.parse(msg);
 						
 			manager.consume(vo);
-			
 			
 			/**
 			 * TODO 수동 커밋, 자동 커밋에 따라 추가 로직 필요 220610 조현일

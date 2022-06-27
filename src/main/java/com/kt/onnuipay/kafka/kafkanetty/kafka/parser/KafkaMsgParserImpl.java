@@ -11,28 +11,17 @@ import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
-public class KafkaMsgParserImpl<T> implements KafkaMsgParser {
+public class KafkaMsgParserImpl implements KafkaMsgParser {
 
 	
 	@Override
-	public MessageWrapper parse(String msg) throws JsonDataProcessingWrapperException {
-
-		return tryConvertMsgOrThrow(msg, MessageWrapper.class);
+	public MessageWrapper parse(String msg) throws JsonDataProcessingWrapperException, RuntimeException {
 		
+		
+		
+		return null;
+
 	}
 
-	private <T> T tryConvertMsgOrThrow(String msg, Class<T> type) {
-			
-		try {
-			return  MessageUtils.toWrapper(msg, type);
-				
-			} catch (JsonSyntaxException e) {
-				e.printStackTrace();
-				throw new JsonDataProcessingWrapperException("Message Json Parsing error",e);
-			} 
-			catch(Exception e) {
-				e.printStackTrace();
-				throw new RuntimeException("Unknown Error Happend originMsgIs=> "+msg,e);
-			}
-		}
+	
 }

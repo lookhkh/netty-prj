@@ -1,33 +1,16 @@
-package com.kt.onnuipay.kafka.kafkanetty.kafka;
-
-import java.util.concurrent.CompletableFuture;
+package com.kt.onnuipay.kafka.kafkanetty.kafka.dynamic;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import com.kt.onnuipay.client.handler.manager.SendManager;
-import com.kt.onnuipay.kafka.kafkanetty.exception.RunTimeExceptionWrapper;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.ResultOfPush;
 
 import datavo.msg.MessageWrapper;
 import lombok.extern.slf4j.Slf4j;
 
-/*
- * KT OnnuriPay version 1.0
- *
- *  Copyright ⓒ 2022 kt corp. All rights reserved.
- *
- *  This is a proprietary software of kt corp, and you may not use this file except in
- *  compliance with license agreement with kt corp. Any redistribution or use of this
- *  software, with or without modification shall be strictly prohibited without prior written
- *  approval of kt corp, and the copyright notice above does not evidence any actual or
- *  intended publication of such software.
- */
-
-
-@Slf4j
 @Component
-public class DynamicHandlerManager {
+@Slf4j
+public class DefaultDynamicHanlderFactory implements DynamicHandlerFactoryMethod {
 
 	@Qualifier(value = "sms-single-manager")
 	private final SendManager smsSingleMng;
@@ -42,8 +25,7 @@ public class DynamicHandlerManager {
 	private final SendManager pushMultipleSend;
 	
 	
-	
-	public DynamicHandlerManager(
+	public DefaultDynamicHanlderFactory(
 			@Qualifier(value = "sms-single-manager") SendManager smsSingleMng, 
 			@Qualifier(value = "sms-multiple-manager") SendManager smsMultipleMng,	
 			@Qualifier(value = "push-single-manager") SendManager pushSingleSend,
@@ -55,31 +37,8 @@ public class DynamicHandlerManager {
 	}
 
 	
-	
-	public void consume(MessageWrapper vo) {
-		
-		log.info("DynamicHanlder recived {}",vo);
-				
-		try {
-					
-			 getInstance(vo).send(vo);
-
-			
-		}
-
-		catch(Exception e) {
-			
-			log.error("{}, unknown error happend == recivedVo => ",e.getMessage(),vo,e);
-
-			throw new RunTimeExceptionWrapper("unknown error happend",vo,e);
-
-		}
-	}
-
-	
-	
-	private SendManager getInstance(MessageWrapper vo) {
-		
+	@Override
+	public SendManager getInstance(MessageWrapper vo) {
 		log.debug("멀티1/단건0 -> {}, and0 / ios1 / sms2 -> {}",vo.getCodeOfType(),vo.getTypeValue());
 		
 		if(vo.getCodeOfType() ==0 && vo.getTypeValue() == 2) { //단건 
@@ -99,9 +58,6 @@ public class DynamicHandlerManager {
 		}
 		
 		throw new IllegalArgumentException("해당하는 SendManager 객체를 찾을 수 없다 => "+vo);
-					
+				
 	}
-
-	
-
 }

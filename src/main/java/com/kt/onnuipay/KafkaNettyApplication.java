@@ -19,6 +19,8 @@ import org.springframework.context.ApplicationContext;
  *  intended publication of such software.
  */
 import org.springframework.context.annotation.Bean;
+
+import com.kt.onnuipay.kafka.kafkanetty.kafka.dynamic.DynamicHandlerFactoryMethod;
 /**
  * @see Thread-worker 개수 성능 테스트에 따라 조절 필요. 현재는 single - db_connection_pool에 맞춰 테스트
  * 
