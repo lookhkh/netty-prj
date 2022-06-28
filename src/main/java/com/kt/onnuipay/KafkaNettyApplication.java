@@ -1,9 +1,11 @@
 package com.kt.onnuipay;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
+import org.springframework.beans.BeansException;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
@@ -20,7 +22,7 @@ import org.springframework.context.ApplicationContext;
  */
 import org.springframework.context.annotation.Bean;
 
-import com.kt.onnuipay.kafka.kafkanetty.kafka.dynamic.DynamicHandlerFactoryMethod;
+import com.kt.onnuipay.kafka.kafkanetty.config.FireBaseConfig;
 /**
  * @see Thread-worker 개수 성능 테스트에 따라 조절 필요. 현재는 single - db_connection_pool에 맞춰 테스트
  * 
@@ -30,8 +32,9 @@ public class KafkaNettyApplication {
 
 	
 	
-	public static void main(String[] args) throws InterruptedException {
+	public static void main(String[] args) throws InterruptedException, BeansException, IOException {
 		ApplicationContext ctx = SpringApplication.run(KafkaNettyApplication.class, args);
+		
 	}
 
 	
@@ -76,6 +79,8 @@ public class KafkaNettyApplication {
 		return service;
 		
 	}
+	
+
 	
 	
 	

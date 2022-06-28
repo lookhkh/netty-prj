@@ -1,7 +1,13 @@
 package com.kt.onnuipay.kafka.kafkanetty.client.handler.manager.impl.hanlder;
 
+import java.io.IOException;
+
 import org.springframework.stereotype.Component;
 
+import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpRequest;
+import com.google.api.client.http.HttpRequestFactory;
+import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.kt.onnuipay.client.handler.manager.SendManager;
 
@@ -38,12 +44,10 @@ public class PushSingleManager implements SendManager {
 	private final FirebaseMessaging instance;
 
 	@Override
-	public void send(MessageWrapper vo) {
+	public void send(MessageWrapper vo)  {
 		log.info("PushSingleSendManager received {}",vo);
 				
-		 
 
-		
 		
 	}
 	

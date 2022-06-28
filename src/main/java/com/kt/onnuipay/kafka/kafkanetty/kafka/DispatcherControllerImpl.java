@@ -1,7 +1,5 @@
 package com.kt.onnuipay.kafka.kafkanetty.kafka;
 
-import java.util.concurrent.CompletableFuture;
-
 import org.springframework.stereotype.Component;
 
 import com.kt.onnuipay.kafka.kafkanetty.exception.JsonDataProcessingWrapperException;
