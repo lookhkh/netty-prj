@@ -3,50 +3,80 @@ package com.kafka.kafkanetty.client.test.manager;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.concurrent.ExecutionException;
 
-import org.apache.http.HttpResponse;
 import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.Dsl;
-import org.asynchttpclient.ListenableFuture;
-import org.asynchttpclient.Response;
 import org.junit.jupiter.api.Test;
 
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.google.auth.oauth2.GoogleCredentials;
+import com.google.firebase.database.util.JsonMapper;
+import com.google.gson.JsonObject;
+
+import datavo.msg.MessageWrapper;
 
 public class LibTest {
 
-
+	class Simpe{
+		String data;
+		int age;
+	
+	public Simpe() {
+		// TODO Auto-generated constructor stub
+	}
+	
+	
+	}
+	
 	@Test
 	public void t() throws IOException, InterruptedException {
-		String value = getAccessToken();
-		System.out.println(value);
 		
-		AsyncHttpClient asyncHttpClient = Dsl.asyncHttpClient();
-		for(int i=0; i<5; i++) {
-			ListenableFuture<Response> r = asyncHttpClient
-				.prepareGet("https://jsonplaceholder.typicode.com/todos/"+i)
-				.addHeader("Authorization", "Bearer "+this.getAccessToken())
-				.execute();
-			r.addListener(extracted(r), null);
+//		AsyncHttpClient asyncHttpClient = Dsl.asyncHttpClient();
+//		String hi = "hi";
+//			 asyncHttpClient
+//				.prepareGet("https://jsonplaceholder.typicode.com/todos/1")
+//				.addHeader("Authorization", "Bearer ")
+//				.execute()
+//				.toCompletableFuture()
+//				.thenApply(response -> response.getResponseBody())
+//				
+//				.thenApply(response -> extracted(response))
+//				.thenAccept(map -> doRestLogic(map, hi));
+//			 	
+//		Thread.sleep(100000);
+//		
+//		asyncHttpClient.close();
+//		
+	  
+		
+	XmlMapper mapper = new XmlMapper();
+	Simple a = new Simple("hi",1);
+	
+		
+		
+		String result = mapper.writeValueAsString(a);
+		Simple t = mapper.readValue(result, Simple.class);
+		
+		System.out.println(result);
+		System.out.println(t.toString());
 
-		}
-		Thread.sleep(100000);
-		
-		asyncHttpClient.close();
-		
 	}
 
-	private Runnable extracted(ListenableFuture<Response> f) {
-		return ()->{
-			try {
-				System.out.println(f.get().getResponseBody());
-				System.out.println("++++++++++++++++++ "+Thread.currentThread().getName());
-			} catch (InterruptedException | ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		};
+	private Object doRestLogic(Object map, String hi) {
+
+		System.out.println(map+hi);
+		
+		return null;
+	}
+
+	private Object extracted(String res) {
+		try {
+			return JsonMapper.parseJson(res);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	private static String getAccessToken() throws IOException {

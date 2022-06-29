@@ -57,6 +57,14 @@ public class SMSHandlerTestClass {
 		
 	}
 	
+	@Test
+	@DisplayName("2.1 AuthTicket 생성")
+	public void test2_1() {
+		
+		assertTrue(false);
+		
+	}
+	
 
 	@Test
 	@DisplayName("3. SP 로그인(인증)요청")
@@ -66,31 +74,6 @@ public class SMSHandlerTestClass {
 		
 	}
 	
-
-	@Test
-	@DisplayName("3-1. 파일 업로드 경로 정보 요청")
-	public void test3_1() {
-		
-		assertTrue(false);
-		
-	}
-	
-
-	@Test
-	@DisplayName("3-2. 파일 업로드 서버 정보 요청")
-	public void test3_2() {
-		
-		assertTrue(false);
-		
-	}
-	
-	@Test
-	@DisplayName("3-3. 파일 업로드 및 완료 요청")
-	public void test3_3() {
-		
-		assertTrue(false);
-		
-	}
 	
 	@Test
 	@DisplayName("4. SMS&MMS 전송 요청")

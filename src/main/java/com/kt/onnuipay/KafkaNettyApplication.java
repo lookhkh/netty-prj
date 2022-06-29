@@ -5,10 +5,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
+import org.asynchttpclient.AsyncHttpClient;
 import org.springframework.beans.BeansException;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.ConfigurableApplicationContext;
 /*
  * KT OnnuriPay version 1.0
  *
@@ -21,8 +25,10 @@ import org.springframework.context.ApplicationContext;
  *  intended publication of such software.
  */
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.event.ContextClosedEvent;
 
-import com.kt.onnuipay.kafka.kafkanetty.config.FireBaseConfig;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.kt.onnuipay.kafka.kafkanetty.config.vo.XroshotParameter;
 /**
  * @see Thread-worker 개수 성능 테스트에 따라 조절 필요. 현재는 single - db_connection_pool에 맞춰 테스트
  * 
@@ -33,8 +39,11 @@ public class KafkaNettyApplication {
 	
 	
 	public static void main(String[] args) throws InterruptedException, BeansException, IOException {
-		ApplicationContext ctx = SpringApplication.run(KafkaNettyApplication.class, args);
+		ConfigurableApplicationContext  ctx = SpringApplication.run(KafkaNettyApplication.class, args);
+		XroshotParameter param = ctx.getBean(XroshotParameter.class);
 		
+
+
 	}
 
 	

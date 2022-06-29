@@ -1,9 +1,5 @@
 package com.kt.onnuipay.kafka.kafkanetty.exception;
 
-import java.io.IOException;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import lombok.Data;
 
 
