@@ -46,7 +46,7 @@ public class ClientConfig {
 	}
 	
 	
-	@Bean
+	@Bean("netty-event-group")
 	public EventLoopGroup getDefaultNioEventLoopGroup() {
 		
 		int threads = Integer.valueOf(env.getProperty("netty.client.loopgroup.threads"));

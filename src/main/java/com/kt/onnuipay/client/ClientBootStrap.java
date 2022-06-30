@@ -1,16 +1,18 @@
 package com.kt.onnuipay.client;
 
 
+import org.springframework.stereotype.Component;
+
+import com.kt.onnuipay.kafka.kafkanetty.exception.RunTimeExceptionWrapper;
+
 import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.logging.LogLevel;
-import io.netty.handler.logging.LoggingHandler;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,75 +40,40 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Getter
-//@Component("client-bootstrap")
+@Component
 public class ClientBootStrap {
-	
-	
 
-	private final String host;
-	private final int port;
-	private EventLoopGroup workerGroup;
+	private final EventLoopGroup workerGroup;
 	
-	public  ClientBootStrap(String host, int port, EventLoopGroup workerGroup) {
-		this.host = host;
-		this.port = port;
-		
-		if(workerGroup == null) {
-			this.workerGroup = new NioEventLoopGroup();
-		}else {
-	        this.workerGroup = workerGroup; //공유자원,bootstrap 설정 시 사용
-		}
-
+	public  ClientBootStrap(EventLoopGroup workerGroup) {
+	
+		this.workerGroup = workerGroup;
+	
 	}
 	
 
-	public  ClientBootStrap(String host, int port) {
-		this.host = host;
-		this.port = port;
-		
-		if(workerGroup == null) {
-			this.workerGroup = new NioEventLoopGroup();
-		}
 
-	}
-	
-	
-	
-
-	public boolean start()  {
+	public Channel start(ChannelInitializer<SocketChannel> init, String host, int port)   {
 		
-        EventLoopGroup workerGroup = new NioEventLoopGroup(); //공유자원,bootstrap 설정 시 사용
         
         try {
             Bootstrap b = new Bootstrap(); 
-            b.group(workerGroup); 
+            b.group(this.workerGroup); 
             b.channel(NioSocketChannel.class); 
             b.option(ChannelOption.SO_KEEPALIVE, true);
             
-            b.handler(new ChannelInitializer<SocketChannel>() {
-                @Override
-                public void initChannel(SocketChannel ch) throws Exception {
-                    ch.pipeline()
-                    	.addLast(new LoggingHandler(LogLevel.DEBUG));
-                }
-            });
+            b.handler(init);
 
-            ChannelFuture f = b.connect(this.host, this.port).sync();
-           
+            ChannelFuture f = b.connect(host, port).sync();
+            return f.channel();
             // Wait until the connection is closed.
-            f.channel().closeFuture().sync();
+            
         } catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			throw new RunTimeExceptionWrapper(e.getMessage(), null, e);
 		}
-        finally {
-            workerGroup.shutdownGracefully();
-        }
+     
 		
-		return true;
-	}
-
-	public void stop() {
-        workerGroup.shutdownGracefully();
 	}
 }

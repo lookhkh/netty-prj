@@ -31,7 +31,7 @@ import lombok.Getter;
 @Getter
 @ConstructorBinding
 @ConfigurationProperties(prefix = "xroshot")
-public final class XroshotParameter {
+public class XroshotParameter {
 
 	
 	private final String sendServerUrl; //

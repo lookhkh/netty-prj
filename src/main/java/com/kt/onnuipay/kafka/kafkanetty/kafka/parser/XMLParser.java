@@ -17,18 +17,18 @@ public class XMLParser {
 	
 	private final XmlMapper mapper;
 
-	public String parseToString(MessageWrapper vo) {
-		log.info("XML parser received {}",vo);
+	public String parseToString(Object object) throws JsonDataProcessingWrapperException {
+		log.info("XML parser received {}",object);
 
 		try {
-			return mapper.writeValueAsString(vo);
+			return mapper.writeValueAsString(object)+"\0";
 		} catch (JsonProcessingException e) {
 			// TODO Auto-generated catch block
 			throw new JsonDataProcessingWrapperException("XML Serialzing Error", e);
 		}
 	}
 	
-	public <T> T deserialzeFromJson(String json, Class<T> clazz) {
+	public  <T> T deserialzeFromJson(String json, Class<T> clazz) {
 		try {
 			return mapper.readValue(json, clazz);
 		} catch (JsonProcessingException e) {
@@ -36,5 +36,7 @@ public class XMLParser {
 			throw new JsonDataProcessingWrapperException("XML DeSerialzing Error", e);
 		}
 	}
+	
+	 
 
 }

@@ -1,13 +1,8 @@
 package com.kt.onnuipay.kafka.kafkanetty.client.handler.manager.impl.hanlder;
 
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.CompletableFuture;
 
-import org.asynchttpclient.AsyncHandler;
 import org.asynchttpclient.AsyncHttpClient;
-import org.asynchttpclient.HttpResponseBodyPart;
-import org.asynchttpclient.HttpResponseStatus;
 import org.asynchttpclient.ListenableFuture;
 import org.asynchttpclient.Request;
 import org.asynchttpclient.RequestBuilder;
@@ -17,12 +12,19 @@ import org.springframework.stereotype.Component;
 import com.google.common.net.HttpHeaders;
 import com.google.common.net.MediaType;
 import com.kt.onnuipay.client.handler.manager.SendManager;
-import com.kt.onnuipay.kafka.kafkanetty.client.handler.async.XroshotAsyncHandler;
+import com.kt.onnuipay.kafka.kafkanetty.client.handler.async.AsyncXroshotHanlder;
+import com.kt.onnuipay.kafka.kafkanetty.client.handler.async.exception.AsyncExceptionHanlder;
+import com.kt.onnuipay.kafka.kafkanetty.client.handler.async.exception.FinalXroshotExceptionHanlder;
+import com.kt.onnuipay.kafka.kafkanetty.client.handler.async.impl.GetServerSyncTime;
+import com.kt.onnuipay.kafka.kafkanetty.client.handler.async.impl.ParsingServerResponse;
 import com.kt.onnuipay.kafka.kafkanetty.config.vo.XroshotParameter;
+import com.kt.onnuipay.kafka.kafkanetty.kafka.model.xml.response.SmsPushServerInfoVo;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.parser.XMLParser;
 
 import datavo.msg.MessageWrapper;
+import io.netty.util.CharsetUtil;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -41,11 +43,18 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component("sms-single-manager")
 @AllArgsConstructor
+@Builder
 public class SmsSingleManager implements SendManager {
 
 	private final AsyncHttpClient client;
 	private final XMLParser parser;
 	private final XroshotParameter param;
+	
+	private final ParsingServerResponse paringMsgServerInfo;
+	private final GetServerSyncTime getSyncServerTime;
+
+	
+	private final FinalXroshotExceptionHanlder FinalXroshotExceptionHandler;
 	
 	@Override
 	public void send(MessageWrapper vo) {
@@ -64,8 +73,12 @@ public class SmsSingleManager implements SendManager {
 		ListenableFuture<Response> f = client.executeRequest(r);
 
 		f.toCompletableFuture()
-			.thenApply(response -> response.getResponseBody());
-		
+			.thenApply(res -> res.getResponseBody(CharsetUtil.UTF_8))
+			.thenApply(paringMsgServerInfo::execute)
+			.thenAccept(getSyncServerTime::execute);
+			
 	}
+
+	
 
 }

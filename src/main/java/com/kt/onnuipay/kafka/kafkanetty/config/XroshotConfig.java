@@ -3,13 +3,20 @@ package com.kt.onnuipay.kafka.kafkanetty.config;
 import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.AsyncHttpClientConfig;
 import org.asynchttpclient.Dsl;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
+import com.fasterxml.jackson.dataformat.xml.JacksonXmlModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import com.kt.onnuipay.kafka.kafkanetty.config.vo.XroshotParameter;
+
+import io.netty.channel.EventLoopGroup;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 
@@ -34,8 +41,12 @@ import com.kt.onnuipay.kafka.kafkanetty.config.vo.XroshotParameter;
 @Configuration
 @EnableConfigurationProperties(value= {XroshotParameter.class})
 @PropertySource("classpath:xroshot.properties")
+@AllArgsConstructor
+@Slf4j
 public class XroshotConfig {
 
+	@Qualifier("netty-event-group")
+	private final EventLoopGroup loop;
 	
 	/****
 	 * 
@@ -45,8 +56,7 @@ public class XroshotConfig {
 	@Bean
 	public AsyncHttpClient getAsyncHttpClient() {
 		
-		
-		AsyncHttpClientConfig config = Dsl.config().build();
+		AsyncHttpClientConfig config = Dsl.config().setEventLoopGroup(this.loop).build();
 		AsyncHttpClient asyncHttpClient = Dsl.asyncHttpClient(config);
 		return asyncHttpClient;
 
@@ -54,6 +64,14 @@ public class XroshotConfig {
 	
 	@Bean
 	public XmlMapper getMapper() {
+		
+		JacksonXmlModule module = new JacksonXmlModule();
+		module.setDefaultUseWrapper(false);
+
+		
+		XmlMapper xmlMapper = new XmlMapper(module);
+		xmlMapper.configure(ToXmlGenerator.Feature.WRITE_XML_DECLARATION, true);
+
 		return new XmlMapper();
 	}
 	

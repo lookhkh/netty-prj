@@ -9,6 +9,7 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.parser.XMLParser;
 
 import datavo.msg.MessageWrapper;
+import datavo.testUtils.MessageWrapperBuilders;
 
 public class XMLParserTest {
 
@@ -17,8 +18,9 @@ public class XMLParserTest {
 	@Test
 	@DisplayName("XML을 JSON으로 변환 중, 에러가 발생하면 런타임 에러를 던진다")
 	public void test() {
+
 		assertTrue(false);
-		parser.parseToString(null);
+		
 	}
 	
 	@Test
