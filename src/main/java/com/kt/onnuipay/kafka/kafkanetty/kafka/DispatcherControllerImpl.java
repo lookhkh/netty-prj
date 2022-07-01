@@ -74,7 +74,7 @@ public class DispatcherControllerImpl implements DispatcherController{
 		
 				db.insertDbHistory(
 						ResultOfPush.builder()
-							.vo(e.getVo())
+							.vo((MessageWrapper)e.getVo())
 							.metaData(null)
 							.isSuccess(false)
 							.reason(e)

@@ -1,7 +1,5 @@
 package com.kt.onnuipay.kafka.kafkanetty.client.handler.manager.impl.hanlder;
 
-import java.util.concurrent.CompletableFuture;
-
 import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.ListenableFuture;
 import org.asynchttpclient.Request;
@@ -12,13 +10,10 @@ import org.springframework.stereotype.Component;
 import com.google.common.net.HttpHeaders;
 import com.google.common.net.MediaType;
 import com.kt.onnuipay.client.handler.manager.SendManager;
-import com.kt.onnuipay.kafka.kafkanetty.client.handler.async.AsyncXroshotHanlder;
-import com.kt.onnuipay.kafka.kafkanetty.client.handler.async.exception.AsyncExceptionHanlder;
 import com.kt.onnuipay.kafka.kafkanetty.client.handler.async.exception.FinalXroshotExceptionHanlder;
-import com.kt.onnuipay.kafka.kafkanetty.client.handler.async.impl.GetServerSyncTime;
 import com.kt.onnuipay.kafka.kafkanetty.client.handler.async.impl.ParsingServerResponse;
+import com.kt.onnuipay.kafka.kafkanetty.client.handler.async.impl.PrepareAndStartNettyClient;
 import com.kt.onnuipay.kafka.kafkanetty.config.vo.XroshotParameter;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.xml.response.SmsPushServerInfoVo;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.parser.XMLParser;
 
 import datavo.msg.MessageWrapper;
@@ -51,7 +46,7 @@ public class SmsSingleManager implements SendManager {
 	private final XroshotParameter param;
 	
 	private final ParsingServerResponse paringMsgServerInfo;
-	private final GetServerSyncTime getSyncServerTime;
+	private final PrepareAndStartNettyClient prepareeAndStartClient;
 
 	
 	private final FinalXroshotExceptionHanlder FinalXroshotExceptionHandler;
@@ -75,7 +70,7 @@ public class SmsSingleManager implements SendManager {
 		f.toCompletableFuture()
 			.thenApply(res -> res.getResponseBody(CharsetUtil.UTF_8))
 			.thenApply(paringMsgServerInfo::execute)
-			.thenAccept(getSyncServerTime::execute);
+			.thenAccept(prepareeAndStartClient::execute);
 			
 	}
 

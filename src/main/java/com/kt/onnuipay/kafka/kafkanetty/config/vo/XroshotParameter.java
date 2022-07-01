@@ -39,8 +39,8 @@ public class XroshotParameter {
 	private final String serviceProviderPw; //
 	private final String certFile; //
 	private final String authKey; //
-	private final String indexBegin; //
-	private final String indexEnd; //
+	private final int indexBegin; //
+	private final int indexEnd; //
 	private final String endUserId; //
 	private final String oneTimeSecretKey; //
 	private final String version; //
@@ -54,8 +54,8 @@ public class XroshotParameter {
 		this.serviceProviderPw = serviceProviderPw;
 		this.certFile = certFile;
 		this.authKey = authKey;
-		this.indexBegin = indexBegin;
-		this.indexEnd = String.valueOf(Integer.valueOf(this.indexBegin)+128);
+		this.indexBegin = Integer.valueOf(indexBegin);
+		this.indexEnd = Integer.valueOf(this.indexBegin)+128;
 		this.endUserId = endUserId;
 		this.oneTimeSecretKey = oneTimeSecretKey;
 		this.version = version;

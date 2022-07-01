@@ -46,13 +46,6 @@ public class ClientConfig {
 	}
 	
 	
-	@Bean("netty-event-group")
-	public EventLoopGroup getDefaultNioEventLoopGroup() {
-		
-		int threads = Integer.valueOf(env.getProperty("netty.client.loopgroup.threads"));
-		
-		return new NioEventLoopGroup(threads);
-	}
 	
 	@Bean
 	public Bootstrap getDefaultNettyBootStrapForClient() {

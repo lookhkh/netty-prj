@@ -79,7 +79,7 @@ public class Controller_Interface_Test {
 		controller.route(validMsg);
 		
 		ResultOfPush failedResult = ResultOfPush.builder()
-										.vo(exception.getVo())
+										.vo((MessageWrapper)exception.getVo())
 										.metaData(null)
 										.isSuccess(false)
 										.reason(exception)

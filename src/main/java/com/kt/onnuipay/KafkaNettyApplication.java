@@ -5,13 +5,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
-import org.asynchttpclient.AsyncHttpClient;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
 /*
  * KT OnnuriPay version 1.0
@@ -25,10 +22,10 @@ import org.springframework.context.ConfigurableApplicationContext;
  *  intended publication of such software.
  */
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.event.ContextClosedEvent;
+import org.springframework.core.env.Environment;
 
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.kt.onnuipay.kafka.kafkanetty.config.vo.XroshotParameter;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
 /**
  * @see Thread-worker 개수 성능 테스트에 따라 조절 필요. 현재는 single - db_connection_pool에 맞춰 테스트
  * 
@@ -36,11 +33,11 @@ import com.kt.onnuipay.kafka.kafkanetty.config.vo.XroshotParameter;
 @SpringBootApplication
 public class KafkaNettyApplication {
 
-	
+	 	@Autowired
+	    Environment env;
 	
 	public static void main(String[] args) throws InterruptedException, BeansException, IOException {
 		ConfigurableApplicationContext  ctx = SpringApplication.run(KafkaNettyApplication.class, args);
-		XroshotParameter param = ctx.getBean(XroshotParameter.class);
 		
 
 
@@ -87,6 +84,20 @@ public class KafkaNettyApplication {
 		
 		return service;
 		
+	}
+	
+	/**
+	 * 
+	 * 
+	 * TODO Netty & AsyncClient가 함게 사용하는 EventLoop, 개수 지정 최적화 필요 조현일 220701
+	 * 
+	 * **/
+	@Bean("netty-event-group")
+	public EventLoopGroup getDefaultNioEventLoopGroup() {
+		
+		int threads = Integer.valueOf(env.getProperty("netty.client.loopgroup.threads"));
+		
+		return new NioEventLoopGroup(threads);
 	}
 	
 

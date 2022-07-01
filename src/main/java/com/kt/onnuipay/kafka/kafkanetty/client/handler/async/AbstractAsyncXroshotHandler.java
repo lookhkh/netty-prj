@@ -13,8 +13,7 @@ public abstract class AbstractAsyncXroshotHandler<T,V,Z> implements AsyncXroshot
 	protected String toJson(Z object) throws JsonDataProcessingWrapperException  {
 		return parser.parseToString(object);
 	}
-	
-	protected Z deserialzeFromJson(String responseBody, Class<Z> clazz) throws JsonDataProcessingWrapperException {
+		protected Z deserialzeFromJson(String responseBody, Class<Z> clazz) throws JsonDataProcessingWrapperException {
 		return parser.deserialzeFromJson(responseBody, clazz);
 	}
 }

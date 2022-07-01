@@ -33,6 +33,7 @@ public class XMLParser {
 			return mapper.readValue(json, clazz);
 		} catch (JsonProcessingException e) {
 			// TODO Auto-generated catch block
+			e.printStackTrace();
 			throw new JsonDataProcessingWrapperException("XML DeSerialzing Error", e);
 		}
 	}

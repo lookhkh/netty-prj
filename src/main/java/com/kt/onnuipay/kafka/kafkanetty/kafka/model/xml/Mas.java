@@ -9,9 +9,11 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
+@ToString
 @JsonInclude(Include.NON_DEFAULT)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JacksonXmlRootElement(localName = "MAS")
@@ -21,7 +23,7 @@ public class Mas {
 
 	@JacksonXmlProperty(localName = "ServiceProviderID")
 	private String serviceProviderID;
-
+	
 	@JacksonXmlProperty(localName = "Result")
 	private String result;
 
@@ -72,15 +74,18 @@ public class Mas {
 
 	@JacksonXmlProperty(localName = "GroupID")
 	private String groupID;
+	
+	@JacksonXmlProperty(localName = "Reason")
+	private String reason;
 
 	@JacksonXmlProperty(localName = "Message")
 	private Message message;
 
 	@Builder
-	public Mas(String method, String serviceProviderID, String result, String time, String endUserID, String authTicket,
-			String authKey, String version, String sessionID, String messageType, String messageSubType,
-			String callbackNumber, String customMessageID, String filename, String fileSize, String path,
-			String sequenceNumber, String jobID, String groupID, Message message) {
+	public Mas(String method, String serviceProviderID, String result, String time,
+			String endUserID, String authTicket, String authKey, String version, String sessionID, String messageType,
+			String messageSubType, String callbackNumber, String customMessageID, String filename, String fileSize,
+			String path, String sequenceNumber, String jobID, String groupID, Message message, String reason) {
 		super();
 		this.method = method;
 		this.serviceProviderID = serviceProviderID;
@@ -102,7 +107,10 @@ public class Mas {
 		this.jobID = jobID;
 		this.groupID = groupID;
 		this.message = message;
+		this.reason = reason;
 	}
+
+	
 	
 	
 	
