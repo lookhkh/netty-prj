@@ -1,4 +1,4 @@
-package com.kt.onnuipay.kafka.kafkanetty.kafka.model.xml.response;
+package com.kt.onnuipay.kafka.kafkanetty.kafka.model.xml.response.sub;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;

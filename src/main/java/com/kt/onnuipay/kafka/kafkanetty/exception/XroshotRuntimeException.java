@@ -1,15 +1,13 @@
 package com.kt.onnuipay.kafka.kafkanetty.exception;
 
-import org.asynchttpclient.Response;
-
 import lombok.Getter;
 
 @Getter
 public class XroshotRuntimeException extends RuntimeException {
 
-	private final String r;
+	private final Object r;
 	
-	public XroshotRuntimeException(String msg, String target) {
+	public XroshotRuntimeException(String msg, Object target) {
 		super(msg);
 		this.r = target;
 	}

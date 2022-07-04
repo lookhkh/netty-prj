@@ -1,8 +1,6 @@
 package com.kt.onnuipay.kafka.kafkanetty.client.handler;
 
 
-import org.asynchttpclient.netty.SimpleChannelFutureListener;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import com.kt.onnuipay.kafka.kafkanetty.client.handler.util.NewXroshotAuth;
@@ -11,13 +9,10 @@ import com.kt.onnuipay.kafka.kafkanetty.exception.RunTimeExceptionWrapper;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.xml.Mas;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.xml.XMLConstant;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.xml.response.ServerTimeVo;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.parser.XMLParser;
 
 import io.netty.channel.ChannelHandler.Sharable;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.util.CharsetUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,6 +36,8 @@ public class RequestAuthTicketHandler extends ChannelInboundHandlerAdapter {
 		log.info("received Msg from previous handler {}",msg);
 		
 		ServerTimeVo vo = (ServerTimeVo)msg;
+		
+		vo.checkResultAndThrowIfInvalidData(vo);
 		
 		Mas req = Mas.builder()
 					.method(XMLConstant.REQ_REGIST)
@@ -70,7 +67,7 @@ public class RequestAuthTicketHandler extends ChannelInboundHandlerAdapter {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			throw new RunTimeExceptionWrapper("Error Happend during generating authticket", null, e);
+			throw new RunTimeExceptionWrapper("Error Happend during generating authticket", vo, e);
 		}
 	}
 }

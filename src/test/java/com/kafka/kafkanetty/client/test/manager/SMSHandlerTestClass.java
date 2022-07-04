@@ -9,6 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.asynchttpclient.AsyncHttpClient;
@@ -16,6 +18,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.xml.JacksonXmlModule;
@@ -25,15 +28,18 @@ import com.kt.onnuipay.client.handler.manager.SendManager;
 import com.kt.onnuipay.kafka.kafkanetty.client.handler.ExceptionHospitalHandler;
 import com.kt.onnuipay.kafka.kafkanetty.client.handler.RequestAuthTicketHandler;
 import com.kt.onnuipay.kafka.kafkanetty.client.handler.RequestServeSyncTimeHandler;
+import com.kt.onnuipay.kafka.kafkanetty.client.handler.SendSingleMessageHandler;
 import com.kt.onnuipay.kafka.kafkanetty.client.handler.async.exception.AsyncExceptionHanlder;
 import com.kt.onnuipay.kafka.kafkanetty.client.handler.async.exception.FinalXroshotExceptionHanlder;
 import com.kt.onnuipay.kafka.kafkanetty.client.handler.async.impl.ParsingServerResponse;
 import com.kt.onnuipay.kafka.kafkanetty.client.handler.codec.DefaultMessageToByteEncoder;
 import com.kt.onnuipay.kafka.kafkanetty.client.handler.codec.MessageDecoderTo;
 import com.kt.onnuipay.kafka.kafkanetty.client.handler.manager.impl.hanlder.SmsSingleManager;
+import com.kt.onnuipay.kafka.kafkanetty.client.handler.util.NewXroshotAuth;
 import com.kt.onnuipay.kafka.kafkanetty.config.vo.XroshotParameter;
 import com.kt.onnuipay.kafka.kafkanetty.exception.XroshotRuntimeException;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.xml.Mas;
+import com.kt.onnuipay.kafka.kafkanetty.kafka.model.xml.Message;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.xml.XMLConstant;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.xml.response.AuthInfoVo;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.xml.response.ResourceInfo;
@@ -41,6 +47,7 @@ import com.kt.onnuipay.kafka.kafkanetty.kafka.model.xml.response.ServerTimeVo;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.xml.response.SmsPushServerInfoVo;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.parser.XMLParser;
 
+import datavo.msg.MessageWrapper;
 import io.grpc.netty.shaded.io.netty.util.CharsetUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -81,11 +88,8 @@ public class SMSHandlerTestClass {
 	
 	
 	ParsingServerResponse parsing = mock(ParsingServerResponse.class);
-	
-	
+
 	AsyncExceptionHanlder<Throwable, Void> e = mock(FinalXroshotExceptionHanlder.class);
-	
-	
 	
 	SendManager mng =  SmsSingleManager.builder()
 						.client(client)
@@ -95,7 +99,6 @@ public class SMSHandlerTestClass {
 						.prepareeAndStartClient(null)
 						.paringMsgServerInfo(parsing).build();
 						
-
 	XmlMapper realParser;
 	XMLParser realParserMapper;
 	
@@ -131,7 +134,6 @@ public class SMSHandlerTestClass {
 	@BeforeEach
 	public void init() {
 
-			System.out.println(param);
 			
 			JacksonXmlModule module = new JacksonXmlModule();
 			module.setDefaultUseWrapper(false);
@@ -256,13 +258,14 @@ public class SMSHandlerTestClass {
 
 		
 		SmsPushServerInfoVo mockVo = mock(SmsPushServerInfoVo.class);
+
 		ParsingServerResponse r2 = new ParsingServerResponse(parser);
 		when(parser.deserialzeFromJson(result, SmsPushServerInfoVo.class)).thenReturn(mockVo);
-		when(mockVo.valid()).thenReturn(false);
+		Mockito.doThrow(new XroshotRuntimeException("error",mockVo)).when(mockVo).checkResultAndThrowIfInvalidData(mockVo);
+
+		XroshotRuntimeException t= assertThrows(XroshotRuntimeException.class, ()->r2.execute(result));
 		
-		assertThrows(XroshotRuntimeException.class, ()->r2.execute(result));
-		
-	
+		assertTrue(t.getR() instanceof SmsPushServerInfoVo);
 	}
 	
 
@@ -334,14 +337,47 @@ public class SMSHandlerTestClass {
 		
 		assertNull(ch.pipeline().get(RequestAuthTicketHandler.class));
 		
+
+		
+		
 		ch.close().sync();
-
+		
 	}
 	
 
 	@Test
-	@DisplayName("메시지 전송 전 암호화 처리")
-	public void test3() {
+	@DisplayName("5_1. SMS 단건 전송")
+	public void test5_1() throws InterruptedException {
+		
+		ch = new EmbeddedChannel(
+				new LoggingHandler(LogLevel.DEBUG)
+				, new MessageDecoderTo(realParserMapper) 
+				, new DefaultMessageToByteEncoder(realParserMapper)
+				, new SendSingleMessageHandler(null)
+				);
+		
+		AuthInfoVo authInfo = AuthInfoVo.builder()
+				.methodName(XMLConstant.RES_AUTH)
+				.result(XMLConstant.OK)
+				.sessionId("session")
+				.build();
+
+		String authInfoString = realParserMapper.parseToString(authInfo);
+
+		ch.writeInbound(Unpooled.copiedBuffer(authInfoString.getBytes(CharsetUtil.UTF_8)));
+
+		String f = ((ByteBuf)ch.readOutbound()).toString(CharsetUtil.UTF_8);
+		
+		assertNotNull(f);
+		assertTrue(f.contains(XMLConstant.REQ_SEND_MESSAGE_SINGLE));
+		
+		ch.close().sync();
+			
+	}
+	
+	@Test
+	@DisplayName("5_2. SMS 동보 전송")
+	public void test5_2() {
 		
 		assertTrue(false);
 		
@@ -349,12 +385,16 @@ public class SMSHandlerTestClass {
 	
 	
 	@Test
-	@DisplayName("5. SMS&MMS 전송 요청")
-	public void test4() {
+	@DisplayName("5_3. SMS 대량 전송")
+	public void test5_3() {
 		
 		assertTrue(false);
 		
 	}
+	
+	
+	
+	
 	
 	@Test
 	@DisplayName("6. DB 저장 요청")

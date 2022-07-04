@@ -5,7 +5,6 @@ import java.util.concurrent.CompletableFuture;
 import org.springframework.stereotype.Component;
 
 import com.kt.onnuipay.kafka.kafkanetty.client.handler.async.AbstractAsyncXroshotHandler;
-import com.kt.onnuipay.kafka.kafkanetty.exception.XroshotRuntimeException;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.xml.response.SmsPushServerInfoVo;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.parser.XMLParser;
 
@@ -27,15 +26,9 @@ public class ParsingServerResponse extends AbstractAsyncXroshotHandler<String, S
 		
 		SmsPushServerInfoVo info = this.deserialzeFromJson(target, SmsPushServerInfoVo.class);
 		
-		if(!info.valid()) throw new XroshotRuntimeException("xroshot valid error happend "+info.toString(),target);
+		info.checkResultAndThrowIfInvalidData(info);
 		
 		return CompletableFuture.supplyAsync(()->info);
 	}
 
-
-	
-
-
-
-	
 }

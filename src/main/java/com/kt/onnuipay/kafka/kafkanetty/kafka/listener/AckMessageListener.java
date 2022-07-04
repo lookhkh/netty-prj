@@ -1,5 +1,6 @@
 package com.kt.onnuipay.kafka.kafkanetty.kafka.listener;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 
@@ -43,10 +44,17 @@ public class AckMessageListener  {
 
 
 
-	@KafkaListener(topics = "hello.kafka", groupId = "spring-boot", containerFactory = "kafkaListenerContainerFactory")
-	public void listen(@Payload String msg) {
-		log.info("{} came from broker"+msg);
-		service.submit(()->dispatch.route(msg));
+	@KafkaListener(topics = "single", groupId = "spring-boot-single", containerFactory = "kafkaSingleListenerContainerFactory")
+	public void listen_single(@Payload String msg) {
+		log.info("{} came from broker {}",msg, Thread.currentThread().getName());
+		//service.submit(()->dispatch.route(msg));
+
+	}
+	
+	@KafkaListener(topics = "batch", groupId = "spring-boot-batch", containerFactory = "kafkaBatchListenerContainerFactory")
+	public void listen_batch(@Payload List<String> msg) {
+		log.info("{} came from broker {}",msg, Thread.currentThread().getName());
+		//service.submit(()->dispatch.route(msg));
 
 	}
 }

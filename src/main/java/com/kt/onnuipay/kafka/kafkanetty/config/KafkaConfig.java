@@ -60,20 +60,61 @@ public class KafkaConfig {
 	}
 
 
-	@Bean
+	@Bean(name = "kafkaSingleListenerContainerFactory")
 	public ConcurrentKafkaListenerContainerFactory<String, String> kafkaContainerFactory(){
 		
+		Map<String, Object> config = createConfig();
+
+		ConsumerFactory<String, String> consumerFactory = new DefaultKafkaConsumerFactory<>(config);
+		
 		ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<String, String>();
-		factory.setConsumerFactory(consumerFactory());
-		factory.setConcurrency(1);
+		factory.setConsumerFactory(consumerFactory);
+		factory.setConcurrency(3);
 		
 		factory.getContainerProperties().setMessageListener(ackMessageListener());
 		factory.getContainerProperties().setPollTimeout(1000);
 		
 		return factory;
 		
+	}
+
+
+
+	@Bean(name = "kafkaBatchListenerContainerFactory")
+	public ConcurrentKafkaListenerContainerFactory<String, String> kafkaBatchListenerContainerFactory(){
+		
+		Map<String,Object> config = createConfig();
+		config.put(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, 10000);//fetch_min_byte, 최소로 가져오는 바이트 크기
+		config.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, 10_000); //fetch_min_byte가 충족되지 않을 경우 최대 대기시간.
+		
+		ConsumerFactory<String, String> consumerFactory = new DefaultKafkaConsumerFactory<>(config);
+		
+		ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<String, String>();
+		factory.setConsumerFactory(consumerFactory);
+		factory.setConcurrency(1);
+		factory.setBatchListener(true);
+		
+		factory.getContainerProperties().setMessageListener(ackMessageListener());
+		factory.getContainerProperties().setPollTimeout(10000);
+		
+		return factory;
 		
 	}
+	
+	private Map<String, Object> createConfig() {
+		Map<String,Object> config = new HashMap<>();
+		config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+		config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
+		config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+		config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+		config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+		config.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 100);
+
+		return config;
+	}
+	
+	
+	
 	
 
 	public AckMessageListener ackMessageListener() {
@@ -83,18 +124,6 @@ public class KafkaConfig {
 	
 	
 
-	public ConsumerFactory<? super String, ? super String> consumerFactory() {
-		
-		Map<String,Object> config = new HashMap<>();
-		config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-		config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);
-		config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-		config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-		config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-		
-		return new DefaultKafkaConsumerFactory<>(config);
-	}
-	
 	
 	
 }

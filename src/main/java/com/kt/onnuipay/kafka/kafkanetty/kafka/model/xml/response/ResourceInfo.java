@@ -12,7 +12,7 @@ import lombok.Data;
 
 @Builder
 @Data
-public class ResourceInfo {
+public class ResourceInfo{
 	
 	@JacksonXmlProperty(localName = "Category")
 	private final String category;
@@ -28,7 +28,7 @@ public class ResourceInfo {
 	
 	public boolean valid() {
 		return 
-				 StringUtils.hasLength(this.address);
+				 StringUtils.hasLength(this.address) && this.port>0;
 	}
 
 
@@ -44,6 +44,7 @@ public class ResourceInfo {
 		this.port = port;
 	}
 
+	
 
 
 }

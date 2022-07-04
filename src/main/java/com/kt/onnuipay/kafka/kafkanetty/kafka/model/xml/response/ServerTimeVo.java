@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.kt.onnuipay.kafka.kafkanetty.exception.XroshotRuntimeException;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -16,20 +17,22 @@ import lombok.ToString;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JacksonXmlRootElement(localName = "MAS")
 @ToString
-public class ServerTimeVo {
+public class ServerTimeVo extends BaseXMLResponse{
 
-	@JacksonXmlProperty(isAttribute = true, localName = "method")
-	private final String methodName;
-	@JacksonXmlProperty(localName = "Result")
-	private final String result;
+
 	@JacksonXmlProperty(localName = "Time")
 	private final String time;
 	
 	@Builder
 	public ServerTimeVo(@JsonProperty("method") String methodName, @JsonProperty("Result")String result, @JsonProperty("Time")String time) {
-		this.methodName = methodName;
-		this.result = result;
+		super(methodName,result);
 		this.time = time;
+	}
+	
+	@Override
+	public boolean valid() throws XroshotRuntimeException {
+		// TODO Auto-generated method stub
+		return !this.time.isBlank();
 	}
 	
 	

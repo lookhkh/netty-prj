@@ -1,5 +1,7 @@
 package com.kt.onnuipay.kafka.kafkanetty.kafka.model.xml;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -12,7 +14,6 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Getter
-@Setter
 @ToString
 @JsonInclude(Include.NON_DEFAULT)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -80,12 +81,15 @@ public class Mas {
 
 	@JacksonXmlProperty(localName = "Message")
 	private Message message;
+	
+	@JacksonXmlProperty(localName ="MessageBundle")
+	private List<Message> bundle;
 
 	@Builder
 	public Mas(String method, String serviceProviderID, String result, String time,
 			String endUserID, String authTicket, String authKey, String version, String sessionID, String messageType,
 			String messageSubType, String callbackNumber, String customMessageID, String filename, String fileSize,
-			String path, String sequenceNumber, String jobID, String groupID, Message message, String reason) {
+			String path, String sequenceNumber, String jobID, String groupID, Message message, String reason, List<Message> bundle) {
 		super();
 		this.method = method;
 		this.serviceProviderID = serviceProviderID;
@@ -108,10 +112,7 @@ public class Mas {
 		this.groupID = groupID;
 		this.message = message;
 		this.reason = reason;
+		this.bundle = bundle;
 	}
 
-	
-	
-	
-	
 }

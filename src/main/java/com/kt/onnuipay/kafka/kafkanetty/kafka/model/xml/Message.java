@@ -1,5 +1,7 @@
 package com.kt.onnuipay.kafka.kafkanetty.kafka.model.xml;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -16,31 +18,24 @@ import lombok.Setter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JacksonXmlRootElement(localName = "Message")
 public class Message {
-	public static final String R_RN = "TempReceiveNumber";
-	public static final String R_A = "TempAttachment";
 
-	@JacksonXmlProperty(localName = R_RN)
-	private String tempReceiveNumber;
+	@JacksonXmlProperty(localName = "ReceiveNumber")
+	private List<String> receiveNumber;
 
 	@JacksonXmlProperty(localName = "Subject")
 	private String subject;
-
+	
 	@JacksonXmlProperty(localName = "Content")
 	private String content;
 
-	@JacksonXmlProperty(localName = "FileSize")
-	private String fileSize;
-
-	@JacksonXmlProperty(localName = R_A)
-	private String tempAttachment;
 
 	@Builder
-	public Message(String tempReceiveNumber, String subject, String content, String fileSize, String tempAttachment) {
-		this.tempReceiveNumber = tempReceiveNumber;
+	public Message(List<String> receiveNumber, String subject, String content) {
+		
+
+		this.receiveNumber = receiveNumber;
 		this.subject = subject;
 		this.content = content;
-		this.fileSize = fileSize;
-		this.tempAttachment = tempAttachment;
 	}
 	
 	

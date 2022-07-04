@@ -29,6 +29,7 @@ public class XMLConstant {
 
 	public static final String REQUEST_SERVER_TIME = "request_server_time";
 	
+	public static final String REQUEST_SEND_MESSAGE = "request_send_message_single";
 
 
 
@@ -70,6 +71,15 @@ public class XMLConstant {
 
 
 	public static final String REQ_UNREGIST = "req_unregist";
+
+
+
+
+
+
+	public static final String REQ_SEND_MESSAGE_SINGLE = "req_send_message_2";
+
+
 
 
 
