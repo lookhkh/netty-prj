@@ -49,11 +49,11 @@ public class SingleHandlerInit  {
 				ChannelPipeline p = ch.pipeline();
 				p.addLast(new LoggingHandler(LogLevel.DEBUG));
 				p.addLast(new XmlFrameDecoder(Integer.MAX_VALUE));
-				p.addLast(XMLConstant.DECODER_SERVER_TIME, decoder);
-				p.addLast(XMLConstant.REQUEST_SERVER_TIME, requestServerTimeHandler);
-				p.addLast(XMLConstant.REQUEST_AUTH_TICKET, authTicketHandler);
-				p.addLast(XMLConstant.REQUEST_SEND_MESSAGE, new SendSingleMessageHandler(message));
-				p.addLast(XMLConstant.EXCEPTION_HOSPITAL, exceptionHospital);				
+				p.addLast(decoder);
+				p.addLast(requestServerTimeHandler);
+				p.addLast(authTicketHandler);
+				p.addLast(new SendSingleMessageHandler(message));
+				p.addLast(exceptionHospital);				
 			}
 		};
 		

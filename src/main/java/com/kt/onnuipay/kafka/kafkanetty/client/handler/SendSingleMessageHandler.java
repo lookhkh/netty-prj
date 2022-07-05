@@ -1,6 +1,5 @@
 package com.kt.onnuipay.kafka.kafkanetty.client.handler;
 
-import com.kt.onnuipay.kafka.kafkanetty.exception.XroshotRuntimeException;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.xml.Mas;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.xml.XMLConstant;
 
