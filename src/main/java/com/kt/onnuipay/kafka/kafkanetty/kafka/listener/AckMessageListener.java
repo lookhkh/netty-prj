@@ -44,17 +44,17 @@ public class AckMessageListener  {
 
 
 
-	@KafkaListener(topics = "single", groupId = "spring-boot-single", containerFactory = "kafkaSingleListenerContainerFactory")
+	@KafkaListener(topics = "single-", groupId = "spring-boot-single", containerFactory = "kafkaSingleListenerContainerFactory")
 	public void listen_single(@Payload String msg) {
 		log.info("{} came from broker {}",msg, Thread.currentThread().getName());
-		//service.submit(()->dispatch.route(msg));
+		service.submit(()->dispatch.route(msg));
 
 	}
 	
-	@KafkaListener(topics = "batch", groupId = "spring-boot-batch", containerFactory = "kafkaBatchListenerContainerFactory")
-	public void listen_batch(@Payload List<String> msg) {
-		log.info("{} came from broker {}",msg, Thread.currentThread().getName());
-		//service.submit(()->dispatch.route(msg));
-
-	}
+//	@KafkaListener(topics = "batch-", groupId = "spring-boot-batch", containerFactory = "kafkaBatchListenerContainerFactory")
+//	public void listen_batch(@Payload List<String> msg) {
+//		log.info("{} came from broker {}",msg, Thread.currentThread().getName());
+//		//service.submit(()->dispatch.route(msg));
+//
+//	}
 }

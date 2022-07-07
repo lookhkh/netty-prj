@@ -45,13 +45,6 @@ public class DispatcherControllerImpl implements DispatcherController{
 			MessageWrapper vo = parser.parse(msg);
 						
 			manager.consume(vo);
-			
-			/**
-			 * TODO 수동 커밋, 자동 커밋에 따라 추가 로직 필요 220610 조현일
-			 * ㄴ-> 굳이 필요 없을듯? 실패했다고 커밋을 안 하게 되면, 진행이 안됨...ㅠ
-			 * ㄴ-> 이보다는, 결과를 모니터링하여 메시지 전송이 실패했을 경우, 확인할 수 있는 방안을 수립하는 것이 효율적일듯
-			 * 220620 조현일
-			 * **/
 
 		}catch(JsonDataProcessingWrapperException e) {
 				log.warn("can`t parsing this recived msg into JSON {}",e.getMessage());

@@ -104,12 +104,12 @@
   <version>6.2.5</version>
 </dependency>
 	
+	
 		<dependency>
 		    <groupId>onnuri</groupId>
-		    <artifactId>producer</artifactId>
+		    <artifactId>dataVo</artifactId>
 		    <version>0.0.2</version>
 		</dependency>
-		
 		
 	</dependencies>
 	

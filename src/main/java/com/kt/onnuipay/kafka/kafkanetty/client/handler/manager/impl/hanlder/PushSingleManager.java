@@ -2,14 +2,14 @@ package com.kt.onnuipay.kafka.kafkanetty.client.handler.manager.impl.hanlder;
 
 import java.io.IOException;
 
+import org.asynchttpclient.AsyncHttpClient;
+import org.asynchttpclient.ListenableFuture;
+import org.asynchttpclient.Request;
+import org.asynchttpclient.Response;
 import org.springframework.stereotype.Component;
 
-import com.google.api.client.http.GenericUrl;
-import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.HttpRequestFactory;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.firebase.messaging.FirebaseMessaging;
 import com.kt.onnuipay.client.handler.manager.SendManager;
+import com.kt.onnuipay.kafka.kafkanetty.config.FireBaseConfig;
 
 import datavo.msg.MessageWrapper;
 import lombok.AllArgsConstructor;
@@ -41,14 +41,43 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PushSingleManager implements SendManager {
 	
-	private final FirebaseMessaging instance;
-
+	//private final FirebaseMessaging instance;
+	private final AsyncHttpClient client;
+	private final FireBaseConfig config;
+	
 	@Override
 	public void send(MessageWrapper vo)  {
 		log.info("PushSingleSendManager received {}",vo);
-				
-
 		
-	}
-	
+        try {
+            Request r = client.prepareGet("https://jsonplaceholder.typicode.com/todos/1").addHeader("Authorization", "bearer "+config.getAccessToken()).build();
+            log.info("{}",r.toString());
+            ListenableFuture<Response> result =  client.executeRequest(r);
+            
+            result.toCompletableFuture().thenAccept(res->log.info("{} {}",res, Thread.currentThread().getName()));
+
+            
+            
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+		
+//		try {
+//		if(vo.isUnicast()) {
+//		    log.info("Unicast Single message");
+//		    String result = instance.send(vo.getMessageObjList().get(0));
+//         
+//		}else{
+//	          log.info("Multicast Single message");
+//		    BatchResponse response =  instance.sendMulticast(vo.getMulticastMessageObjList().get(0));
+//		    log.info("batch response => {}",response.toString());
+//		    
+//		}
+//		}catch(FirebaseMessagingException e) {
+//		    e.printStackTrace();
+//	}
+		
+		
+		}	
 }

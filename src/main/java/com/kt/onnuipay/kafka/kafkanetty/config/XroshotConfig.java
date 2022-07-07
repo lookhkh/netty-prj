@@ -15,6 +15,8 @@ import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import com.kt.onnuipay.kafka.kafkanetty.config.vo.XroshotParameter;
 
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.pool.ChannelPool;
+import io.netty.channel.pool.SimpleChannelPool;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -56,7 +58,7 @@ public class XroshotConfig {
 	@Bean
 	public AsyncHttpClient getAsyncHttpClient() {
 		
-		AsyncHttpClientConfig config = Dsl.config().setEventLoopGroup(this.loop).build();
+		AsyncHttpClientConfig config = Dsl.config().setEventLoopGroup(this.loop).setRequestTimeout(30000).setCompressionEnforced(true).build();
 		AsyncHttpClient asyncHttpClient = Dsl.asyncHttpClient(config);
 		return asyncHttpClient;
 

@@ -18,8 +18,13 @@ public class KafkaMsgParserImpl implements KafkaMsgParser {
 	public MessageWrapper parse(String msg) throws JsonDataProcessingWrapperException, RuntimeException {
 		
 		
+		try {
+		    return MessageUtils.toWrapper(msg, MessageWrapper.class);
+		}catch(JsonSyntaxException es) {
+		    log.error("Message Parsing error. error orgin => {}",msg);
+		    throw new JsonDataProcessingWrapperException("역직렬화 에러 발생", es);
+		}
 		
-		return null;
 
 	}
 

@@ -75,7 +75,7 @@ public class FireBaseConfig {
 		}
 	   
 	   public String getAccessToken() throws IOException {
-			FileInputStream r =  new FileInputStream("C:\\Users\\PC\\Downloads\\kafka-netty\\kafka-netty\\src\\main\\resources\\onnuri-4b38d-firebase-adminsdk-jympu-ea1fc6a964.json");
+			FileInputStream r =  new FileInputStream("C:\\dev\\workspace\\kafka-netty\\src\\main\\resources\\onnuri-4b38d-firebase-adminsdk-jympu-ea1fc6a964.json");
 			
 		
 			credentials.refreshIfExpired();
