@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 
 import com.kt.onnuipay.client.ClientBootStrap;
 import com.kt.onnuipay.kafka.kafkanetty.client.handler.init.SingleHandlerInit;
-import com.kt.onnuipay.kafka.kafkanetty.config.vo.XroshotParameter;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.xml.response.ResourceInfo;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.xml.response.SmsPushServerInfoVo;
 

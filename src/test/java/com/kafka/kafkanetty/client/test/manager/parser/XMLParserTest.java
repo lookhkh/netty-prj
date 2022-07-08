@@ -8,9 +8,6 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.parser.XMLParser;
 
-import datavo.msg.MessageWrapper;
-import datavo.testUtils.MessageWrapperBuilders;
-
 public class XMLParserTest {
 
 	XMLParser parser = new XMLParser(new XmlMapper());

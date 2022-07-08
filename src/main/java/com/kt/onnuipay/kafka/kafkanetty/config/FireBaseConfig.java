@@ -1,6 +1,7 @@
 package com.kt.onnuipay.kafka.kafkanetty.config;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
@@ -74,13 +75,16 @@ public class FireBaseConfig {
 			
 		}
 	   
-	   public String getAccessToken() throws IOException {
-			FileInputStream r =  new FileInputStream("C:\\dev\\workspace\\kafka-netty\\src\\main\\resources\\onnuri-4b38d-firebase-adminsdk-jympu-ea1fc6a964.json");
-			
-		
-			credentials.refreshIfExpired();
-			  
-			  return credentials.getAccessToken().getTokenValue();
+	   public String getAccessToken()  {
+    			try {
+                    FileInputStream r =  new FileInputStream("C:\\dev\\workspace\\kafka-netty\\src\\main\\resources\\onnuri-4b38d-firebase-adminsdk-jympu-ea1fc6a964.json");
+                    credentials.refreshIfExpired();
+                    return credentials.getAccessToken().getTokenValue();
+    			} catch (IOException  e) {
+                    // TODO Auto-generated catch block
+    			    throw new RuntimeException("Firebase AuthInfo Fetching error happend",e);
+                } 
+
 			}
 	   
 }

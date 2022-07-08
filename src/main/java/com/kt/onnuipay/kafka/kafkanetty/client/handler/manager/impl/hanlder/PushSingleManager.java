@@ -1,20 +1,25 @@
 package com.kt.onnuipay.kafka.kafkanetty.client.handler.manager.impl.hanlder;
 
-import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.asynchttpclient.AsyncHttpClient;
-import org.asynchttpclient.ListenableFuture;
-import org.asynchttpclient.Request;
-import org.asynchttpclient.Response;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
 
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.Message;
 import com.kt.onnuipay.client.handler.manager.SendManager;
 import com.kt.onnuipay.kafka.kafkanetty.config.FireBaseConfig;
 
 import datavo.msg.MessageWrapper;
-import lombok.AllArgsConstructor;
+import datavo.msg.util.MessageUtils;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
 
 /**
  * 
@@ -36,32 +41,43 @@ import lombok.extern.slf4j.Slf4j;
  */
 
 @Setter
-@AllArgsConstructor
 @Component("push-single-manager")
 @Slf4j
 public class PushSingleManager implements SendManager {
 	
-	//private final FirebaseMessaging instance;
-	private final AsyncHttpClient client;
-	private final FireBaseConfig config;
+	private final FirebaseMessaging instance;
+	private final WebClient client;
 	
-	@Override
+	
+	public PushSingleManager(FirebaseMessaging instance, @Qualifier("fcm-client") WebClient client) {
+        super();
+        this.instance = instance;
+        this.client = client;
+    }
+
+
+
+    @Override
 	public void send(MessageWrapper vo)  {
 		log.info("PushSingleSendManager received {}",vo);
 		
-        try {
-            Request r = client.prepareGet("https://jsonplaceholder.typicode.com/todos/1").addHeader("Authorization", "bearer "+config.getAccessToken()).build();
-            log.info("{}",r.toString());
-            ListenableFuture<Response> result =  client.executeRequest(r);
-            
-            result.toCompletableFuture().thenAccept(res->log.info("{} {}",res, Thread.currentThread().getName()));
-
-            
-            
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+		
+		String r = MessageUtils.toJson(vo.getMessageObjList().get(0), Message.class);
+        log.info("직렬화 결과 {}",r);
+        
+        //{"message":{"notification":{"title":"noti","body":"body"},"token":"token"}} 이렇게 나와야 함.
+        
+        client.post()
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(BodyInserters.fromValue(r))
+            .retrieve()
+            .bodyToFlux(String.class)
+            .subscribe(str->System.out.println(str));
+		
+        
+     
+        
 		
 //		try {
 //		if(vo.isUnicast()) {

@@ -1,23 +1,29 @@
 package com.kt.onnuipay.kafka.kafkanetty.config;
 
+import java.time.Duration;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.http.client.reactive.ReactorResourceFactory;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
-import lombok.AllArgsConstructor;
+import io.netty.handler.timeout.ReadTimeoutHandler;
+import io.netty.handler.timeout.WriteTimeoutHandler;
+import reactor.netty.resources.ConnectionProvider;
+import reactor.netty.resources.LoopResources;
 
 
 /*
@@ -32,19 +38,67 @@ import lombok.AllArgsConstructor;
  *  intended publication of such software.
  */
 
-@AllArgsConstructor
+
 @Configuration
 @PropertySource("classpath:application.properties")
 public class ClientConfig {
 	
     @Autowired
     Environment env;
+    
+    @Autowired
+    FireBaseConfig firebaseConfig;
 
 	@Bean
 	public static PropertySourcesPlaceholderConfigurer propertyConfigInDev() {
 		return new PropertySourcesPlaceholderConfigurer();
 	}
 	
+	@Bean("fcm-client") 
+	public WebClient getClient() {
+	    LoopResources loop = LoopResources.create("worker-event-loop", 1, 10, true);
+	        
+	    
+	      // String baseUrl = "https://fcm.googleapis.com/v1/projects/onnuri/messages:send";
+           String baseUrl = "http://localhost:8080";
+
+	       DefaultUriBuilderFactory uriFactory = new DefaultUriBuilderFactory(baseUrl);
+
+	       
+	       ConnectionProvider provider =
+	               ConnectionProvider.builder("custom")
+	                                 .maxConnections(200)
+	                                 
+	                                 .maxIdleTime(Duration.ofSeconds(20))           
+	                                 .maxLifeTime(Duration.ofSeconds(60))           
+	                                 .pendingAcquireTimeout(Duration.ofSeconds(60)) 
+	                                 .evictInBackground(Duration.ofSeconds(120))    
+	                                 .build();
+	       
+	       
+	       ReactorResourceFactory factory = new ReactorResourceFactory();
+	       factory.setLoopResources(loop);
+	       factory.setConnectionProvider(provider);
+	       
+
+	       WebClient client = WebClient.builder()
+	               .uriBuilderFactory(uriFactory)
+	               .defaultHeader("Authorization", "Bearer "+firebaseConfig.getAccessToken())
+	               .clientConnector(new ReactorClientHttpConnector(
+	                       factory,
+	                       httpClient -> httpClient
+	                           .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
+	                           .doOnConnected(connection ->
+	                               connection.addHandlerLast(new ReadTimeoutHandler(5)
+	                               ).addHandlerLast(new WriteTimeoutHandler(5))
+	                           ).responseTimeout(Duration.ofSeconds(5)) // 0.9.11 부터 추가
+	                   ))
+	               
+	               .build();
+	       
+	       
+	       return client;
+	}
 	
 	
 	@Bean
@@ -72,5 +126,7 @@ public class ClientConfig {
 //	            f.channel().closeFuture().sync();
 	        
 	}
+	
+
 	
 }

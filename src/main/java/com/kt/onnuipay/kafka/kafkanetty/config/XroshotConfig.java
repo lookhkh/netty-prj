@@ -1,5 +1,7 @@
 package com.kt.onnuipay.kafka.kafkanetty.config;
 
+import java.net.InetSocketAddress;
+
 import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.AsyncHttpClientConfig;
 import org.asynchttpclient.Dsl;
@@ -15,8 +17,8 @@ import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import com.kt.onnuipay.kafka.kafkanetty.config.vo.XroshotParameter;
 
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.pool.ChannelPool;
-import io.netty.channel.pool.SimpleChannelPool;
+import io.netty.channel.pool.ChannelPoolMap;
+import io.netty.channel.pool.FixedChannelPool;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -49,6 +51,7 @@ public class XroshotConfig {
 
 	@Qualifier("netty-event-group")
 	private final EventLoopGroup loop;
+		
 	
 	/****
 	 * 

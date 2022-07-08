@@ -101,6 +101,7 @@ public class KafkaNettyApplication {
 	/**
 	 * 
 	 * 
+	 * 
 	 * TODO Netty & AsyncClient가 함게 사용하는 EventLoop, 개수 지정 최적화 필요 조현일 220701
 	 * 
 	 * **/
