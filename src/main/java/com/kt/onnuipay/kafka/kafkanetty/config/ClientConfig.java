@@ -59,27 +59,27 @@ public class ClientConfig {
 	    LoopResources loop = LoopResources.create("worker-event-loop", 1, 10, true);
 	        
 	    
-	      // String baseUrl = "https://fcm.googleapis.com/v1/projects/onnuri/messages:send";
-           String baseUrl = "http://localhost:8080";
+	       String baseUrl = "https://fcm.googleapis.com/v1/projects/onnuri-4b38d/messages:send";
 
 	       DefaultUriBuilderFactory uriFactory = new DefaultUriBuilderFactory(baseUrl);
 
 	       
 	       ConnectionProvider provider =
 	               ConnectionProvider.builder("custom")
-	                                 .maxConnections(200)
+	                                 .maxConnections(5)
 	                                 
 	                                 .maxIdleTime(Duration.ofSeconds(20))           
-	                                 .maxLifeTime(Duration.ofSeconds(60))           
+	                                 .maxLifeTime(Duration.ofSeconds(120))           
 	                                 .pendingAcquireTimeout(Duration.ofSeconds(60)) 
+	                                 
 	                                 .evictInBackground(Duration.ofSeconds(120))    
+	                                 .lifo()
 	                                 .build();
 	       
 	       
 	       ReactorResourceFactory factory = new ReactorResourceFactory();
 	       factory.setLoopResources(loop);
 	       factory.setConnectionProvider(provider);
-	       
 
 	       WebClient client = WebClient.builder()
 	               .uriBuilderFactory(uriFactory)

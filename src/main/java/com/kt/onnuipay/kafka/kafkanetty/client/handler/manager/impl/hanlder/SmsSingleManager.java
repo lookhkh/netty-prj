@@ -5,10 +5,10 @@ import org.asynchttpclient.ListenableFuture;
 import org.asynchttpclient.Request;
 import org.asynchttpclient.RequestBuilder;
 import org.asynchttpclient.Response;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
-import com.google.common.net.HttpHeaders;
-import com.google.common.net.MediaType;
 import com.kt.onnuipay.client.handler.manager.SendManager;
 import com.kt.onnuipay.kafka.kafkanetty.client.handler.async.exception.FinalXroshotExceptionHanlder;
 import com.kt.onnuipay.kafka.kafkanetty.client.handler.async.impl.ParsingServerResponse;
@@ -55,14 +55,15 @@ public class SmsSingleManager implements SendManager {
 	public void send(MessageWrapper vo) {
 		log.info("SMS single Msg {}",vo);
 		
+		
+		
 		String serializedBody = parser.parseToString(vo);
 		
 		Request r = new RequestBuilder()
 				.setUrl(param.getSendServerUrl())
 				.setMethod("get")
-				.addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_UTF_8)
-				.addHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_UTF_8)
-				.setBody(serializedBody)
+				.addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE)
+				.addHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_VALUE)
 				.build();
 		
 		ListenableFuture<Response> f = client.executeRequest(r);
@@ -70,7 +71,8 @@ public class SmsSingleManager implements SendManager {
 		f.toCompletableFuture()
 			.thenApply(res -> res.getResponseBody(CharsetUtil.UTF_8))
 			.thenApply(paringMsgServerInfo::execute)
-			.thenAccept(prepareeAndStartClient::execute);
+			.thenAccept(prepareeAndStartClient::execute)
+			;
 			
 	}
 

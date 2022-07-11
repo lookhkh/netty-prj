@@ -53,7 +53,7 @@ public class ClientBootStrap {
 	
 
 
-	public void start(ChannelInitializer<SocketChannel> init, String host, int port)   {
+	public Channel start(ChannelInitializer<SocketChannel> init, String host, int port)   {
 		
 		if(log.isDebugEnabled()) log.debug("init netty client init class {}, host : {}, port : {}",init,host,port);
         
@@ -69,6 +69,7 @@ public class ClientBootStrap {
             
             f.channel().closeFuture().sync();
             
+            return f.channel();
             // Wait until the connection is closed.
             
         } catch (InterruptedException e) {

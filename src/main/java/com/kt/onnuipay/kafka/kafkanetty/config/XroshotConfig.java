@@ -1,6 +1,11 @@
 package com.kt.onnuipay.kafka.kafkanetty.config;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
+import java.net.URL;
 
 import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.AsyncHttpClientConfig;
@@ -14,8 +19,13 @@ import org.springframework.context.annotation.PropertySource;
 import com.fasterxml.jackson.dataformat.xml.JacksonXmlModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
+import com.kt.onnuipay.kafka.kafkanetty.client.handler.async.impl.ParsingServerResponse;
+import com.kt.onnuipay.kafka.kafkanetty.client.handler.async.impl.PrepareAndStartNettyClient;
 import com.kt.onnuipay.kafka.kafkanetty.config.vo.XroshotParameter;
+import com.kt.onnuipay.kafka.kafkanetty.kafka.model.xml.response.SmsPushServerInfoVo;
+import com.kt.onnuipay.kafka.kafkanetty.kafka.parser.XMLParser;
 
+import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.pool.ChannelPoolMap;
 import io.netty.channel.pool.FixedChannelPool;
@@ -51,6 +61,54 @@ public class XroshotConfig {
 
 	@Qualifier("netty-event-group")
 	private final EventLoopGroup loop;
+	
+	private final XMLParser parser;
+
+
+	@Bean
+	public ChannelPoolMap<InetSocketAddress, FixedChannelPool> getChannelPool() throws IOException {
+	    
+
+	    URL url = new URL("https://jsonplaceholder.typicode.com/todos/1");
+        HttpURLConnection con = (HttpURLConnection)url.openConnection();
+        BufferedReader r = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        StringBuffer temp = new StringBuffer();
+        String t;
+        
+        while((t = r.readLine())!=null) {
+            temp.append(t);
+        }
+        
+        log.info("Xroshot init info result => {}",temp.toString());
+        
+        con.disconnect();
+        r.close();
+        
+        //SmsPushServerInfoVo vo = parser.deserialzeFromJson(temp.toString(), SmsPushServerInfoVo.class);
+        
+	    /**
+	     * TODO 크로샷 연동 규격 확인.
+	     * 1. 크로샷의 각각의 인스턴스와 연동이 가능한지? 혹은 하나의 SP ID 당 하나의 인스턴스와만 Connection을 맺을 수 있는 것인지?
+	     * 220711 조현일
+	     */
+
+
+//        
+//	    
+//	    ChannelPoolMap<InetSocketAddress, FixedChannelPool> channelPoolMap = new AbstractChannelPoolMap<InetSocketAddress, FixedChannelPool>() {
+//            @Override
+//            protected FixedChannelPool newPool(InetSocketAddress key) {
+//                return new FixedChannelPool(bootStrap.remoteAddress(key), new AbstractChannelPoolHandler() {
+//                    @Override
+//                    public void channelCreated(Channel ch) throws Exception {
+//                        
+//                    }
+//                }, 1);
+//            }
+//        };
+        
+        return null;
+	}
 		
 	
 	/****
@@ -64,21 +122,9 @@ public class XroshotConfig {
 		AsyncHttpClientConfig config = Dsl.config().setEventLoopGroup(this.loop).setRequestTimeout(30000).setCompressionEnforced(true).build();
 		AsyncHttpClient asyncHttpClient = Dsl.asyncHttpClient(config);
 		return asyncHttpClient;
-
 	}
 	
-	@Bean
-	public XmlMapper getMapper() {
-		
-		JacksonXmlModule module = new JacksonXmlModule();
-		module.setDefaultUseWrapper(false);
 
-		
-		XmlMapper xmlMapper = new XmlMapper(module);
-		xmlMapper.configure(ToXmlGenerator.Feature.WRITE_XML_DECLARATION, true);
-
-		return new XmlMapper();
-	}
 	
 	
 }

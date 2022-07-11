@@ -9,6 +9,8 @@ import com.kt.onnuipay.kafka.kafkanetty.client.handler.init.SingleHandlerInit;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.xml.response.ResourceInfo;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.xml.response.SmsPushServerInfoVo;
 
+import io.netty.channel.Channel;
+
 @Component
 public class PrepareAndStartNettyClient  {
 
@@ -25,20 +27,20 @@ public class PrepareAndStartNettyClient  {
 	
 	}
 
-	public CompletableFuture<Void> execute(CompletableFuture<SmsPushServerInfoVo> target) {
+	public CompletableFuture<Channel> execute(CompletableFuture<SmsPushServerInfoVo> target) {
 
-		 target
+		 return target
 			.thenApply(vo -> vo.getResource())
-			.thenAccept(this::startTransaction);
-		 
-		 return null;
+			.thenApplyAsync(this::startTransaction)
+			;
+		     
 		
 	}
 	
-	private void startTransaction(ResourceInfo resource) {
+	private Channel startTransaction(ResourceInfo resource) {
 		
 
-		 boot.start(
+		 return boot.start(
 				 		singleChannelInit.getChannelInit(null),
 						resource.getAddress(), 
 						resource.getPort());
