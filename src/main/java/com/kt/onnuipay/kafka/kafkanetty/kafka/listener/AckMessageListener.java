@@ -51,10 +51,11 @@ public class AckMessageListener  {
 
 	}
 	
-//	@KafkaListener(topics = "batch-", groupId = "spring-boot-batch", containerFactory = "kafkaBatchListenerContainerFactory")
-//	public void listen_batch(@Payload List<String> msg) {
-//		log.info("{} came from broker {}",msg, Thread.currentThread().getName());
-//		//service.submit(()->dispatch.route(msg));
-//
-//	}
+	@KafkaListener(topics = "batch-", groupId = "spring-boot-batch", containerFactory = "kafkaBatchListenerContainerFactory")
+	public void listen_batch(@Payload List<String> msgs) {
+		log.info("{} came from broker {}",msgs, Thread.currentThread().getName());
+		
+		msgs.forEach(this.dispatch::route);
+
+	}
 }

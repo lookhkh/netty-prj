@@ -1,12 +1,16 @@
 package com.kt.onnuipay.kafka.kafkanetty.client.handler.manager.impl.hanlder;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import com.google.firebase.messaging.FirebaseMessaging;
-import com.kt.onnuipay.client.handler.manager.SendManager;
 
 import datavo.msg.MessageWrapper;
-import lombok.AllArgsConstructor;
+import datavo.msg.util.MessageUtils;
 import lombok.extern.slf4j.Slf4j;
 /**
  * @see https://firebase.google.com/docs/cloud-messaging/send-message#java
@@ -25,20 +29,45 @@ import lombok.extern.slf4j.Slf4j;
  *  intended publication of such software.
  */
 
-@AllArgsConstructor
+
 @Component("push-multiple-manager")
 @Slf4j
-public class PushMultipleManager implements SendManager {
+public class PushMultipleManager extends  CommonPushManager {
 
-	private final FirebaseMessaging instance;
+    public PushMultipleManager(FirebaseMessaging instance, @Qualifier("fcm-client") WebClient client) {
+        super(instance, client);
 
-	@Override
-	public void send(MessageWrapper vo) {
+    }
+   
+    @Override
+    public void processResult(String jsonRequestBody) {
+        System.out.println(" result "+jsonRequestBody);
+    }
 
-		log.info("pushMultipleManager received {}",vo);
-		
-		
-	}
 
+    @Override
+    public String getJsonMsgFromVo(MessageWrapper vo) {
+        //{"message":{"notification":{"title":"noti","body":"body"},"token":"token"}} 이렇게 나와야 함.
+
+        
+        Map<String, ? super Object> reqBody = new HashMap<>();
+        
+        if(vo.isUnicast()) {
+            reqBody.put("messagesBundle", vo.getMessageObjList());
+        }else {
+            reqBody.put("multicastBundle", vo.getMulticastMessageObjList());
+        }
+        
+        String result =  MessageUtils.toJson(reqBody, Map.class);
+        
+        log.info("직렬화 결과 {}",result);
+        //{"message":{"notification":{"title":"noti","body":"body"},"token":"token"}} 이렇게 나와야 함.
+
+        
+        return result;
+    }   
+    
+
+   
 
 }

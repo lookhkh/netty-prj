@@ -39,9 +39,6 @@ public class KafkaNettyApplication {
 	 	
 	public static void main(String[] args) throws InterruptedException, BeansException, IOException {
 		ConfigurableApplicationContext  ctx = SpringApplication.run(KafkaNettyApplication.class, args);
-		
-		
-
 	}
 
 	

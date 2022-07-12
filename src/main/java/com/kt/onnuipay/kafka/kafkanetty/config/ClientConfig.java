@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.http.client.reactive.ReactorResourceFactory;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -66,7 +68,7 @@ public class ClientConfig {
 	       
 	       ConnectionProvider provider =
 	               ConnectionProvider.builder("custom")
-	                                 .maxConnections(5)
+	                                 .maxConnections(20)
 	                                 
 	                                 .maxIdleTime(Duration.ofSeconds(20))           
 	                                 .maxLifeTime(Duration.ofSeconds(120))           
@@ -83,7 +85,9 @@ public class ClientConfig {
 
 	       WebClient client = WebClient.builder()
 	               .uriBuilderFactory(uriFactory)
-	               .defaultHeader("Authorization", "Bearer "+firebaseConfig.getAccessToken())
+	               .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer "+firebaseConfig.getAccessToken())
+	               .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+	               .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
 	               .clientConnector(new ReactorClientHttpConnector(
 	                       factory,
 	                       httpClient -> httpClient
@@ -93,7 +97,6 @@ public class ClientConfig {
 	                               ).addHandlerLast(new WriteTimeoutHandler(5))
 	                           ).responseTimeout(Duration.ofSeconds(5)) // 0.9.11 부터 추가
 	                   ))
-	               
 	               .build();
 	       
 	       
