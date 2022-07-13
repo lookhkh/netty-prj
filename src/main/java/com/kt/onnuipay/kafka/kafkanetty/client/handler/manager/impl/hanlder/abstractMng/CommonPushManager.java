@@ -1,4 +1,4 @@
-package com.kt.onnuipay.kafka.kafkanetty.client.handler.manager.impl.hanlder;
+package com.kt.onnuipay.kafka.kafkanetty.client.handler.manager.impl.hanlder.abstractMng;
 
 import java.time.Duration;
 

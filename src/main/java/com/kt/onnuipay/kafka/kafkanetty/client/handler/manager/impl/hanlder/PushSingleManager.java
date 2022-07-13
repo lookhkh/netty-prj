@@ -15,6 +15,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
 import com.kt.onnuipay.client.handler.manager.SendManager;
+import com.kt.onnuipay.kafka.kafkanetty.client.handler.manager.impl.hanlder.abstractMng.CommonPushManager;
 import com.kt.onnuipay.kafka.kafkanetty.exception.FirebaseMessageRunTimeException;
 import com.kt.onnuipay.kafka.kafkanetty.exception.FirebaseServerError;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.model.ResultOfPush;

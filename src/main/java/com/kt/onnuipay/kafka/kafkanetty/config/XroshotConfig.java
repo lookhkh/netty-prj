@@ -19,6 +19,7 @@ import org.springframework.context.annotation.PropertySource;
 import com.fasterxml.jackson.dataformat.xml.JacksonXmlModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
+import com.kt.onnuipay.client.ClientBootStrap;
 import com.kt.onnuipay.kafka.kafkanetty.client.handler.async.impl.ParsingServerResponse;
 import com.kt.onnuipay.kafka.kafkanetty.client.handler.async.impl.PrepareAndStartNettyClient;
 import com.kt.onnuipay.kafka.kafkanetty.config.vo.XroshotParameter;
@@ -26,6 +27,7 @@ import com.kt.onnuipay.kafka.kafkanetty.kafka.model.xml.response.SmsPushServerIn
 import com.kt.onnuipay.kafka.kafkanetty.kafka.parser.XMLParser;
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.pool.ChannelPoolMap;
 import io.netty.channel.pool.FixedChannelPool;
@@ -63,10 +65,33 @@ public class XroshotConfig {
 	private final EventLoopGroup loop;
 	
 	private final XMLParser parser;
+	
+	private final ClientBootStrap boot;
+	
+	private final PrepareAndStartNettyClient init;
 
-
-	@Bean
-	public ChannelPoolMap<InetSocketAddress, FixedChannelPool> getChannelPool() throws IOException {
+	
+	/**
+	 * 
+	 * @return Channel 크로샷 인증이 끝난 Channel을 리턴하며, SMS 발송 시, 해당 채널을 주입받아 공용으로 사용
+	 * @throws IOException
+	 * 
+	 * TODO 크로샷 서버와 로그인 완료 후, 메시지를 바로 보낼 수 있게끔 준비하여 Bean으로 등록한다.
+	 * /**
+     *          네티 클라이언트               Xroshot
+     *          
+     *          서버 시간 요청        ->>
+     *                          <--         서버 시간 응답
+     *          
+     *          로그인 요청          ->> 
+     *                          <---        로그인 응답 및 세션 생성
+     *  
+     *          메시지 전송      ->>     
+     * 
+     * 
+     */	
+	@Bean("Xroshot-channel")
+	public Channel getChannelPool() throws IOException {
 	    
 
 	    URL url = new URL("https://jsonplaceholder.typicode.com/todos/1");
@@ -84,7 +109,10 @@ public class XroshotConfig {
         con.disconnect();
         r.close();
         
-        //SmsPushServerInfoVo vo = parser.deserialzeFromJson(temp.toString(), SmsPushServerInfoVo.class);
+//        SmsPushServerInfoVo vo = parser.deserialzeFromJson(temp.toString(), SmsPushServerInfoVo.class);
+//        
+//        return boot.start(init.execute(vo), vo.getResource().getAddress(), vo.getResource().getPort());
+//           
         
 	    /**
 	     * TODO 크로샷 연동 규격 확인.
