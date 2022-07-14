@@ -1,5 +1,6 @@
 package com.kafka.kafkanetty.client.test.manager;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -70,23 +71,24 @@ public class NettyXroshotIntegeTest {
 	 * 
 	 */
 	@Test
-	@DisplayName("네티 클라이언트 통합 테스트")
+	@DisplayName(" 네티 클라이언트 통합 테스트 => 로그인 ")
 	public void test() {
 
 		
-		EmbeddedChannel ch = new EmbeddedChannel(
+		EmbeddedChannel ch = new EmbeddedChannel
+		        (
 				new LoggingHandler(LogLevel.DEBUG)
 				, new MessageDecoderTo(realParserMapper) 
 				, new DefaultMessageToByteEncoder(realParserMapper)
 				, new RequestServeSyncTimeHandler(this.param)
 				, new RequestAuthTicketHandler(this.param)
-				, new SendSingleMessageHandler(null)
 				, new ExceptionHospitalHandler()
 				);
 		
 		ChannelPipeline pipeline = ch.pipeline();
 		
-		
+	
+	//로그인 과정 시작
 		//채널 active 시, 서버 시간 정보를 요청
 		String reqServerTime =  ((ByteBuf)ch.readOutbound()).toString(CharsetUtil.UTF_8);
 		
@@ -144,31 +146,34 @@ public class NettyXroshotIntegeTest {
 		ch.writeInbound(Unpooled.copiedBuffer(serverAuthInfoResponse.getBytes(CharsetUtil.UTF_8)));
 		
 		//SP 로그인 요청
+	 //로그인 과정 완료
 
-		//서버 단일 메시지 전송
-		String singleMessage = ((ByteBuf)ch.readOutbound()).toString(CharsetUtil.UTF_8);		
+		//서버 에러 발생 시, 로그아웃 API 호출 및 채널 close
 		
-		assertNotNull(singleMessage);
-		assertTrue(singleMessage.contains("MAS method=\"req_send_message_2\""));
-		
-		assertNotNull(pipeline.get(SendSingleMessageHandler.class));
+
+		assertAll(()->{
+		   ChannelPipeline p = ch.pipeline();
+		   
+		   assertNotNull(p.get(LoggingHandler.class));
+		   assertNotNull(p.get(MessageDecoderTo.class));
+		   assertNotNull(p.get(DefaultMessageToByteEncoder.class));
+		   assertNotNull(p.get(ExceptionHospitalHandler.class));
+           
+		});
 		
 		assertTrue(ch.isActive());
 		
-		//서버 단일 메시지 전송
-
 		
-		//서버 에러 발생 시, 로그아웃 API 호출 및 채널 close
-		
-		ch.writeInbound(Unpooled.copiedBuffer("test failed".getBytes()));
-		
-		String reqUnregistMessage = ((ByteBuf)ch.readOutbound()).toString(CharsetUtil.UTF_8);		
-
-		assertNotNull(reqUnregistMessage);
-		
-		assertTrue(reqUnregistMessage.contains("MAS method=\"req_unregist\""));
-		
-		assertFalse(ch.isActive());
+//에러 메시지 수신 시 처리 로직. 다른 테스트 케이스로 이전 예정
+//		ch.writeInbound(Unpooled.copiedBuffer("test failed".getBytes()));
+//		
+//		String reqUnregistMessage = ((ByteBuf)ch.readOutbound()).toString(CharsetUtil.UTF_8);		
+//
+//		assertNotNull(reqUnregistMessage);
+//		
+//		assertTrue(reqUnregistMessage.contains("MAS method=\"req_unregist\""));
+//		
+//		assertFalse(ch.isActive());
 		
 		//서버 에러 발생 시, 로그아웃 API 호출 및 채널 close
 

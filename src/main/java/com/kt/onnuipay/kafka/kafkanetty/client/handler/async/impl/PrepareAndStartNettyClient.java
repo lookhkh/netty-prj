@@ -23,8 +23,6 @@ public class PrepareAndStartNettyClient  {
 		
 		this.boot = boot;
 		this.singleChannelInit = singleChannelInit;
-	
-	
 	}
 
 	public CompletableFuture<Channel> execute(CompletableFuture<SmsPushServerInfoVo> target) {
@@ -32,13 +30,10 @@ public class PrepareAndStartNettyClient  {
 		 return target
 			.thenApply(vo -> vo.getResource())
 			.thenApplyAsync(this::startTransaction)
-			;
-		     
-		
+			;	
 	}
 	
 	private Channel startTransaction(ResourceInfo resource) {
-		
 
 		 return boot.start(
 				 		singleChannelInit.getChannelInit(null),

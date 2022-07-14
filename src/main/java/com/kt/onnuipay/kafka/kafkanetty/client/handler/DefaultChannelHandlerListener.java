@@ -19,13 +19,14 @@ import com.kt.onnuipay.kafka.kafkanetty.exception.ChannelHandlerExceptionError;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInboundHandler;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author cho hyun il lookhkh37@gmail.com
  * @date 2022. 7. 1.
  * @apiNote 핸들러가 분리될 때, 간단한 로그를 남기는 리스너
  */
-
+@Slf4j
 @AllArgsConstructor
 public class DefaultChannelHandlerListener extends SimpleChannelFutureListener {
 
@@ -41,7 +42,9 @@ public class DefaultChannelHandlerListener extends SimpleChannelFutureListener {
 	
 	@Override
 	public void onSuccess(Channel channel) {
-		channel.pipeline().remove(hanldler);
+	    
+	    log.info("{} to {} hanlder removed ",this,channel);
+		channel.pipeline().remove(this.hanldler);
 		
 	}
 }

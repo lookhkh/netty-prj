@@ -9,6 +9,7 @@ import com.kt.onnuipay.kafka.kafkanetty.kafka.model.ResultOfPush;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.mongo.TempMongodbTemplate;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.parser.KafkaMsgParser;
 
+import datavo.MetaData;
 import datavo.msg.MessageWrapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -68,7 +69,7 @@ public class DispatcherControllerImpl implements DispatcherController{
 				db.insertDbHistory(
 						ResultOfPush.builder()
 							.vo((MessageWrapper)e.getVo())
-							.metaData(null)
+							.metaData(e.getVo() instanceof MessageWrapper ? (MetaData)e.getVo():null)
 							.isSuccess(false)
 							.reason(e)
 							.build());

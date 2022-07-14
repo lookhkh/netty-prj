@@ -60,7 +60,6 @@ public class KafkaNettyApplication {
 		});
 		
 		return service;
-		
 	}
 	
 	/**
@@ -89,6 +88,7 @@ public class KafkaNettyApplication {
 	 * 
 	 * 
 	 * TODO Netty & AsyncClient가 함게 사용하는 EventLoop, 개수 지정 최적화 필요 조현일 220701
+	 * => AsyncClient 사용 X로 변경 220714 조현일
 	 * 
 	 * **/
 	@Bean("netty-event-group")

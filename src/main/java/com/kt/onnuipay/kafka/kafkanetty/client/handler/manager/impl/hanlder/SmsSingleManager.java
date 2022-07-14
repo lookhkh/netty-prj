@@ -1,23 +1,12 @@
 package com.kt.onnuipay.kafka.kafkanetty.client.handler.manager.impl.hanlder;
 
-import org.asynchttpclient.AsyncHttpClient;
-import org.asynchttpclient.ListenableFuture;
-import org.asynchttpclient.Request;
-import org.asynchttpclient.RequestBuilder;
-import org.asynchttpclient.Response;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 import com.kt.onnuipay.client.handler.manager.SendManager;
-import com.kt.onnuipay.kafka.kafkanetty.client.handler.async.exception.FinalXroshotExceptionHanlder;
-import com.kt.onnuipay.kafka.kafkanetty.client.handler.async.impl.ParsingServerResponse;
-import com.kt.onnuipay.kafka.kafkanetty.client.handler.async.impl.PrepareAndStartNettyClient;
-import com.kt.onnuipay.kafka.kafkanetty.config.vo.XroshotParameter;
 import com.kt.onnuipay.kafka.kafkanetty.kafka.parser.XMLParser;
 
 import datavo.msg.MessageWrapper;
-import io.netty.util.CharsetUtil;
+import io.netty.channel.Channel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
@@ -41,15 +30,15 @@ import lombok.extern.slf4j.Slf4j;
 @Builder
 public class SmsSingleManager implements SendManager {
 
-	private final AsyncHttpClient client;
+//	private final AsyncHttpClient client;
 	private final XMLParser parser;
-	private final XroshotParameter param;
-	
-	private final ParsingServerResponse paringMsgServerInfo;
-	private final PrepareAndStartNettyClient prepareeAndStartClient;
+//	private final XroshotParameter param;
+//	
+//	private final ParsingServerResponse paringMsgServerInfo;
+//	private final PrepareAndStartNettyClient prepareeAndStartClient;
 
+    private final Channel xroshotChannel;
 	
-	private final FinalXroshotExceptionHanlder FinalXroshotExceptionHandler;
 	
 	@Override
 	public void send(MessageWrapper vo) {
@@ -57,22 +46,24 @@ public class SmsSingleManager implements SendManager {
 		
 		
 		
-		String serializedBody = parser.parseToString(vo);
 		
-		Request r = new RequestBuilder()
-				.setUrl(param.getSendServerUrl())
-				.setMethod("get")
-				.addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE)
-				.addHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_VALUE)
-				.build();
+		String serializedBody = parser.parseToString(vo.getSmsVo());
 		
-		ListenableFuture<Response> f = client.executeRequest(r);
-
-		f.toCompletableFuture()
-			.thenApply(res -> res.getResponseBody(CharsetUtil.UTF_8))
-			.thenApply(paringMsgServerInfo::execute)
-			.thenAccept(prepareeAndStartClient::execute)
-			;
+//		
+//		Request r = new RequestBuilder()
+//				.setUrl(param.getSendServerUrl())
+//				.setMethod("get")
+//				.addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE)
+//				.addHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_VALUE)
+//				.build();
+//		
+//		ListenableFuture<Response> f = client.executeRequest(r);
+//
+//		f.toCompletableFuture()
+//			.thenApply(res -> res.getResponseBody(CharsetUtil.UTF_8))
+//			.thenApply(paringMsgServerInfo::execute)
+//			.thenAccept(prepareeAndStartClient::execute)
+//			;
 			
 	}
 

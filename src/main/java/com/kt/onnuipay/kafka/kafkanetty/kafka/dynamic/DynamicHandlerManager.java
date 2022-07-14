@@ -1,13 +1,8 @@
 package com.kt.onnuipay.kafka.kafkanetty.kafka.dynamic;
 
-import java.util.concurrent.CompletableFuture;
-
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import com.kt.onnuipay.client.handler.manager.SendManager;
 import com.kt.onnuipay.kafka.kafkanetty.exception.RunTimeExceptionWrapper;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.ResultOfPush;
 
 import datavo.msg.MessageWrapper;
 import lombok.AllArgsConstructor;
@@ -40,7 +35,9 @@ public class DynamicHandlerManager {
 				
 		try {
 					
-			 factory.getInstance(vo).send(vo);
+			 factory
+			     .getInstance(vo)
+			     .send(vo);
 		}
 
 		catch(Exception e) {

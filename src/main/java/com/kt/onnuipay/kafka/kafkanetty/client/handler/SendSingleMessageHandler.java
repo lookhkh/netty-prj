@@ -32,7 +32,9 @@ public class SendSingleMessageHandler extends ChannelInboundHandlerAdapter {
 		
 		log.info("메시지 생성 => {}",mas);
 		
-		ctx.writeAndFlush(mas);
+		ctx.writeAndFlush(mas).addListener(new DefaultChannelHandlerListener(this));
+		
+		
 		
 		
 		
