@@ -7,8 +7,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import com.kt.onnuipay.client.handler.manager.SendManager;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.dynamic.DynamicHandlerManager;
+import com.kt.onnuripay.kafka.client.handler.manager.SendManager;
+import com.kt.onnuripay.kafka.dynamic.DynamicHandlerManager;
 
 import datavo.msg.MessageWrapper;
 

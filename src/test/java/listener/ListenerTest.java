@@ -9,9 +9,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.context.ContextConfiguration;
 
-import com.kt.onnuipay.KafkaNettyApplication;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.DispatcherController;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.listener.AckMessageListener;
+import com.kt.onnuripay.KafkaNettyApplication;
+import com.kt.onnuripay.kafka.controller.DispatcherController;
+import com.kt.onnuripay.kafka.listener.AckMessageListener;
 
 import lombok.extern.slf4j.Slf4j;
 

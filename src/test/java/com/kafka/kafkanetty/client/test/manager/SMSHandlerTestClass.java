@@ -17,22 +17,21 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.kt.onnuipay.kafka.kafkanetty.client.handler.ExceptionHospitalHandler;
-import com.kt.onnuipay.kafka.kafkanetty.client.handler.RequestAuthTicketHandler;
-import com.kt.onnuipay.kafka.kafkanetty.client.handler.RequestServeSyncTimeHandler;
-import com.kt.onnuipay.kafka.kafkanetty.client.handler.SendSingleMessageHandler;
-import com.kt.onnuipay.kafka.kafkanetty.client.handler.async.impl.ParsingServerResponse;
-import com.kt.onnuipay.kafka.kafkanetty.client.handler.codec.DefaultMessageToByteEncoder;
-import com.kt.onnuipay.kafka.kafkanetty.client.handler.codec.MessageDecoderTo;
-import com.kt.onnuipay.kafka.kafkanetty.config.vo.XroshotParameter;
-import com.kt.onnuipay.kafka.kafkanetty.exception.XroshotRuntimeException;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.xml.Mas;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.xml.XMLConstant;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.xml.response.AuthInfoVo;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.xml.response.ResourceInfo;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.xml.response.ServerTimeVo;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.model.xml.response.SmsPushServerInfoVo;
-import com.kt.onnuipay.kafka.kafkanetty.kafka.parser.XMLParser;
+import com.kt.onnuripay.common.config.vo.XroshotParameter;
+import com.kt.onnuripay.common.exception.XroshotRuntimeException;
+import com.kt.onnuripay.kafka.parser.XMLParser;
+import com.kt.onnuripay.kafka.xroshot.client.handler.ExceptionHospitalHandler;
+import com.kt.onnuripay.kafka.xroshot.client.handler.RequestAuthTicketHandler;
+import com.kt.onnuripay.kafka.xroshot.client.handler.RequestServeSyncTimeHandler;
+import com.kt.onnuripay.kafka.xroshot.client.handler.SendSingleMessageHandler;
+import com.kt.onnuripay.kafka.xroshot.client.handler.codec.DefaultMessageToByteEncoder;
+import com.kt.onnuripay.kafka.xroshot.client.handler.codec.MessageDecoderTo;
+import com.kt.onnuripay.kafka.xroshot.kafka.model.xml.Mas;
+import com.kt.onnuripay.kafka.xroshot.kafka.model.xml.XMLConstant;
+import com.kt.onnuripay.kafka.xroshot.kafka.model.xml.response.AuthInfoVo;
+import com.kt.onnuripay.kafka.xroshot.kafka.model.xml.response.ResourceInfo;
+import com.kt.onnuripay.kafka.xroshot.kafka.model.xml.response.ServerTimeVo;
+import com.kt.onnuripay.kafka.xroshot.kafka.model.xml.response.SmsPushServerInfoVo;
 
 import io.grpc.netty.shaded.io.netty.util.CharsetUtil;
 import io.netty.buffer.ByteBuf;
@@ -222,35 +221,6 @@ public class SMSHandlerTestClass {
 
 	}
 	
-	@Test
-	@DisplayName("1. 전송할 서버 위치 확인")
-	public void test() throws JsonProcessingException, InterruptedException {
-		
-	
-															
-		String result = realParserMapper.parseToString(info);
-		
-		ParsingServerResponse r = new ParsingServerResponse(realParserMapper);
-		CompletableFuture<SmsPushServerInfoVo> serverInfo =  r.execute(result);
-		
-		SmsPushServerInfoVo rrr = serverInfo.join();
-
-		assertTrue(rrr.getResult().equals(info.getResult()));
-		assertTrue(rrr.getResource().getAddress().equals(info.getResource().getAddress()));
-		assertTrue(rrr.getResource().getCategory().equals(info.getResource().getCategory()));
-		assertTrue(rrr.getResource().getPort() == info.getResource().getPort());
-
-		
-		SmsPushServerInfoVo mockVo = mock(SmsPushServerInfoVo.class);
-
-		ParsingServerResponse r2 = new ParsingServerResponse(parser);
-		when(parser.deserialzeFromJson(result, SmsPushServerInfoVo.class)).thenReturn(mockVo);
-		Mockito.doThrow(new XroshotRuntimeException("error",mockVo)).when(mockVo).checkResultAndThrowIfInvalidData(mockVo);
-
-		XroshotRuntimeException t= assertThrows(XroshotRuntimeException.class, ()->r2.execute(result));
-		
-		assertTrue(t.getR() instanceof SmsPushServerInfoVo);
-	}
 	
 
 	@Test
