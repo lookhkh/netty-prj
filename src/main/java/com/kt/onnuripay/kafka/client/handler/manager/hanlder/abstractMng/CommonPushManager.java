@@ -18,6 +18,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.kt.onnuripay.common.exception.FirebaseMessageRunTimeException;
 import com.kt.onnuripay.common.exception.FirebaseServerError;
 import com.kt.onnuripay.kafka.client.handler.manager.SendManager;
@@ -27,6 +28,7 @@ import io.netty.util.CharsetUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.netty.internal.shaded.reactor.pool.PoolAcquirePendingLimitException;
 import reactor.util.retry.Retry;
 
@@ -35,7 +37,7 @@ import reactor.util.retry.Retry;
 public abstract class CommonPushManager implements SendManager{
 
     private final WebClient client;
-    
+
     /**
      * 
      */
@@ -48,19 +50,18 @@ public abstract class CommonPushManager implements SendManager{
         .body(BodyInserters.fromValue(getJsonMsgFromVo(vo)))         
         .retrieve()
         .onStatus(HttpStatus::is4xxClientError , res -> res.createException())
-        .onStatus(HttpStatus::is5xxServerError, res -> res.createException())
+        .onStatus(HttpStatus::is5xxServerError, res -> Mono.error(new FirebaseServerError(res)))
         .bodyToFlux(String.class)
         .retryWhen(Retry.backoff(3, Duration.ofSeconds(5))
                 .filter(throwable -> throwable instanceof FirebaseServerError | throwable instanceof PoolAcquirePendingLimitException)
                 .onRetryExhaustedThrow((retryBackoffSpec, retrySignal)->{
                     throw new FirebaseMessageRunTimeException("Retry failed");   
                 }))
-        
         .onErrorResume(e->{
             
             if(e instanceof WebClientResponseException) {
                 WebClientResponseException t =  (WebClientResponseException)e;
-                log.error("{}",t.getResponseBodyAsString(CharsetUtil.UTF_8));
+                log.error("Client Logic error happend {}",t.getResponseBodyAsString(CharsetUtil.UTF_8));
             }else {
                 log.error("Logic related Error happend {}",e.getMessage());
             }

@@ -36,7 +36,11 @@ public class RequestServeSyncTimeHandler extends ChannelInboundHandlerAdapter {
 		if(log.isDebugEnabled()) log.debug("{} handler removed ",ctx.channel());
 		super.handlerRemoved(ctx);
 	}
-	
+	/**
+	 * 
+	 * @implSpec 채널이 Active된 이후, Xroshot 서버로 서버 시간 동기화를 위한 시간을 요청한 이후, 요청이 성공하면 pipeline에서 스스로를 삭제함.
+	 * 
+	 */
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
 		

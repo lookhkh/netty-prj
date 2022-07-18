@@ -47,14 +47,13 @@ public class PushSingleManager extends  CommonPushManager {
         if(vo.isUnicast()) {
             reqBody.put("message", vo.getMessageObjList().get(0));
         }else {
-            reqBody.put("multicast", vo.getMulticastMessageObjList().get(0));
+            reqBody.put("message", vo.getMulticastMessageObjList().get(0));
         }
         
         String result =  MessageUtils.toJson(reqBody, Map.class);
         
         if(log.isDebugEnabled())log.debug("직렬화 결과 {}",result);
         //{"message":{"notification":{"title":"noti","body":"body"},"token":"token"}} 이렇게 나와야 함.
-
         
         return result;
     }	

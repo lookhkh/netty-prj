@@ -52,7 +52,7 @@ public class SingleHandlerInit  {
 	}
 	
 	
-	public 	ChannelInitializer<SocketChannel> getChannelInit(MessageWrapper message){
+	public 	ChannelInitializer<SocketChannel> getChannelInit(){
 		
 		return new ChannelInitializer<SocketChannel>() {
 			@Override
@@ -63,7 +63,6 @@ public class SingleHandlerInit  {
 				p.addLast(decoder);
 				p.addLast(requestServerTimeHandler);
 				p.addLast(authTicketHandler);
-				p.addLast(new SendSingleMessageHandler(message));
 				p.addLast(exceptionHospital);				
 			}
 		};

@@ -17,6 +17,7 @@ import com.kt.onnuripay.common.exception.ChannelHandlerExceptionError;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInboundHandler;
+import io.netty.util.AttributeKey;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,7 +42,7 @@ public class DefaultChannelHandlerListener extends SimpleChannelFutureListener {
 	
 	@Override
 	public void onSuccess(Channel channel) {
-	    
+	   
 	    if(log.isDebugEnabled()) log.debug("{} to {} hanlder removed ",this,channel);
 		channel.pipeline().remove(this.hanldler);
 		

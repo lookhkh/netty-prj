@@ -71,7 +71,7 @@ public class ClientConfig {
 	
 	@Bean("fcm-client") 
 	public WebClient getClient() {
-	    LoopResources loop = LoopResources.create("worker-event-loop", 1, 10, true);
+	        LoopResources loop = LoopResources.create("worker-event-loop", 1, 1, true);
 	        
 	    
 	       String baseUrl = "https://fcm.googleapis.com/v1/projects/onnuri-4b38d/messages:send";
@@ -81,7 +81,7 @@ public class ClientConfig {
 	       
 	       ConnectionProvider provider =
 	               ConnectionProvider.builder("custom")
-	                                 .maxConnections(20)
+	                                 .maxConnections(50)
 	                                 
 	                                 .maxIdleTime(Duration.ofSeconds(20))           
 	                                 .maxLifeTime(Duration.ofSeconds(120))           
