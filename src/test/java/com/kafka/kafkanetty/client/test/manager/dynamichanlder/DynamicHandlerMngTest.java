@@ -1,16 +1,10 @@
 package com.kafka.kafkanetty.client.test.manager.dynamichanlder;
 
-import static org.mockito.Mockito.times;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
-import com.kt.onnuripay.kafka.client.handler.manager.SendManager;
-import com.kt.onnuripay.kafka.dynamic.DynamicHandlerManager;
-
-import datavo.msg.MessageWrapper;
+import com.kt.onnuripay.message.kafka.dynamic.DynamicHandlerManager;
 
 /**
  * 1. MSG 타입 및 종류(안드로이드? IOS? SMS? / 단건 발송? 멀티발송?)에 따라, 해당하는 핸들러로 메시지를 라우팅한다.

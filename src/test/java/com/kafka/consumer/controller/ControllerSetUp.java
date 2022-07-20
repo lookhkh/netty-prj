@@ -2,17 +2,16 @@ package com.kafka.consumer.controller;
 
 import org.mockito.Mockito;
 
-import com.kt.onnuripay.kafka.client.handler.mapper.SmsPushMapper;
-import com.kt.onnuripay.kafka.controller.DispatcherController;
-import com.kt.onnuripay.kafka.controller.DispatcherControllerImpl;
-import com.kt.onnuripay.kafka.dynamic.DynamicHandlerManager;
-import com.kt.onnuripay.kafka.parser.KafkaMsgParser;
+import com.kt.onnuripay.message.kafka.client.handler.mapper.SmsPushMapper;
+import com.kt.onnuripay.message.kafka.controller.DispatcherController;
+import com.kt.onnuripay.message.kafka.controller.DispatcherControllerImpl;
+import com.kt.onnuripay.message.kafka.dynamic.DynamicHandlerManager;
+import com.kt.onnuripay.message.kafka.parser.KafkaMsgParser;
 
 import lombok.Data;
-import util.TestSeUpAbstract;
 
 @Data
-public class ControllerSetUp extends TestSeUpAbstract{
+public class ControllerSetUp {
 	
 	public KafkaMsgParser mockParser = Mockito.mock(KafkaMsgParser.class);
 	public DynamicHandlerManager mockHanlder = Mockito.mock(DynamicHandlerManager.class);
@@ -24,7 +23,6 @@ public class ControllerSetUp extends TestSeUpAbstract{
 	  
 
 
-	@Override
 	public void reset() {
 		this.mockParser = Mockito.mock(KafkaMsgParser.class);
 		this.mockHanlder = Mockito.mock(DynamicHandlerManager.class);

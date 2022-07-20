@@ -2,19 +2,18 @@ package com.kafka.kafkanetty.client.test.manager.dynamichanlder;
 
 import static org.mockito.Mockito.mock;
 
-import com.kt.onnuripay.kafka.client.handler.manager.SendManager;
-import com.kt.onnuripay.kafka.client.handler.manager.hanlder.impl.PushMultipleManager;
-import com.kt.onnuripay.kafka.client.handler.manager.hanlder.impl.PushSingleManager;
-import com.kt.onnuripay.kafka.client.handler.manager.hanlder.impl.SmsMultipleManager;
-import com.kt.onnuripay.kafka.client.handler.manager.hanlder.impl.SmsSingleManager;
-import com.kt.onnuripay.kafka.dynamic.DynamicHandlerFactoryMethod;
-import com.kt.onnuripay.kafka.dynamic.DynamicHandlerManager;
+import com.kt.onnuripay.message.kafka.client.handler.manager.SendManager;
+import com.kt.onnuripay.message.kafka.client.handler.manager.hanlder.impl.PushMultipleManager;
+import com.kt.onnuripay.message.kafka.client.handler.manager.hanlder.impl.PushSingleManager;
+import com.kt.onnuripay.message.kafka.client.handler.manager.hanlder.impl.SmsMultipleManager;
+import com.kt.onnuripay.message.kafka.client.handler.manager.hanlder.impl.SmsSingleManager;
+import com.kt.onnuripay.message.kafka.dynamic.DynamicHandlerFactoryMethod;
+import com.kt.onnuripay.message.kafka.dynamic.DynamicHandlerManager;
 
 import lombok.Data;
-import util.TestSeUpAbstract;
 
 @Data
-public class DynamicHander_setup extends TestSeUpAbstract {
+public class DynamicHander_setup  {
 
 	SendManager sms_single_manager = mock(SmsSingleManager.class);
 	SendManager sms_multiple_manager = mock(SmsMultipleManager.class);
@@ -25,7 +24,6 @@ public class DynamicHander_setup extends TestSeUpAbstract {
 
 	DynamicHandlerManager hanlder = new DynamicHandlerManager(mockFactory);
 			 
-	@Override
 	public void reset() {
 		this.sms_single_manager = mock(SmsSingleManager.class);
 		this.sms_multiple_manager = mock(SmsMultipleManager.class);

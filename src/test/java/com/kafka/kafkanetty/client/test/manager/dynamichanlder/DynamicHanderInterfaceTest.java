@@ -10,12 +10,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.kt.onnuripay.common.exception.RunTimeExceptionWrapper;
-import com.kt.onnuripay.kafka.client.handler.manager.SendManager;
-import com.kt.onnuripay.kafka.dynamic.DynamicHandlerFactoryMethod;
-import com.kt.onnuripay.kafka.dynamic.DynamicHandlerManager;
-
-import datavo.msg.MessageWrapper;
+import com.kt.onnuripay.datavo.msg.MessageWrapper;
+import com.kt.onnuripay.message.common.exception.RunTimeExceptionWrapper;
+import com.kt.onnuripay.message.kafka.client.handler.manager.SendManager;
+import com.kt.onnuripay.message.kafka.dynamic.DynamicHandlerFactoryMethod;
+import com.kt.onnuripay.message.kafka.dynamic.DynamicHandlerManager;
 
 @DisplayName("다이내믹 핸들러 인터페이스 테스트")
 public class DynamicHanderInterfaceTest {

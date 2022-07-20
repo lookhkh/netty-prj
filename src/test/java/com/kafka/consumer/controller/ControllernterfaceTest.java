@@ -17,12 +17,11 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DatabindException;
-import com.kt.onnuripay.common.exception.JsonDataProcessingWrapperException;
-import com.kt.onnuripay.common.exception.RunTimeExceptionWrapper;
-import com.kt.onnuripay.kafka.controller.DispatcherController;
-import com.kt.onnuripay.kafka.model.ResultOfPush;
-
-import datavo.msg.MessageWrapper;
+import com.kt.onnuripay.datavo.msg.MessageWrapper;
+import com.kt.onnuripay.message.common.exception.JsonDataProcessingWrapperException;
+import com.kt.onnuripay.message.common.exception.RunTimeExceptionWrapper;
+import com.kt.onnuripay.message.kafka.controller.DispatcherController;
+import com.kt.onnuripay.message.kafka.model.ResultOfPush;
 
 /*
  * 

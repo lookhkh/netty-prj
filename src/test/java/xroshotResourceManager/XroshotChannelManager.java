@@ -12,11 +12,11 @@ import javax.annotation.PostConstruct;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
-import com.kt.onnuripay.common.config.vo.XroshotParameter;
-import com.kt.onnuripay.kafka.parser.XMLParser;
-import com.kt.onnuripay.kafka.xroshot.client.ClientBootStrap;
-import com.kt.onnuripay.kafka.xroshot.client.handler.init.SingleHandlerInit;
-import com.kt.onnuripay.kafka.xroshot.kafka.model.xml.response.SmsPushServerInfoVo;
+import com.kt.onnuripay.message.common.config.vo.XroshotParameter;
+import com.kt.onnuripay.message.kafka.parser.XMLParser;
+import com.kt.onnuripay.message.kafka.xroshot.client.ClientBootStrap;
+import com.kt.onnuripay.message.kafka.xroshot.client.handler.init.SingleHandlerInit;
+import com.kt.onnuripay.message.kafka.xroshot.kafka.model.xml.response.SmsPushServerInfoVo;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -93,7 +93,7 @@ public class XroshotChannelManager {
      */
     public Channel connectToXroshotServer() throws IOException {
 
-        URL url = new URL("https://jsonplaceholder.typicode.com/todos/1");
+        URL url = new URL(this.param.getSendServerUrl());
         HttpURLConnection con = (HttpURLConnection)url.openConnection();
         BufferedReader r = new BufferedReader(new InputStreamReader(con.getInputStream()));
         StringBuffer temp = new StringBuffer();

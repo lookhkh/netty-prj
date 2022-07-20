@@ -3,8 +3,8 @@ package util;
 import com.fasterxml.jackson.dataformat.xml.JacksonXmlModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
-import com.kt.onnuripay.common.config.vo.XroshotParameter;
-import com.kt.onnuripay.kafka.parser.XMLParser;
+import com.kt.onnuripay.message.common.config.vo.XroshotParameter;
+import com.kt.onnuripay.message.kafka.parser.XMLParser;
 
 public class XroshotTestUtil {
 
