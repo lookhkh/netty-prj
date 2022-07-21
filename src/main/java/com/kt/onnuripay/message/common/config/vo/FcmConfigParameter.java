@@ -53,8 +53,8 @@ public class FcmConfigParameter {
         this.maxConnection = maxConnection == null? 200 : Integer.valueOf(maxConnection);
         this.maxIdleTime = maxIdleTime == null? 5 : Integer.valueOf(maxIdleTime);
         this.maxLifeTime = maxLifeTime == null? 5 : Integer.valueOf(maxLifeTime);
-        this.evictTime = evictTime == null? 5 : Integer.valueOf(evictTime);
-        this.timeout = maxConnection == null? 5 : Integer.valueOf(timeout);
+        this.evictTime = evictTime == null? 120 : Integer.valueOf(evictTime);
+        this.timeout = timeout == null? 60 : Integer.valueOf(timeout);
         this.pendingAcquireTimeout = pendingAcquireTimeout == null? 60 : Integer.valueOf(pendingAcquireTimeout);
 
         this.baseUrl  =  env.getProperty("project.properties.fms.fcmUrl");

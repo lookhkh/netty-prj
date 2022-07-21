@@ -1,0 +1,20 @@
+   메시지 서버 설정 정보. 
+     * fcm.eventloop.thread.number = FCM 이벤트 루프 개수 설정 값. default 1
+     * fcm.connection.max = FCM 커넥션 수 설정값. default 200
+     * fcm.connection.pool.idleTime.max = FCM 커넥션 풀 내의 최대 IDLE 허용값. default 5
+     * fcm.connection.pool.lifeTime.max = 커넥션 풀 내의 최대 생존 기간 default 5
+     * fcm.connection.pool.evictTime = 커네션 풀 내의 채널 검사 주기 default 120
+     * fcm.connection.timeout = fcm 내 커넥션 read / write timeout 시간 default 60
+     * fcm.connection.pool.maxPendingAcquiireTimeout = 커넥션 풀 내 최대 대기 시간. default 60
+     * kafka.consumer.container.single.pollInterval = single polling interval default 1000ms
+     * kafka.consumer.container.batch.pollInterval = batch polling interval default 1000ms
+     * kafka.consumer.container.batch.minByte = Fetch 시 최소 byte 수 default 60 10_000 bytes
+     * kafka.consumer.container.batch.maxWaitMs = Fetch 시 대기하는 최대 MS default 1000
+     * kafka.consumer.container.brokers = 서버 브로커 정보 IP:PORT 형식 default localhost:9092
+     * kafka.consumer.container.maxPollRecords = fetch 시 최대 records 수 default 100
+     * netty.client.loopgroup.threads= netty eventloop thread 수 default 1
+     * netty.client.pool.dbConnectionNums = DB 입출력을 담당할 스레드 수 default 1
+     * project.properties.fms.fireBaseCreateScoped = FCM Auth 가능 범위
+	 * project.properties.fms.credentialPath = FCM 서비스 Key 위치
+     * project.properties.fms.fcmUrl = FCM 메시지 URL
+     
