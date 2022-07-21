@@ -27,6 +27,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 
 import com.kt.onnuripay.message.common.config.unit.fcm.FireBaseConfig;
+import com.kt.onnuripay.message.common.config.vo.FcmConfigParameter;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelInitializer;
@@ -37,6 +38,8 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.resources.ConnectionProvider;
 import reactor.netty.resources.LoopResources;
@@ -55,40 +58,48 @@ import reactor.netty.tcp.TcpClient;
  *  intended publication of such software.
  */
 
-
+@Slf4j
 @Configuration
 @PropertySource("classpath:application.properties")
+@AllArgsConstructor
 public class ClientConfig {
 	
-    @Autowired
-    Environment env;
-    
-    @Autowired
-    FireBaseConfig firebaseConfig;
+    /**
+     * fcm.eventloop.thread.number = FCM 이벤트 루프 개수 설정 값.
+     * fcm.connection.max = FCM 커넥션 수 설정값. 
+     * fcm.connection.pool.idleTime.max = FCM 커넥션 풀 내의 최대 IDLE 허용값.
+     * fcm.connection.pool.lifeTime.max = 커넥션 풀 내의 최대 생존 기간
+     * fcm.connection.pool.evictTime = 커네션 풀 내의 채널 검사 주기
+     * fcm.connection.timeout = fcm 내 커넥션 read / write timeout 시간
+     * 
+     */
 
-	@Bean
-	public static PropertySourcesPlaceholderConfigurer propertyConfigInDev() {
-		return new PropertySourcesPlaceholderConfigurer();
-	}
+    private final FcmConfigParameter parameter;
+    
+    
+    private final FireBaseConfig firebaseConfig;
+
+    
 	
 	@Bean("fcm-client") 
 	public WebClient getClient() {
-	        LoopResources loop = LoopResources.create("worker-event-loop", 1, 10, true);
+	    
 	        
-	       String baseUrl = env.getProperty("project.properties.fms.fcmUrl");
+	    
+	       LoopResources loop = LoopResources.create("worker-event-loop", 1, parameter.getEventLoops(), true);
 	       
-	       DefaultUriBuilderFactory uriFactory = new DefaultUriBuilderFactory(baseUrl);
+	       DefaultUriBuilderFactory uriFactory = new DefaultUriBuilderFactory(parameter.getBaseUrl());
 	       
 	       
 	       ConnectionProvider provider =
 	               ConnectionProvider.builder("custom")
-	                                 .maxConnections(100)
+	                                 .maxConnections(parameter.getMaxConnection())
 	                                 
-	                                 .maxIdleTime(Duration.ofSeconds(20))           
-	                                 .maxLifeTime(Duration.ofSeconds(120))           
-	                                 .pendingAcquireTimeout(Duration.ofSeconds(60)) 
+	                                 .maxIdleTime(Duration.ofSeconds(parameter.getMaxIdleTime()))           
+	                                 .maxLifeTime(Duration.ofSeconds(parameter.getMaxLifeTime()))           
+	                                 .pendingAcquireTimeout(Duration.ofSeconds(parameter.getPendingAcquireTimeout())) 
 	                                 
-	                                 .evictInBackground(Duration.ofSeconds(120))    
+	                                 .evictInBackground(Duration.ofSeconds(parameter.getEvictTime()))    
 	                                 
 	                                 .lifo()
 	                                 .build();
@@ -109,11 +120,11 @@ public class ClientConfig {
 	               .clientConnector(new ReactorClientHttpConnector(
 	                       factory,
 	                       httpClient -> httpClient
-	                           .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
+	                           .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, parameter.getTimeout() * 1000)
 	                           .doOnConnected(connection ->
-	                               connection.addHandlerLast(new ReadTimeoutHandler(5)
-	                               ).addHandlerLast(new WriteTimeoutHandler(5))
-	                           ).responseTimeout(Duration.ofSeconds(5)) // 0.9.11 부터 추가
+	                               connection.addHandlerLast(new ReadTimeoutHandler(parameter.getTimeout())
+	                               ).addHandlerLast(new WriteTimeoutHandler(parameter.getTimeout()))
+	                           ).responseTimeout(Duration.ofSeconds(parameter.getTimeout())) 
 	                   ))
 	               .build();
 	       
@@ -124,7 +135,7 @@ public class ClientConfig {
 	
 	@Bean
 	public Bootstrap getDefaultNettyBootStrapForClient() {
-		boolean keepAlive = Boolean.valueOf(env.getProperty("netty.client.options.keepAlive"));
+		boolean keepAlive = true;
 
 		  
 	            Bootstrap b = new Bootstrap(); 

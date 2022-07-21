@@ -21,12 +21,14 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.ContextClosedEvent;
 
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 @SpringBootApplication
 public class KafkaNettyApplication {
 
 	public static void main(String[] args) throws InterruptedException, BeansException, IOException {
 	    SpringApplication.run(KafkaNettyApplication.class, args);
-	  
+	    log.info("한글 가능 여부 체크");
 	}
 
 }

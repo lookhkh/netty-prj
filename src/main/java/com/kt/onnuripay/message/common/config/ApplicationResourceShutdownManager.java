@@ -10,6 +10,7 @@
  *  approval of kt corp, and the copyright notice above does not evidence any actual or
  *  intended publication of such software.
  */
+
 package com.kt.onnuripay.message.common.config;
 
 import java.util.concurrent.ExecutorService;
@@ -24,32 +25,30 @@ import io.netty.channel.EventLoopGroup;
 import lombok.extern.slf4j.Slf4j;
 
 
-
-
-
 /**
  * @author cho hyun il lookhkh37@gmail.com
- * @date 2022. 7. 20.
- * @implNote ThreadExecutors 리소스 관리. container에 exit signal 수신 시, executors의 awaitTermination 호출하며 30초간 유지
- * 
- * 
+ * @date 2022. 7. 21.
+ * @implNote ExecutorService와 같은 자원들을 어플리케이션이 shutdown 될 시 관리한다.
  *
  */
 @Slf4j
 @Component
-public class ApplicationResourceShutdownHook {
+public class ApplicationResourceShutdownManager {
 
     private final ExecutorService singleExecutors;
     private final ExecutorService dbPoolExecutors;
     private final EventLoopGroup nettyEventLoop;
     
-    public ApplicationResourceShutdownHook(@Qualifier("single") ExecutorService singleExecutors, @Qualifier("db-thread-pool")ExecutorService dbPoolExecutors,
+    public ApplicationResourceShutdownManager(@Qualifier("single") ExecutorService singleExecutors, @Qualifier("db-thread-pool")ExecutorService dbPoolExecutors,
             @Qualifier("netty-event-group")EventLoopGroup nettyEventLoop) {
         this.singleExecutors = singleExecutors;
         this.dbPoolExecutors = dbPoolExecutors;
         this.nettyEventLoop = nettyEventLoop;
     }
-
+    
+    /**
+     * @apiNote App이 shutdown될 시 호출되며, 리소스를 관리한다.
+     */
     @PreDestroy
     public void destroyResource() {
        log.info("Container get shutdown signal and start managing resource");
@@ -65,8 +64,6 @@ public class ApplicationResourceShutdownHook {
    
 
     }
-    
-    
     
     
 }

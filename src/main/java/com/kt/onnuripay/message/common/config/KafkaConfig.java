@@ -26,6 +26,7 @@ import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 
+import com.kt.onnuripay.message.common.config.vo.KafkaConfigParameter;
 import com.kt.onnuripay.message.kafka.controller.DispatcherController;
 import com.kt.onnuripay.message.kafka.listener.AckMessageListener;
 
@@ -34,9 +35,7 @@ import com.kt.onnuripay.message.kafka.listener.AckMessageListener;
 @EnableKafka
 public class KafkaConfig {
 
-
-	private final Environment env;
-	
+	private final KafkaConfigParameter param;
 	private final DispatcherController controller;
 	
 	@Qualifier("single")
@@ -44,10 +43,10 @@ public class KafkaConfig {
 	
 	
 
-	public KafkaConfig(Environment env, DispatcherController controller, @Qualifier("single") ExecutorService exex) {
-		this.env = env;
+	public KafkaConfig(DispatcherController controller, @Qualifier("single") ExecutorService exex, KafkaConfigParameter param) {
 		this.controller = controller;
 		this.exex = exex;
+		this.param = param;
 	}
 
 
@@ -63,7 +62,7 @@ public class KafkaConfig {
 		factory.setConcurrency(1);
 		
 		factory.getContainerProperties().setMessageListener(ackMessageListener());
-		factory.getContainerProperties().setPollTimeout(1000);
+		factory.getContainerProperties().setPollTimeout(param.getSinglePollInterval());
 		
 		return factory;
 		
@@ -75,8 +74,8 @@ public class KafkaConfig {
 	public ConcurrentKafkaListenerContainerFactory<String, String> kafkaBatchListenerContainerFactory(){
 		
 		Map<String,Object> config = createConfig();
-		config.put(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, 10000);//fetch_min_byte, 최소로 가져오는 바이트 크기
-		config.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, 10_000); //fetch_min_byte가 충족되지 않을 경우 최대 대기시간.
+		config.put(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, param.getBatchMinBytesConfig());//fetch_min_byte, 최소로 가져오는 바이트 크기
+		config.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, param.getBatchMaxWaitMsConfig()); //fetch_min_byte가 충족되지 않을 경우 최대 대기시간.
 		
 		ConsumerFactory<String, String> consumerFactory = new DefaultKafkaConsumerFactory<>(config);
 		
@@ -86,7 +85,7 @@ public class KafkaConfig {
 		factory.setBatchListener(true);
 		
 		factory.getContainerProperties().setMessageListener(ackMessageListener());
-		factory.getContainerProperties().setPollTimeout(10000);
+		factory.getContainerProperties().setPollTimeout(param.getBatchPollInterval());
 		
 		return factory;
 		
@@ -94,12 +93,12 @@ public class KafkaConfig {
 	
 	private Map<String, Object> createConfig() {
 		Map<String,Object> config = new HashMap<>();
-		config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+		config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, param.getBrokers());
 		config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
 		config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 		config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 		config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-		config.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 100);
+		config.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, param.getMaxPollRecords());
 
 		return config;
 	}

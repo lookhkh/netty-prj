@@ -15,17 +15,15 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
+
+import com.kt.onnuripay.message.common.config.vo.ApplicationResourceConfigParameter;
 
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 /**
  * @author cho hyun il lookhkh37@gmail.com
@@ -33,12 +31,13 @@ import io.netty.channel.nio.NioEventLoopGroup;
  * @implNote ThreadPool Resource Manager Config. 
  * TODO APPLICATION Shutdown 시 리소스가 Leaked 된 것은 없는지 체크 확실히 할 것. 220715 조현일
  */
-
+@AllArgsConstructor
+@Data
 @Configuration
 public class ApplicationResourceConfig {
 
-    @Autowired
-    Environment env;
+    private final ApplicationResourceConfigParameter param; 
+  
     
     /**
      * TODO 스레드플 개수 지정 220616 조현일
@@ -67,7 +66,7 @@ public class ApplicationResourceConfig {
      * **/
     @Bean("db-thread-pool")
     public ExecutorService getDbHandlingThreadPoolDefault() {
-        ExecutorService service =  Executors.newFixedThreadPool(1,new ThreadFactory() {
+        ExecutorService service =  Executors.newFixedThreadPool(param.getDbConnectionThreadNum(),new ThreadFactory() {
             int cnt = 0;
             @Override
             public Thread newThread(Runnable r) {
@@ -93,7 +92,7 @@ public class ApplicationResourceConfig {
     @Bean("netty-event-group")
     public EventLoopGroup getDefaultNioEventLoopGroup() {
         
-        int threads = Integer.valueOf(env.getProperty("netty.client.loopgroup.threads"));
+        int threads = Integer.valueOf(param.getNettyThreadsNum());
         
         return new NioEventLoopGroup(threads);
     }
