@@ -6,6 +6,7 @@
      * fcm.connection.pool.evictTime = 커네션 풀 내의 채널 검사 주기 default 120
      * fcm.connection.timeout = fcm 내 커넥션 read / write timeout 시간 default 60
      * fcm.connection.pool.maxPendingAcquiireTimeout = 커넥션 풀 내 최대 대기 시간. default 60
+     * fcm.connection.pool.multiPush = FCM Multipush 스레드 개수 default 10
      * kafka.consumer.container.single.pollInterval = single polling interval default 1000ms
      * kafka.consumer.container.batch.pollInterval = batch polling interval default 1000ms
      * kafka.consumer.container.batch.minByte = Fetch 시 최소 byte 수 default 60 10_000 bytes

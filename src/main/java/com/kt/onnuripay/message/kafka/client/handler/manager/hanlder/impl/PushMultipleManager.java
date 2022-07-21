@@ -11,17 +11,18 @@
  */
 package com.kt.onnuripay.message.kafka.client.handler.manager.hanlder.impl;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
 
+import com.google.firebase.messaging.BatchResponse;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.kt.onnuripay.datavo.msg.MessageWrapper;
-import com.kt.onnuripay.datavo.msg.util.MessageUtils;
-import com.kt.onnuripay.message.kafka.client.handler.manager.hanlder.abstractMng.CommonPushManager;
+import com.kt.onnuripay.message.kafka.client.handler.manager.SendManager;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -32,39 +33,62 @@ import lombok.extern.slf4j.Slf4j;
  * **/
 @Component("push-multiple-manager")
 @Slf4j
-public class PushMultipleManager extends  CommonPushManager {
+public class PushMultipleManager implements SendManager {
 
-    public PushMultipleManager( @Qualifier("fcm-client") WebClient client) {
-        super( client );
+    private final FirebaseMessaging instance;
+    private final ExecutorService service;
 
-    }
-   
-    @Override
-    public void processResult(String jsonRequestBody) {
-        log.info(" PushMulitpleManager Process result "+jsonRequestBody);
-    }
-
-
-    @Override
-    public String getJsonMsgFromVo(MessageWrapper vo) {
-        //{"message":{"notification":{"title":"noti","body":"body"},"token":"token"}} 이렇게 나와야 함.
-
-        
-        Map<String, ? super Object> reqBody = new HashMap<>();
-        
-        if(vo.isUnicast()) {
-            reqBody.put("messagesBundle", vo.getMessageObjList());
-        }
-        
-        String result =  MessageUtils.toJson(reqBody, Map.class);
-        
-        if(log.isDebugEnabled())log.debug("직렬화 결과 {}",result);
-        //{"message":{"notification":{"title":"noti","body":"body"},"token":"token"}} 이렇게 나와야 함.
-
-        
-        return result;
-    }   
     
+    
+   public PushMultipleManager(FirebaseMessaging instance, @Qualifier("fcm-multi-push") ExecutorService service) {
+        this.instance = instance;
+        this.service = service;
+    }
+
+    @Override
+    public void send(MessageWrapper vo) {
+
+       if(log.isDebugEnabled()) log.debug("{} received message {}",this.getClass().getName(), vo);
+
+           this.service.submit(()->{
+               
+               try {
+                   
+                       BatchResponse res = vo.isUnicast() ? instance.sendAll(vo.getMessageObjList(), false) :  instance.sendMulticast(vo.getMulticastMessage(), false);
+
+                         if(log.isDebugEnabled()) log.debug("총 메시지 개수 : {}, 성공 메시지 개수 : {}, 실패 메시지 개수 : {}",vo.getMessageObjList().size(), res.getSuccessCount(), res.getFailureCount());
+                           res.getResponses()
+                               .stream()
+                               .forEach(sendRes -> {
+                                   
+                                   String msgId = sendRes.getMessageId();
+                                   
+                                   if(sendRes.isSuccessful()) { 
+                                       
+                                       log.info("{} is successfull ",msgId);
+                                       /**
+                                        * TODO 성공 로직 추가하기 ( DB 적재 로직 추가 ) 220721 조현일
+                                        */
+                                   }else {
+                                       
+                                       log.info("msg send failed, reason => {}",sendRes.getException().getErrorCode());
+                                       /**
+                                        * TODO 실패 로직 추가하기 ( DB 적재 로직 추가 ) 220721 조현일
+                                        */
+                                   }
+                           });
+                   
+                } catch (FirebaseMessagingException e) {
+                    log.error("Firebase related Error happend errorCode ->> {}",e.getMessagingErrorCode(),e);
+                    /**
+                     * 
+                     * TODO Firebase 통신 실패 시 실패 로직 추가하기.
+                     * 
+                     */
+                }
+           });
+
+    }
 
    
 

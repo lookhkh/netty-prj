@@ -39,7 +39,7 @@ public class AckMessageListener  {
 	}
 
 
-	@KafkaListener(topics = "single-", groupId = "spring-boot-single", containerFactory = "kafkaSingleListenerContainerFactory")
+	@KafkaListener(topics = "producer.test.single", groupId = "spring-boot-single", containerFactory = "kafkaSingleListenerContainerFactory")
 	public void listen_single(@Payload String msg) {
 		if(log.isDebugEnabled())log.debug("{} came from broker {}",msg, Thread.currentThread().getName());
 		service.submit(()->dispatch.route(msg));

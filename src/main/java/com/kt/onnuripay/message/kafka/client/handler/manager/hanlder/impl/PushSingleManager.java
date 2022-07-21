@@ -11,35 +11,79 @@
  */
 package com.kt.onnuripay.message.kafka.client.handler.manager.hanlder.impl;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import com.kt.onnuripay.datavo.msg.MessageWrapper;
 import com.kt.onnuripay.datavo.msg.util.MessageUtils;
-import com.kt.onnuripay.message.kafka.client.handler.manager.hanlder.abstractMng.CommonPushManager;
+import com.kt.onnuripay.message.common.exception.FirebaseMessageRunTimeException;
+import com.kt.onnuripay.message.common.exception.FirebaseServerError;
+import com.kt.onnuripay.message.kafka.client.handler.manager.SendManager;
 
+import io.netty.util.CharsetUtil;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.netty.internal.shaded.reactor.pool.PoolAcquirePendingLimitException;
+import reactor.util.retry.Retry;
 
 @Component("push-single-manager")
 @Slf4j
-public class PushSingleManager extends  CommonPushManager {
+public class PushSingleManager implements SendManager {
+    
+    private final WebClient client;
 
 	public PushSingleManager(@Qualifier("fcm-client") WebClient client) {
-        super(client);
+	    this.client = client;
     }
 
-    @Override
-    public void processResult(String jsonRequestBody) {
-        log.info(" PushSingleManager Process result "+jsonRequestBody);
+	@Override
+	public void send(MessageWrapper vo) {
+	    if(log.isDebugEnabled()) log.debug("Manager get input {}",vo);
         
+        client.post()
+        .body(BodyInserters.fromValue(getJsonMsgFromVo(vo)))         
+        .retrieve()
+        .onStatus(HttpStatus::is4xxClientError , res -> res.createException())
+        .onStatus(HttpStatus::is5xxServerError, res -> Mono.error(new FirebaseServerError(res)))
+        .bodyToFlux(String.class)
+        .retryWhen(Retry.backoff(3, Duration.ofSeconds(5))
+                .filter(throwable -> throwable instanceof FirebaseServerError | throwable instanceof PoolAcquirePendingLimitException)
+                .onRetryExhaustedThrow((retryBackoffSpec, retrySignal)->{
+                    throw new FirebaseMessageRunTimeException("Retry failed");   
+                }))
+        .onErrorResume(e->{
+            
+            if(e instanceof WebClientResponseException) {
+                WebClientResponseException t =  (WebClientResponseException)e;
+                log.error("Client Logic error happend {}",t.getResponseBodyAsString(CharsetUtil.UTF_8));
+            }else {
+                log.error("Logic related Error happend {}",e.getMessage());
+            }
+            
+            return Flux.just("에러가 발생했어요  "+e.getMessage());
+        })
+        .subscribe(str->processResult(str));	    
+	}
+	
+    
+    private void processResult(String jsonRequestBody) {
+        log.info(" PushSingleManager Process result "+jsonRequestBody);
+        /**
+         * TODO 처리 로직 추가 예정 220721 조현일
+         */
     }
 
-    @Override
-    public String getJsonMsgFromVo(MessageWrapper vo) {
+    
+    private String getJsonMsgFromVo(MessageWrapper vo) {
 
         Map<String, ? super Object> reqBody = new HashMap<>();
         

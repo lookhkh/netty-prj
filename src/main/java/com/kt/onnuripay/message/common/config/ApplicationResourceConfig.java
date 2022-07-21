@@ -81,6 +81,24 @@ public class ApplicationResourceConfig {
         
     }
     
+    @Bean("fcm-multi-push")
+    public ExecutorService getFCMMulitiMessageThreadPool() {
+        
+        ExecutorService service =  Executors.newFixedThreadPool(param.getFcmMultiPushThreadNum(),new ThreadFactory() {
+            int cnt = 0;
+            @Override
+            public Thread newThread(Runnable r) {
+                Thread t = new Thread(r);
+                t.setName("Thread-Wokrer-FCM-Multipush "+cnt);
+                cnt++;
+                return t;
+            }
+        });
+        
+        return service;
+        
+    }
+    
     /**
      * 
      * 

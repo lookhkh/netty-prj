@@ -16,5 +16,11 @@ import com.kt.onnuripay.message.kafka.client.handler.manager.SendManager;
 
 public interface DynamicHandlerFactoryMethod {
 
-	public SendManager getInstance(MessageWrapper vo);
+    /**
+     * 
+     * @param vo
+     * @return
+     * @throws IllegalArgumentException 알맞은 구현체를 찾지 못할 경우 해당 에러를 던진다
+     */
+	public SendManager getInstance(MessageWrapper vo) throws IllegalArgumentException;
 }

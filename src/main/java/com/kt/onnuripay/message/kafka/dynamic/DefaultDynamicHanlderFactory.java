@@ -49,8 +49,7 @@ public class DefaultDynamicHanlderFactory implements DynamicHandlerFactoryMethod
 
 	
 	@Override
-	public SendManager getInstance(MessageWrapper vo) {
-		log.debug("멀티1/단건0 -> {}, and0 / ios1 / sms2 -> {}",vo.getCodeOfType(),vo.getTypeValue());
+	public SendManager getInstance(MessageWrapper vo) throws IllegalArgumentException {
 		
 		if(vo.getCodeOfType() ==0 && vo.getTypeValue() == 2) { //단건 
 			return smsSingleMng;
