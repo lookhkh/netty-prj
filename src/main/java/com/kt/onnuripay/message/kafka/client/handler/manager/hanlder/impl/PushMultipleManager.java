@@ -20,9 +20,9 @@ import com.google.firebase.messaging.BatchResponse;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.kt.onnuripay.datavo.msg.MessageWrapper;
+import com.kt.onnuripay.message.common.exception.RunTimeExceptionWrapper;
 import com.kt.onnuripay.message.kafka.client.handler.manager.SendManager;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -85,6 +85,7 @@ public class PushMultipleManager implements SendManager {
                      * TODO Firebase 통신 실패 시 실패 로직 추가하기.
                      * 
                      */
+                    throw new RunTimeExceptionWrapper("Firebase Error Happend "+e.getMessage(), vo, e);
                 }
            });
 

@@ -9,30 +9,42 @@
  *  approval of kt corp, and the copyright notice above does not evidence any actual or
  *  intended publication of such software.
  */
-package com.kt.onnuripay.message.kafka.xroshot.kafka.model.xml.response.sub;
+package com.kt.onnuripay.message.kafka.xroshot.model.xml.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlText;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.kt.onnuripay.message.common.exception.XroshotRuntimeException;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
+
 @Getter
 @JsonInclude(Include.NON_DEFAULT)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JacksonXmlRootElement(localName = "RCP")
 @ToString
-@AllArgsConstructor
-@Builder
-public class ProductStatus {
+public class SmsPushServerInfoVo extends BaseXMLResponse{
 
-	@JacksonXmlProperty(isAttribute = true, localName = "msgType")
-	private final int type;
-	@JacksonXmlText
-	private final String limit;
+
+	@JacksonXmlProperty(localName = "Resource")
+	private final ResourceInfo resource;
+
+	@Builder
+	public SmsPushServerInfoVo(@JsonProperty("Result") String result, @JsonProperty("method") String method,  @JsonProperty("Resource")ResourceInfo resource) {
+		super(method,result);
+
+		this.resource = resource;
+	}
 	
+	@Override
+	public boolean valid() throws XroshotRuntimeException {
+		return this.resource.valid();
+	}
+
 }

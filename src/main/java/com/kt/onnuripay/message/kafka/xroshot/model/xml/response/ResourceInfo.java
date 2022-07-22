@@ -9,7 +9,7 @@
  *  approval of kt corp, and the copyright notice above does not evidence any actual or
  *  intended publication of such software.
  */
-package com.kt.onnuripay.message.kafka.xroshot.kafka.model.xml.response;
+package com.kt.onnuripay.message.kafka.xroshot.model.xml.response;
 
 import org.springframework.util.StringUtils;
 

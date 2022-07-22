@@ -14,8 +14,8 @@ package com.kt.onnuripay.message.kafka.xroshot.client.handler;
 import org.springframework.stereotype.Service;
 
 import com.kt.onnuripay.message.common.config.vo.XroshotParameter;
-import com.kt.onnuripay.message.kafka.xroshot.kafka.model.xml.Mas;
-import com.kt.onnuripay.message.kafka.xroshot.kafka.model.xml.XMLConstant;
+import com.kt.onnuripay.message.kafka.xroshot.model.xml.Mas;
+import com.kt.onnuripay.message.kafka.xroshot.model.xml.XMLConstant;
 
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;

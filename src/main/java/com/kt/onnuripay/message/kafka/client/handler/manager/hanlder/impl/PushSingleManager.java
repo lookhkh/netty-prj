@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -40,9 +41,11 @@ import reactor.util.retry.Retry;
 public class PushSingleManager implements SendManager {
     
     private final WebClient client;
+    private final Environment env;
 
-	public PushSingleManager(@Qualifier("fcm-client") WebClient client) {
+	public PushSingleManager(@Qualifier("fcm-client") WebClient client,Environment env) {
 	    this.client = client;
+	    this.env =env;
     }
 
 	@Override
@@ -55,7 +58,7 @@ public class PushSingleManager implements SendManager {
         .onStatus(HttpStatus::is4xxClientError , res -> res.createException())
         .onStatus(HttpStatus::is5xxServerError, res -> Mono.error(new FirebaseServerError(res)))
         .bodyToFlux(String.class)
-        .retryWhen(Retry.backoff(3, Duration.ofSeconds(5))
+        .retryWhen(Retry.backoff(3, Duration.ofSeconds(1)).jitter(0.75)
                 .filter(throwable -> throwable instanceof FirebaseServerError | throwable instanceof PoolAcquirePendingLimitException)
                 .onRetryExhaustedThrow((retryBackoffSpec, retrySignal)->{
                     throw new FirebaseMessageRunTimeException("Retry failed");   
@@ -89,8 +92,7 @@ public class PushSingleManager implements SendManager {
         
         
         reqBody.put("message", vo.getMessageObjList().get(0));
-        reqBody.put("validate_only", true);
-        
+        reqBody.put("validate_only", env.getProperty("spring.profiles.active").equals("local")? true: false);
         
         String result =  MessageUtils.toJson(reqBody, Map.class);
         

@@ -17,11 +17,11 @@ import org.springframework.stereotype.Service;
 
 import com.kt.onnuripay.message.common.exception.XroshotRuntimeException;
 import com.kt.onnuripay.message.kafka.parser.XMLParser;
-import com.kt.onnuripay.message.kafka.xroshot.kafka.model.xml.XMLConstant;
-import com.kt.onnuripay.message.kafka.xroshot.kafka.model.xml.response.AuthInfoVo;
-import com.kt.onnuripay.message.kafka.xroshot.kafka.model.xml.response.BaseXMLResponse;
-import com.kt.onnuripay.message.kafka.xroshot.kafka.model.xml.response.ServerTimeVo;
-import com.kt.onnuripay.message.kafka.xroshot.kafka.model.xml.response.SmsPushServerInfoVo;
+import com.kt.onnuripay.message.kafka.xroshot.model.xml.XMLConstant;
+import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.AuthInfoVo;
+import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.BaseXMLResponse;
+import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.ServerTimeVo;
+import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.SmsPushServerInfoVo;
 
 import io.grpc.netty.shaded.io.netty.util.CharsetUtil;
 import io.netty.buffer.ByteBuf;
@@ -81,8 +81,6 @@ public class MessageDecoderTo extends MessageToMessageDecoder<ByteBuf> {
 		String pipeStr = msgJson.substring(msgJson.indexOf("method")+"method=\"".length());
 		String method = pipeStr.substring(0,pipeStr.indexOf("\""));
 	
-		if(log.isDebugEnabled()) log.debug("message parsing for factory, msg => {}, result => {}",msgJson, method);
-
 		return method;
 	}
 	

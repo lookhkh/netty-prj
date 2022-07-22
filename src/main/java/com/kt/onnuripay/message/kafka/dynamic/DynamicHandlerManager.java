@@ -42,8 +42,8 @@ public class DynamicHandlerManager {
 			
 			log.error("{}, unknown error happend == recivedVo => ",e.getMessage(),vo,e);
 
-			throw new RunTimeExceptionWrapper("unknown error happend",vo,e);
-
+			throw new RunTimeExceptionWrapper("unknown error happend",vo,e.getCause());
+			
 		}
 	}
 

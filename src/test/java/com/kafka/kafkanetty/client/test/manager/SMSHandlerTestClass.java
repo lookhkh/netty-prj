@@ -26,12 +26,12 @@ import com.kt.onnuripay.message.kafka.xroshot.client.handler.RequestServeSyncTim
 import com.kt.onnuripay.message.kafka.xroshot.client.handler.SendSingleMessageHandler;
 import com.kt.onnuripay.message.kafka.xroshot.client.handler.codec.DefaultMessageToByteEncoder;
 import com.kt.onnuripay.message.kafka.xroshot.client.handler.codec.MessageDecoderTo;
-import com.kt.onnuripay.message.kafka.xroshot.kafka.model.xml.Mas;
-import com.kt.onnuripay.message.kafka.xroshot.kafka.model.xml.XMLConstant;
-import com.kt.onnuripay.message.kafka.xroshot.kafka.model.xml.response.AuthInfoVo;
-import com.kt.onnuripay.message.kafka.xroshot.kafka.model.xml.response.ResourceInfo;
-import com.kt.onnuripay.message.kafka.xroshot.kafka.model.xml.response.ServerTimeVo;
-import com.kt.onnuripay.message.kafka.xroshot.kafka.model.xml.response.SmsPushServerInfoVo;
+import com.kt.onnuripay.message.kafka.xroshot.model.xml.Mas;
+import com.kt.onnuripay.message.kafka.xroshot.model.xml.XMLConstant;
+import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.AuthInfoVo;
+import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.ResourceInfo;
+import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.ServerTimeVo;
+import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.SmsPushServerInfoVo;
 
 import io.grpc.netty.shaded.io.netty.util.CharsetUtil;
 import io.netty.buffer.ByteBuf;

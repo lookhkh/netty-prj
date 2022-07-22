@@ -43,7 +43,7 @@ public class DefaultChannelHandlerListener extends SimpleChannelFutureListener {
 	@Override
 	public void onSuccess(Channel channel) {
 	   
-	    if(log.isDebugEnabled()) log.debug("{} to {} hanlder removed ",this,channel);
+	    if(log.isDebugEnabled()) log.debug("{} hanlder finished work and removed from channel info => {}",this.hanldler,channel);
 		channel.pipeline().remove(this.hanldler);
 		
 	}

@@ -9,45 +9,30 @@
  *  approval of kt corp, and the copyright notice above does not evidence any actual or
  *  intended publication of such software.
  */
-package com.kt.onnuripay.message.kafka.xroshot.kafka.model.xml;
-
-import java.util.List;
+package com.kt.onnuripay.message.kafka.xroshot.model.xml.response.sub;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlText;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.ToString;
 
 @Getter
-@Setter
 @JsonInclude(Include.NON_DEFAULT)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JacksonXmlRootElement(localName = "Message")
-public class Message {
+@ToString
+@AllArgsConstructor
+@Builder
+public class ProductStatus {
 
-	@JacksonXmlProperty(localName = "ReceiveNumber")
-	private List<String> receiveNumber;
-
-	@JacksonXmlProperty(localName = "Subject")
-	private String subject;
-	
-	@JacksonXmlProperty(localName = "Content")
-	private String content;
-
-
-	@Builder
-	public Message(List<String> receiveNumber, String subject, String content) {
-		
-
-		this.receiveNumber = receiveNumber;
-		this.subject = subject;
-		this.content = content;
-	}
-	
+	@JacksonXmlProperty(isAttribute = true, localName = "msgType")
+	private final int type;
+	@JacksonXmlText
+	private final String limit;
 	
 }

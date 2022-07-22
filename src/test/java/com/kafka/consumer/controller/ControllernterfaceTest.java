@@ -30,7 +30,7 @@ import com.kt.onnuripay.message.kafka.model.ResultOfPush;
  * DynamicHandlerManager으로 전달한 이후 결과를 바탕으로 kafka에 commit 한다.
  * 
  * */
-@DisplayName("controller는 메시지 파싱 및 컨슘을 중개하며, 아래에서 발생하는 에러를 Catch하여 DB에 적재하낟.")
+@DisplayName("controller는 메시지 파싱 및 컨슘을 중개하며, 아래에서 발생하는 에러를 Catch하여 DB에 적재한다.")
 public class ControllernterfaceTest {
 
 	ControllerSetUp setup = new ControllerSetUp();

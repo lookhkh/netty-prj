@@ -12,11 +12,16 @@
     	  <root level="DEBUG">
        		 <appender-ref ref="STDOUT" />
     	  </root>
+    	   <logger name="org.springframework" level="WARN">
+    	     <appender-ref ref="STDOUT" />
+    	  </logger>
     	  <logger name="org.springframework.kafka" level="INFO">
        		 <appender-ref ref="STDOUT" />
     	  </logger>
     	   <logger name="org.apache.kafka" level="INFO">
        		 <appender-ref ref="STDOUT" />
     	  </logger>
+    	
+    
 	
 </configuration>

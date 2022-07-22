@@ -1,15 +1,13 @@
-package xroshotResourceManager;
+package com.kt.onnuripay.message.kafka.xroshot.client.channelmanager;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.annotation.PostConstruct;
 
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 import com.kt.onnuripay.message.common.config.vo.XroshotParameter;
@@ -19,9 +17,6 @@ import com.kt.onnuripay.message.kafka.xroshot.client.handler.init.SingleHandlerI
 import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.SmsPushServerInfoVo;
 
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.socket.SocketChannel;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -34,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
  *      2.1 health-check가 지정된 프로토콜에 따라 실패할 경우, 생성된 channel을 close하며, 다시 인증을 재시도한다. 재시도 중에는 접근하는 스레드는 블락되어야만 한다. 
  *  3. 생성된 채널은 Thread-safe 해야만 한다.
  *  4. 생성된 채널에 단건, 동보, 대량 메시지 write가 가능해야만 한다. 
- * 
+ * s
  * 
  * </p>
  */
@@ -105,14 +100,12 @@ public class XroshotChannelManager {
                 
         con.disconnect();
         r.close();
-        
-        log.debug("Xroshot init info result (xroshot-IP and Port) => {}",temp.toString());
-        
+                
         SmsPushServerInfoVo vo = this.parser.deserialzeFromJson(temp.toString(), SmsPushServerInfoVo.class);
         
-        log.debug("deserialzied result of server info => {}",vo);
+        log.info("deserialzied result of server info => {}",vo);
         
-        return  bootStrap.start(init.getChannelInit(), "tempIP", 0);
+        return bootStrap.start(init.getChannelInit(), vo.getResource().getAddress(), vo.getResource().getPort());
 
     }
     
