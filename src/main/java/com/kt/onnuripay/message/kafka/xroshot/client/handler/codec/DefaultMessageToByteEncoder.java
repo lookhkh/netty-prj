@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import com.kt.onnuripay.message.kafka.parser.XMLParser;
 import com.kt.onnuripay.message.kafka.xroshot.model.xml.Mas;
+import com.kt.onnuripay.message.util.LoggerUtils;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -34,7 +35,7 @@ public class DefaultMessageToByteEncoder extends MessageToByteEncoder<Mas> {
 	protected void encode(ChannelHandlerContext ctx, Mas msg, ByteBuf out) throws Exception {
 		
 		out.writeBytes(parser.parseToString(msg).getBytes(CharsetUtil.UTF_8));
-		if(log.isDebugEnabled()) log.debug("MessageDecoder received {} and encoded it into byte",msg);
+		LoggerUtils.logDebug(log, "MessageEncoder received {} and encoded it into byte", msg); 
 	}
 
 	

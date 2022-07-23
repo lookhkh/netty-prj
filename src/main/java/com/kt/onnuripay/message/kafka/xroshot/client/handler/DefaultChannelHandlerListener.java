@@ -14,6 +14,7 @@ package com.kt.onnuripay.message.kafka.xroshot.client.handler;
 import org.asynchttpclient.netty.SimpleChannelFutureListener;
 
 import com.kt.onnuripay.message.common.exception.ChannelHandlerExceptionError;
+import com.kt.onnuripay.message.util.LoggerUtils;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInboundHandler;
@@ -31,6 +32,8 @@ import lombok.extern.slf4j.Slf4j;
 public class DefaultChannelHandlerListener extends SimpleChannelFutureListener {
 
 	private final ChannelInboundHandler hanldler;
+	public static String STATUS= " status";
+	private XroshotStatus status;
 	
 	@Override
 	public void onFailure(Channel channel, Throwable cause) {
@@ -43,8 +46,8 @@ public class DefaultChannelHandlerListener extends SimpleChannelFutureListener {
 	@Override
 	public void onSuccess(Channel channel) {
 	   
-	    if(log.isDebugEnabled()) log.debug("{} hanlder finished work and removed from channel info => {}",this.hanldler,channel);
+	    LoggerUtils.logDebug(log,"{} hanlder finished work and removed from channel info => {}",this.hanldler,channel);
+	    channel.attr(AttributeKey.valueOf(STATUS)).set(status.getStatus());
 		channel.pipeline().remove(this.hanldler);
-		
 	}
 }

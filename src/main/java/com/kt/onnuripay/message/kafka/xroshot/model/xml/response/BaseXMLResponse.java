@@ -66,7 +66,7 @@ public abstract class BaseXMLResponse {
 	 * @throws XroshotRuntimeException
 	 */
 	public void checkResultAndThrowIfInvalidData(Object target) throws XroshotRuntimeException{
-		if(!(this.result.equals(XMLConstant.OK) && this.valid())) throw new XroshotRuntimeException("Response vadlidation Error",target) ;
+		//if(!(this.result.equals(XMLConstant.OK) && this.valid())) throw new XroshotRuntimeException("Response vadlidation Error",target) ;
 	}
 	/**
 	 * 

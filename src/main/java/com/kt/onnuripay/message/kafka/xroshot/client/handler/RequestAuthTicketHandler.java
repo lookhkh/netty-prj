@@ -16,10 +16,13 @@ import org.springframework.stereotype.Service;
 
 import com.kt.onnuripay.message.common.config.vo.XroshotParameter;
 import com.kt.onnuripay.message.common.exception.RunTimeExceptionWrapper;
+import com.kt.onnuripay.message.kafka.xroshot.client.channelmanager.XroshotChannelManager;
 import com.kt.onnuripay.message.kafka.xroshot.client.handler.util.NewXroshotAuth;
 import com.kt.onnuripay.message.kafka.xroshot.model.xml.Mas;
 import com.kt.onnuripay.message.kafka.xroshot.model.xml.XMLConstant;
+import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.AuthInfoVo;
 import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.ServerTimeVo;
+import com.kt.onnuripay.message.util.LoggerUtils;
 
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
@@ -51,25 +54,35 @@ public class RequestAuthTicketHandler extends ChannelInboundHandlerAdapter {
 	
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-	    if(log.isDebugEnabled()) log.debug("received Msg from previous handler {}",msg);
-		
-		ServerTimeVo vo = (ServerTimeVo)msg;
-		
-		vo.checkResultAndThrowIfInvalidData(vo);
-		
-		Mas req = Mas.builder()
-					.method(XMLConstant.REQ_REGIST)
-					.serviceProviderID(this.param.getServiceProviderId())
-					.endUserID(param.getEndUserId())
-					.authTicket(createAuthTicket(vo,param))
-					.authKey(param.getAuthKey())
-					.version(param.getVersion())
-					.build();
-		
-		if(log.isDebugEnabled()) log.debug("completed xml req -> {}",req.toString());
-					
-		ctx.writeAndFlush(req).addListener(new DefaultChannelHandlerListener(this));
-		
+	   LoggerUtils.logDebug(log, "received Msg from previous handler {}", msg);
+	          
+	    if(msg instanceof ServerTimeVo) {
+    		ServerTimeVo vo = (ServerTimeVo)msg;
+    		
+    		vo.checkResultAndThrowIfInvalidData(vo);
+    		
+    		Mas req = Mas.builder()
+    					.method(XMLConstant.REQ_REGIST)
+    					.serviceProviderID(this.param.getServiceProviderId())
+    					.endUserID(param.getEndUserId())
+    					.authTicket(createAuthTicket(vo,param))
+    					.authKey(param.getAuthKey())
+    					.version(param.getVersion())
+    					.build();
+    		LoggerUtils.logDebug(log, "completed xml req -> {}", req.toString());
+    					
+    		ctx.writeAndFlush(req);
+    		
+	    }else if(msg instanceof AuthInfoVo) {
+	        
+	        LoggerUtils.logDebug(log, "received AuhInfo FROM Server {}", msg);	       
+	        ctx.channel().attr(XroshotChannelManager.KEY).set(XroshotChannelManager.REQ_AUTH);
+	        ctx.pipeline().remove(this);
+	        
+	        /**
+	         * 왜 에러가 안 떨어지면 멈추지?
+	         */
+	    }
 		
 		
 	}

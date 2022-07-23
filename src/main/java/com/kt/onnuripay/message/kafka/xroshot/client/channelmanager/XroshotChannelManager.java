@@ -13,10 +13,13 @@ import org.springframework.stereotype.Component;
 import com.kt.onnuripay.message.common.config.vo.XroshotParameter;
 import com.kt.onnuripay.message.kafka.parser.XMLParser;
 import com.kt.onnuripay.message.kafka.xroshot.client.ClientBootStrap;
+import com.kt.onnuripay.message.kafka.xroshot.client.handler.DefaultChannelHandlerListener;
 import com.kt.onnuripay.message.kafka.xroshot.client.handler.init.SingleHandlerInit;
 import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.SmsPushServerInfoVo;
+import com.kt.onnuripay.message.util.LoggerUtils;
 
 import io.netty.channel.Channel;
+import io.netty.util.AttributeKey;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -44,6 +47,11 @@ public class XroshotChannelManager {
     
     private Channel xroshotChannel;
     
+    public static final AttributeKey<String> KEY = AttributeKey.valueOf("status");
+   
+    public static final String REQ_SERVER_TIME = "req_server_time_completed";
+    public static final String REQ_AUTH = "req_auth_completed";
+    
     public XroshotChannelManager(XroshotParameter param, ClientBootStrap bootStrap, XMLParser parser, SingleHandlerInit init) {
         this.param = param;
         this.bootStrap = bootStrap;
@@ -55,9 +63,9 @@ public class XroshotChannelManager {
     public void init() {
         try {
             
-            this.xroshotChannel = connectToXroshotServer();
-            if(log.isDebugEnabled()) log.debug("Xroshot server connected {}",this.xroshotChannel);
-
+            connectToXroshotServer();
+       
+            
         } catch (IOException e) {
             
             e.printStackTrace();
@@ -86,7 +94,7 @@ public class XroshotChannelManager {
      * 
      * 
      */
-    public Channel connectToXroshotServer() throws IOException {
+    public void connectToXroshotServer() throws IOException {
 
         URL url = new URL(this.param.getSendServerUrl());
         HttpURLConnection con = (HttpURLConnection)url.openConnection();
@@ -103,11 +111,13 @@ public class XroshotChannelManager {
                 
         SmsPushServerInfoVo vo = this.parser.deserialzeFromJson(temp.toString(), SmsPushServerInfoVo.class);
         
-        log.info("deserialzied result of server info => {}",vo);
+        LoggerUtils.logDebug(log, "deserialzied result of server info => {}", vo); 
         
-        return bootStrap.start(init.getChannelInit(), vo.getResource().getAddress(), vo.getResource().getPort());
-
+        this.xroshotChannel = bootStrap.start(init.getChannelInit(), vo.getResource().getAddress(), vo.getResource().getPort());
+        
     }
+    
+    
     
     
 }

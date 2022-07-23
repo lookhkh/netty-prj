@@ -289,6 +289,7 @@ public class SMSHandlerTestClass {
 		assertTrue(outboundR.contains("EndUserID"));
 		assertTrue(outboundR.contains("req_regist"));
 		
+		
 		assertNull(ch.pipeline().get(RequestAuthTicketHandler.class));
 		
 

@@ -14,6 +14,7 @@ package com.kt.onnuripay.message.kafka.xroshot.client.handler;
 import org.asynchttpclient.netty.SimpleChannelFutureListener;
 import org.springframework.stereotype.Service;
 
+import com.kt.onnuripay.message.kafka.xroshot.client.channelmanager.XroshotChannelManager;
 import com.kt.onnuripay.message.kafka.xroshot.model.xml.Mas;
 import com.kt.onnuripay.message.kafka.xroshot.model.xml.XMLConstant;
 
@@ -38,7 +39,7 @@ public class ExceptionHospitalHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-		log.error("UnHandled exception happed channelInfo -> {}, cause -> ",ctx.channel(),cause, cause);
+		log.error("UnHandled exception happed channelInfo -> {}, cause -> {}, status of this channel => {}",ctx.channel(),cause,ctx.channel().attr(XroshotChannelManager.KEY), cause);
 		
 		Mas mas = Mas
 				.builder()
