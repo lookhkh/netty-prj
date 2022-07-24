@@ -4,22 +4,30 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import javax.annotation.PostConstruct;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import com.kt.onnuripay.datavo.msg.MessageWrapper;
 import com.kt.onnuripay.message.common.config.vo.XroshotParameter;
 import com.kt.onnuripay.message.kafka.parser.XMLParser;
 import com.kt.onnuripay.message.kafka.xroshot.client.ClientBootStrap;
-import com.kt.onnuripay.message.kafka.xroshot.client.handler.DefaultChannelHandlerListener;
 import com.kt.onnuripay.message.kafka.xroshot.client.handler.init.SingleHandlerInit;
+import com.kt.onnuripay.message.kafka.xroshot.model.xml.XMLConstant;
 import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.SmsPushServerInfoVo;
 import com.kt.onnuripay.message.util.LoggerUtils;
 
 import io.netty.channel.Channel;
 import io.netty.util.AttributeKey;
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.GenericFutureListener;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -44,19 +52,24 @@ public class XroshotChannelManager {
     private final ClientBootStrap bootStrap;
     private final XMLParser parser;
     private final SingleHandlerInit init;
+    private final ScheduledExecutorService scheduler;
+    
     
     private Channel xroshotChannel;
     
+    
+       
     public static final AttributeKey<String> KEY = AttributeKey.valueOf("status");
    
     public static final String REQ_SERVER_TIME = "req_server_time_completed";
     public static final String REQ_AUTH = "req_auth_completed";
     
-    public XroshotChannelManager(XroshotParameter param, ClientBootStrap bootStrap, XMLParser parser, SingleHandlerInit init) {
+    public XroshotChannelManager(XroshotParameter param, ClientBootStrap bootStrap, XMLParser parser, SingleHandlerInit init, @Qualifier("scheduler-thread")ScheduledExecutorService scheduler) {
         this.param = param;
         this.bootStrap = bootStrap;
         this.parser = parser;
         this.init = init;
+        this.scheduler = scheduler;
     }
 
     @PostConstruct
@@ -64,8 +77,10 @@ public class XroshotChannelManager {
         try {
             
             connectToXroshotServer();
-       
-            
+            this.scheduler.scheduleWithFixedDelay(()->{
+                if(XroshotChannelManager.isLoginSuccess(xroshotChannel)) xroshotChannel.write(XMLConstant.REQ_PING);
+            }, 60, 60, TimeUnit.SECONDS);
+                            
         } catch (IOException e) {
             
             e.printStackTrace();
@@ -96,6 +111,18 @@ public class XroshotChannelManager {
      */
     public void connectToXroshotServer() throws IOException {
 
+        StringBuffer temp = connectToXroshotControllerServerAndGetServerInfo();
+                
+        SmsPushServerInfoVo vo = this.parser.deserialzeFromJson(temp.toString(), SmsPushServerInfoVo.class);
+        
+        LoggerUtils.logDebug(log, "deserialzied result of server info => {}", vo); 
+        
+        this.xroshotChannel = bootStrap.start(init.getChannelInit(), vo.getResource().getAddress(), vo.getResource().getPort());
+        
+    }
+
+    private StringBuffer connectToXroshotControllerServerAndGetServerInfo() throws MalformedURLException, IOException {
+       
         URL url = new URL(this.param.getSendServerUrl());
         HttpURLConnection con = (HttpURLConnection)url.openConnection();
         BufferedReader r = new BufferedReader(new InputStreamReader(con.getInputStream()));
@@ -108,15 +135,56 @@ public class XroshotChannelManager {
                 
         con.disconnect();
         r.close();
-                
-        SmsPushServerInfoVo vo = this.parser.deserialzeFromJson(temp.toString(), SmsPushServerInfoVo.class);
         
-        LoggerUtils.logDebug(log, "deserialzied result of server info => {}", vo); 
+        return temp;
+    }
+    
+    /**
+     * 
+     * @param vo
+     * @param consume 메시지가 비동기 적으로 write 이벤트가 성공할 경우, 처리할 callback을 전달
+     * @apiNote xroshotChannel이 writable 한 경우, 메시지를 비동기 적으로 전송한다.
+     */
+    public void send(MessageWrapper vo, Consumer<MessageWrapper> consume) {
         
-        this.xroshotChannel = bootStrap.start(init.getChannelInit(), vo.getResource().getAddress(), vo.getResource().getPort());
+        if(this.xroshotChannel.isActive() && XroshotChannelManager.isLoginSuccess(this.xroshotChannel)) {
+            
+            this.xroshotChannel.write(vo).addListener(future -> consume.accept(vo));
+            
+        }else {
+            
+            log.error(" failed to send {} because channel {} is close or session is not established => channel is active? {}, channel status is {}", 
+                    vo, this.xroshotChannel, this.xroshotChannel.isActive(), this.xroshotChannel.attr(XroshotChannelManager.KEY));
+            /**
+             * TODO Channel이 준비되어 있지 않을 때, 처리할 로직 추가
+             */
+        }
         
     }
     
+    public void closeChannel() {
+        try {
+            this.xroshotChannel.close().sync().addListener(new GenericFutureListener<Future<? super Void>>() {
+                public void operationComplete(Future<? super Void> future) throws Exception {
+                    log.warn("{} close operation finished, current active status {}", xroshotChannel,xroshotChannel.isActive());              
+                };
+            });
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * 
+     * @param ctx xroshot 서버와 연결되어 있는 채널의 ctx를 받는다.
+     * @return Xroshot 서버와 로그인 인증 과정이 끝난 경우 true를 반환한다.
+     */
+    public static boolean isLoginSuccess(Channel channel) {
+        
+        return channel.attr(XroshotChannelManager.KEY).get() == XroshotChannelManager.REQ_AUTH;
+        
+    }
     
     
     

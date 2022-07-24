@@ -48,7 +48,7 @@ public class RequestAuthTicketHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
-		if(log.isDebugEnabled()) log.debug("{} RequestAuthTicketHandler removed",ctx.channel());
+		LoggerUtils.logDebug(log, "{} RequestAuthTicketHandler removed", ctx.channel());
 		super.handlerRemoved(ctx);
 	}
 	

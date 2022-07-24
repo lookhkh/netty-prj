@@ -113,12 +113,16 @@ public class NettyXroshotIntegeTest {
 		//SP 로그인 요청
 		String reqForLoginWithAuthTicket = ((ByteBuf)ch.readOutbound()).toString(CharsetUtil.UTF_8);		
 		
+		
+		
 		assertNotNull(reqForLoginWithAuthTicket);
 		
 		assertTrue(reqForLoginWithAuthTicket.contains("MAS method=\"req_regist\""));
 		assertTrue(reqForLoginWithAuthTicket.contains("AuthTicket"));
 		
-		assertNull(pipeline.get(RequestAuthTicketHandler.class));
+		
+		
+		
 
 		//서버 로그인 정보
 		AuthInfoVo vo = AuthInfoVo.builder()
@@ -145,6 +149,8 @@ public class NettyXroshotIntegeTest {
 		String serverAuthInfoResponse = realParserMapper.parseToString(vo);
 		ch.writeInbound(Unpooled.copiedBuffer(serverAuthInfoResponse.getBytes(CharsetUtil.UTF_8)));
 		
+	      assertNull(pipeline.get(RequestAuthTicketHandler.class));
+
 		//SP 로그인 요청
 	 //로그인 과정 완료
 

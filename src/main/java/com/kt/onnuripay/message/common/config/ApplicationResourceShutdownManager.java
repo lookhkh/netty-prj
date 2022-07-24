@@ -14,12 +14,15 @@
 package com.kt.onnuripay.message.common.config;
 
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PreDestroy;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+
+import com.kt.onnuripay.message.kafka.xroshot.client.channelmanager.XroshotChannelManager;
 
 import io.netty.channel.EventLoopGroup;
 import lombok.extern.slf4j.Slf4j;
@@ -38,12 +41,20 @@ public class ApplicationResourceShutdownManager {
     private final ExecutorService singleExecutors;
     private final ExecutorService dbPoolExecutors;
     private final EventLoopGroup nettyEventLoop;
+    private final ScheduledExecutorService scheduler;
+    private final XroshotChannelManager manager;
     
-    public ApplicationResourceShutdownManager(@Qualifier("single") ExecutorService singleExecutors, @Qualifier("db-thread-pool")ExecutorService dbPoolExecutors,
-            @Qualifier("netty-event-group")EventLoopGroup nettyEventLoop) {
+    public ApplicationResourceShutdownManager(
+            @Qualifier("single") ExecutorService singleExecutors, 
+            @Qualifier("db-thread-pool")ExecutorService dbPoolExecutors,
+            @Qualifier("netty-event-group")EventLoopGroup nettyEventLoop,
+            XroshotChannelManager manager,
+            @Qualifier("scheduler-thread") ScheduledExecutorService scheduler) {
         this.singleExecutors = singleExecutors;
         this.dbPoolExecutors = dbPoolExecutors;
         this.nettyEventLoop = nettyEventLoop;
+        this.manager = manager;
+        this.scheduler = scheduler;
     }
     
     /**
@@ -56,6 +67,8 @@ public class ApplicationResourceShutdownManager {
             singleExecutors.awaitTermination(10, TimeUnit.SECONDS);
             dbPoolExecutors.awaitTermination(10, TimeUnit.SECONDS);
             nettyEventLoop.awaitTermination(10, TimeUnit.SECONDS);
+            manager.closeChannel();
+            scheduler.awaitTermination(10, TimeUnit.SECONDS);
     } catch (InterruptedException e) {
         // TODO Auto-generated catch block
         e.printStackTrace();

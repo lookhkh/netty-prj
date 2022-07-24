@@ -55,7 +55,8 @@ public abstract class BaseXMLResponse {
 	private final String methodName;
 	@JacksonXmlProperty(localName = "Result")
 	private final String result;
-	public BaseXMLResponse(@JsonProperty("method") String methodName, @JsonProperty("Result")String result) {
+	public BaseXMLResponse(@JsonProperty("method") String methodName, 
+	                       @JsonProperty("Result")String result) {
 		this.methodName = methodName;
 		this.result = result;
 	}
@@ -66,7 +67,8 @@ public abstract class BaseXMLResponse {
 	 * @throws XroshotRuntimeException
 	 */
 	public void checkResultAndThrowIfInvalidData(Object target) throws XroshotRuntimeException{
-		//if(!(this.result.equals(XMLConstant.OK) && this.valid())) throw new XroshotRuntimeException("Response vadlidation Error",target) ;
+		if(!this.result.equals(XMLConstant.OK)) throw new XroshotRuntimeException("Response Common vadlidation Error, server response not with result code  0 => "+target,target) ;
+		if(!this.valid()) throw new XroshotRuntimeException("Response Custom vadlidation Error, server response with result code  0  but some custom validation failed => "+target,target) ;
 	}
 	/**
 	 * 

@@ -10,6 +10,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -22,6 +23,7 @@ import com.kt.onnuripay.message.common.exception.XroshotRuntimeException;
 import com.kt.onnuripay.message.kafka.parser.XMLParser;
 import com.kt.onnuripay.message.kafka.xroshot.client.handler.ExceptionHospitalHandler;
 import com.kt.onnuripay.message.kafka.xroshot.client.handler.RequestAuthTicketHandler;
+import com.kt.onnuripay.message.kafka.xroshot.client.handler.RequestPingHandler;
 import com.kt.onnuripay.message.kafka.xroshot.client.handler.RequestServeSyncTimeHandler;
 import com.kt.onnuripay.message.kafka.xroshot.client.handler.SendSingleMessageHandler;
 import com.kt.onnuripay.message.kafka.xroshot.client.handler.codec.DefaultMessageToByteEncoder;
@@ -95,6 +97,7 @@ public class SMSHandlerTestClass {
 	}
 	
 
+	
 
 	@Test
 	public void TEMP() {

@@ -20,6 +20,7 @@ import com.kt.onnuripay.message.kafka.parser.XMLParser;
 import com.kt.onnuripay.message.kafka.xroshot.model.xml.XMLConstant;
 import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.AuthInfoVo;
 import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.BaseXMLResponse;
+import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.PingResponse;
 import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.ServerTimeVo;
 import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.SmsPushServerInfoVo;
 
@@ -73,7 +74,7 @@ public class MessageDecoderTo extends MessageToMessageDecoder<ByteBuf> {
 		if(extractMethodFromServer.equals(XMLConstant.RES_SERVER_TIME)) return ServerTimeVo.class;
 		if(extractMethodFromServer.equals(XMLConstant.RES_REGIST)) return AuthInfoVo.class;
 		if(extractMethodFromServer.equals(XMLConstant.MESSAGE_INFO_REQUEST)) return SmsPushServerInfoVo.class;
-		
+		if(extractMethodFromServer.equals(XMLConstant.RES_PING)) return PingResponse.class;
 		throw new XroshotRuntimeException("Message Deserialization Error Message => "+extractMethodFromServer, extractMethodFromServer);
 	}
 

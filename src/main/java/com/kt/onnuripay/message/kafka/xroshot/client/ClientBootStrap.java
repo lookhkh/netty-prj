@@ -15,6 +15,7 @@ package com.kt.onnuripay.message.kafka.xroshot.client;
 import org.springframework.stereotype.Component;
 
 import com.kt.onnuripay.message.common.exception.RunTimeExceptionWrapper;
+import com.kt.onnuripay.message.util.LoggerUtils;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -50,8 +51,8 @@ public class ClientBootStrap {
 	
 	public Channel start(ChannelInitializer<SocketChannel> init, String host, int port)   {
 		
-		if(log.isDebugEnabled()) log.debug("init netty client init class {}, host : {}, port : {}",init,host,port);
-        
+		LoggerUtils.logDebug(log, "init netty client init class {}, host : {}, port : {}",init,host,port); 
+		
         try {
             Bootstrap b = new Bootstrap(); 
             b.group(this.workerGroup); 
@@ -62,7 +63,7 @@ public class ClientBootStrap {
 
             ChannelFuture f = b.connect(host, port).sync();
             
-            f.channel().closeFuture().sync();
+            //f.channel().closeFuture().sync();
             
             return f.channel();
             // Wait until the connection is closed.

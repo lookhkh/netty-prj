@@ -25,9 +25,6 @@ import lombok.ToString;
 
 
 @Getter
-@JsonInclude(Include.NON_DEFAULT)
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JacksonXmlRootElement(localName = "RCP")
 @ToString
 public class SmsPushServerInfoVo extends BaseXMLResponse{
 

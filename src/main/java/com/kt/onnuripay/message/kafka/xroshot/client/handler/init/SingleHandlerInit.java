@@ -14,6 +14,7 @@ package com.kt.onnuripay.message.kafka.xroshot.client.handler.init;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import com.kt.onnuripay.message.kafka.xroshot.client.handler.RequestPingHandler;
 import com.kt.onnuripay.message.kafka.xroshot.client.handler.codec.DefaultMessageToByteEncoder;
 import com.kt.onnuripay.message.kafka.xroshot.client.handler.codec.MessageDecoderTo;
 import com.kt.onnuripay.message.kafka.xroshot.model.xml.Mas;
@@ -64,6 +65,7 @@ public class SingleHandlerInit  {
 				p.addLast(new LoggingHandler(LogLevel.DEBUG));
 				p.addLast(encoder);
 				p.addLast(decoder);
+				p.addLast(new RequestPingHandler());
 				p.addLast(requestServerTimeHandler);
 				p.addLast(authTicketHandler);
 				p.addLast(exceptionHospital);				

@@ -11,12 +11,8 @@
  */
 package com.kt.onnuripay.message.kafka.xroshot.model.xml.response;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.kt.onnuripay.message.common.exception.XroshotRuntimeException;
 
 import lombok.Builder;
@@ -24,9 +20,6 @@ import lombok.Getter;
 import lombok.ToString;
 
 @Getter
-@JsonInclude(Include.NON_DEFAULT)
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JacksonXmlRootElement(localName = "MAS")
 @ToString
 public class ServerTimeVo extends BaseXMLResponse{
 

@@ -13,6 +13,7 @@ package com.kt.onnuripay.message.common.config;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 
 import org.springframework.context.annotation.Bean;
@@ -53,6 +54,20 @@ public class ApplicationResourceConfig {
                 Thread t = new Thread(r);
                 t.setName("Thread-Wokrer-Push_Server "+cnt);
                 cnt++;
+                return t;
+            }
+        });
+
+        return service;
+    }
+    
+    @Bean("scheduler-thread")
+    public ScheduledExecutorService getScheduler() {
+        ScheduledExecutorService  service =  Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
+            @Override
+            public Thread newThread(Runnable r) {
+                Thread t = new Thread(r);
+                t.setName("scheduler-thread-worker");
                 return t;
             }
         });
@@ -103,7 +118,7 @@ public class ApplicationResourceConfig {
      * 
      * 
      * 
-     * TODO Netty & AsyncClient가 함게 사용하는 EventLoop, 개수 지정 최적화 필요 조현일 220701
+     * TODO Xroshot client Netty 사용하는 EventLoop, 개수 지정 최적화 필요 조현일 220701
      * => AsyncClient 사용 X로 변경 220714 조현일
      * 
      * **/

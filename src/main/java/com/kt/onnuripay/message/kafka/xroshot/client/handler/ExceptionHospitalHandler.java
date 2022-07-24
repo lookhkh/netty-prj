@@ -14,6 +14,7 @@ package com.kt.onnuripay.message.kafka.xroshot.client.handler;
 import org.asynchttpclient.netty.SimpleChannelFutureListener;
 import org.springframework.stereotype.Service;
 
+import com.kt.onnuripay.message.common.exception.XroshotRuntimeException;
 import com.kt.onnuripay.message.kafka.xroshot.client.channelmanager.XroshotChannelManager;
 import com.kt.onnuripay.message.kafka.xroshot.model.xml.Mas;
 import com.kt.onnuripay.message.kafka.xroshot.model.xml.XMLConstant;
@@ -22,6 +23,8 @@ import io.grpc.netty.shaded.io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.GenericFutureListener;
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -39,38 +42,59 @@ public class ExceptionHospitalHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-		log.error("UnHandled exception happed channelInfo -> {}, cause -> {}, status of this channel => {}",ctx.channel(),cause,ctx.channel().attr(XroshotChannelManager.KEY), cause);
-		
-		Mas mas = Mas
-				.builder()
-				.method(XMLConstant.REQ_UNREGIST)
-				.reason("0")
-				.build();
-		
-		ctx.writeAndFlush(mas).addListener(new SimpleChannelFutureListener() {
-			
-			@Override
-			public void onSuccess(Channel channel) {
-				try {
-					channel.close().sync();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				
-			}
-			
-			@Override
-			public void onFailure(Channel channel, Throwable cause) {
-				try {
-					channel.close().sync();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				
-			}
-		});
-		
-		
+	    
+    		log.error("UnHandled exception happed channelInfo -> {}, cause -> {}, status of this channel => {}"
+    		        ,ctx.channel(),cause,ctx.channel().attr(XroshotChannelManager.KEY));
+    		
+    		
+    		if(XroshotChannelManager.isLoginSuccess(ctx.channel())) {
+    		        createChannelFuture(ctx);		
+    	    }else {
+    	        ctx.close().sync().addListener(getSimpleFutureListener(ctx, cause));
+    	    }
 	}
+
+    private GenericFutureListener<Future<? super Void>> getSimpleFutureListener(ChannelHandlerContext ctx,
+            Throwable cause) {
+        return new GenericFutureListener<Future<? super Void>>() {
+            public void operationComplete(Future<? super Void> future) throws Exception {
+                log.error("{} error happend on channel {} and closing channel operation finished",cause.getMessage(), ctx.channel());
+            };
+        };
+    }
+
+    private void createChannelFuture(ChannelHandlerContext ctx) {
+       
+        Mas mas = Mas
+                .builder()
+                .method(XMLConstant.REQ_UNREGIST)
+                .reason("0")
+                .build();
+        
+        ctx.writeAndFlush(mas).addListener(new SimpleChannelFutureListener() {
+        
+            @Override
+            public void onSuccess(Channel channel) {
+                try {
+                    channel.close().sync();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                
+            }                   
+            @Override
+            public void onFailure(Channel channel, Throwable cause) {
+                try {
+                    channel.close().sync();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                
+            }
+        });
+        
+         
+    }
+	
 
 }
