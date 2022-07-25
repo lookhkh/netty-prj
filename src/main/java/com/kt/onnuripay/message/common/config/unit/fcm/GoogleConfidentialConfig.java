@@ -37,8 +37,8 @@ public class GoogleConfidentialConfig {
 	
 	   @Bean
 	   public GoogleCredentials getGoogleCredentials() throws IOException {
-		   String fireBaseCreateScoped = env.getProperty("project.properties.fms.fireBaseCreateScoped");
-			String credentialPath = env.getProperty("project.properties.fms.credentialPath");
+		   String fireBaseCreateScoped = env.getProperty("project.properties.fcm.fireBaseCreateScoped");
+			String credentialPath = env.getProperty("project.properties.fcm.credentialPath");
 			
 			
 			try {

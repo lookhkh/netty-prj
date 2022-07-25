@@ -50,7 +50,7 @@ import lombok.extern.slf4j.Slf4j;
 @Order(value = Ordered.LOWEST_PRECEDENCE)
 @AllArgsConstructor
 @Configuration
-@PropertySource("classpath:application.properties")
+@PropertySource("classpath:application.yml")
 @Slf4j
 public class FireBaseConfig {
 

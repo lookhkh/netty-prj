@@ -60,7 +60,7 @@ import reactor.netty.tcp.TcpClient;
 
 @Slf4j
 @Configuration
-@PropertySource("classpath:application.properties")
+@PropertySource("classpath:application.yml")
 @AllArgsConstructor
 public class ClientConfig {
 	

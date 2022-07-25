@@ -35,34 +35,10 @@ import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @EnableConfigurationProperties(value= {XroshotParameter.class})
-@PropertySource("classpath:xroshot.properties")
+@PropertySource("classpath:application.yml")
 @AllArgsConstructor
 @Slf4j
 public class XroshotConfig {
 
-	@Qualifier("netty-event-group")
-	private final EventLoopGroup loop;
-	
 
-	/****
-	 * 
-	 * TODO AsyncHttpClient 자원관리 신경 써야 한다. 220629 조현일
-	 * TODO 동기식으로 크로샷 서버정보를 가져오는 방식으로 로직을 변경할 예정이기에 삭제 예정 
-	 */
-	
-	@Deprecated
-	@Bean
-	public AsyncHttpClient getAsyncHttpClient() {
-		
-		AsyncHttpClientConfig config = Dsl.config().setEventLoopGroup(this.loop)
-		                                           .setRequestTimeout(30000)
-		                                           .setCompressionEnforced(true)
-		                                           .build();
-		AsyncHttpClient asyncHttpClient = Dsl.asyncHttpClient(config);
-		return asyncHttpClient;
-	}
-	
-
-	
-	
 }

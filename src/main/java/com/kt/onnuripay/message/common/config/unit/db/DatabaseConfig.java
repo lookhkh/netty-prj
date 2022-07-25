@@ -49,9 +49,7 @@ public class DatabaseConfig {
         factoryBean.setDataSource(dataSource);
         //factoryBean
                 //.setConfigLocation(applicationContext.getResource("classpath:mybatis/mybatis-config.xml"));
-        
-        factoryBean
-                .setMapperLocations(applicationContext.getResources("classpath:mapper/*.xml"));
+
         return factoryBean.getObject();
     }
 

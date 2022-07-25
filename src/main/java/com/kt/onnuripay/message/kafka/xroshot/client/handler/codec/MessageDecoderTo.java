@@ -48,9 +48,8 @@ public class MessageDecoderTo extends MessageToMessageDecoder<ByteBuf> {
 			
 			Class<?> clazz = getClassFromMethod(extractMethodFromServer(msgJson));
 			
-			String serializedMessage = msg.toString(CharsetUtil.UTF_8);
 			
-			BaseXMLResponse baseVo = validationResponse(clazz, serializedMessage);
+			BaseXMLResponse baseVo = validationResponse(clazz, msgJson);
 			
 			out.add(baseVo);
 			

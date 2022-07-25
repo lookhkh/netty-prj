@@ -123,18 +123,18 @@
 
 	<profiles>
         <profile>
-            <id>local</id>
+            <id>dev</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <spring.profiles.active>local</spring.profiles.active>
+                <spring.profiles.active>dev</spring.profiles.active>
             </properties>
         </profile>
         <profile>
-            <id>dev</id>
+            <id>stg</id>
             <properties>
-                <spring.profiles.active>dev</spring.profiles.active>
+                <spring.profiles.active>stg</spring.profiles.active>
             </properties>
         </profile>
         <profile>

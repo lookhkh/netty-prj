@@ -57,7 +57,7 @@ public class FcmConfigParameter {
         this.timeout = timeout == null? 60 : Integer.valueOf(timeout);
         this.pendingAcquireTimeout = pendingAcquireTimeout == null? 60 : Integer.valueOf(pendingAcquireTimeout);
 
-        this.baseUrl  =  env.getProperty("project.properties.fms.fcmUrl");
+        this.baseUrl  =  env.getProperty("project.properties.fcm.fcmUrl");
         
         log.debug("FcmConfigParameter init {}",this.toString());
 

@@ -1,22 +1,14 @@
 <configuration>
-
-    <!--로그 파일 저장 위치-->
-    	<property name="LOGS_PATH" value="./logs"/>
 	    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 	        <encoder>
 	            <pattern>[%d{yyyy-MM-dd HH:mm:ss}:%-3relative][%thread] %-5level %logger{35} - %msg%n</pattern>
 	        </encoder>
 	    </appender>
 
-		 
     	  <root level="DEBUG">
        		 <appender-ref ref="STDOUT" />
     	  </root>
     	   <logger name="org.springframework" level="INFO">
     	     <appender-ref ref="STDOUT" />
     	  </logger>
-
-    	
-    
-	
 </configuration>
