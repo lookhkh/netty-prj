@@ -16,12 +16,16 @@ import lombok.Getter;
 @Getter
 public class XroshotRuntimeException extends RuntimeException {
 
-	private final Object r;
+	private Object r;
 	
 	public XroshotRuntimeException(String msg, Object target) {
 		super(msg);
 		this.r = target;
 	}
+
+    public XroshotRuntimeException(String msg) {
+        super(msg);
+    }
 	
 
 	

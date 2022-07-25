@@ -77,10 +77,8 @@ public class XroshotChannelManager {
         try {
             
             connectToXroshotServer();
-            this.scheduler.scheduleWithFixedDelay(()->{
-                if(XroshotChannelManager.isLoginSuccess(xroshotChannel)) xroshotChannel.write(XMLConstant.REQ_PING);
-            }, 60, 60, TimeUnit.SECONDS);
-                            
+            startPingRequest();
+   
         } catch (IOException e) {
             
             e.printStackTrace();
@@ -90,6 +88,13 @@ public class XroshotChannelManager {
     }
 
     
+    private void startPingRequest() {
+        /**
+         * TODO PING 스케줄러 구현하기 220725 조현일
+         */
+        
+    }
+
     /**
      * 
      * @return Channel 크로샷 인증이 끝난 Channel을 리턴하며, SMS 발송 시, 해당 채널을 주입받아 공용으로 사용

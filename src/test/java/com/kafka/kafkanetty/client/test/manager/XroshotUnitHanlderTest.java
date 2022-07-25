@@ -23,6 +23,8 @@ import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.CharsetUtil;
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.GenericFutureListener;
 import lombok.extern.slf4j.Slf4j;
 import util.XroshotTestUtil;
 
@@ -70,29 +72,41 @@ public class XroshotUnitHanlderTest {
      * 
      */
     
-    //@Test
+    @Test
     public void t() throws InterruptedException {
         
         EmbeddedChannel ch = new EmbeddedChannel(
                 new LoggingHandler(LogLevel.DEBUG)
-                , new RequestPingHandler()
+                , new RequestPingHandler(Executors.newScheduledThreadPool(1, new ThreadFactory() {
+                    
+                    @Override
+                    public Thread newThread(Runnable r) {
+                        Thread t = new Thread(r);
+                        t.setName("스케줄러 쓰레드");
+                        return t;
+                    }
+                }))
                 , new ExceptionHospitalHandler()
                     );
         
         
-        e.scheduleAtFixedRate(()->{
+        
+        for(int i=0; i<10; i++) {
             ch.write(XMLConstant.REQ_PING);
             
-           Mas msg = ((Mas) ch.readOutbound());
-           log.info("OUT - BOUND MESSAGE => {}",msg);
-           
-           PingResponse r= new PingResponse(XMLConstant.RES_PING, XMLConstant.OK);
-           ch.writeInbound(r);
-           
             
-        }, 0, 8, TimeUnit.SECONDS);
-        
-        Thread.sleep(10_000_000);
+            Mas ping = (Mas)ch.readOutbound();
+            
+            log.info("{}",ping);
+            
+            Thread.sleep(6000);
+
+            
+            ch.writeInbound(new PingResponse(XMLConstant.RES_PING, XMLConstant.OK));
+            
+            System.out.println("*********************************************");
+        }
+     
     }
     
 }

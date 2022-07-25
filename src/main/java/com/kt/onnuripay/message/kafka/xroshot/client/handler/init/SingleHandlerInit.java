@@ -11,6 +11,8 @@
  */
 package com.kt.onnuripay.message.kafka.xroshot.client.handler.init;
 
+import java.util.concurrent.ScheduledExecutorService;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -38,12 +40,14 @@ public class SingleHandlerInit  {
 	private final ChannelInboundHandler requestServerTimeHandler;
 	private final DefaultMessageToByteEncoder encoder;
 	private final MessageDecoderTo decoder;
+	private final ScheduledExecutorService scheduler;
 
 	
 	public SingleHandlerInit(
 			@Qualifier("auth_ticket_handler") ChannelInboundHandlerAdapter authTicketHandler,
 			@Qualifier("exception_hospital_handler") ChannelInboundHandler exceptionHospital,
 			@Qualifier("request_server_time_handler") ChannelInboundHandler requestServerTimeHandler,
+			@Qualifier("scheduler-thread")ScheduledExecutorService scheduler,
 			MessageDecoderTo decoder,
 			DefaultMessageToByteEncoder encoder
 			) {
@@ -53,6 +57,7 @@ public class SingleHandlerInit  {
 		this.requestServerTimeHandler = requestServerTimeHandler;
 		this.decoder = decoder;
 		this.encoder = encoder;
+		this.scheduler = scheduler;
 	}
 	
 	
@@ -65,7 +70,7 @@ public class SingleHandlerInit  {
 				p.addLast(new LoggingHandler(LogLevel.DEBUG));
 				p.addLast(encoder);
 				p.addLast(decoder);
-				p.addLast(new RequestPingHandler());
+				p.addLast(new RequestPingHandler(scheduler));
 				p.addLast(requestServerTimeHandler);
 				p.addLast(authTicketHandler);
 				p.addLast(exceptionHospital);				

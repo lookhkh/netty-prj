@@ -44,7 +44,7 @@ public class ExceptionHospitalHandler extends ChannelInboundHandlerAdapter {
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 	    
     		log.error("UnHandled exception happed channelInfo -> {}, cause -> {}, status of this channel => {}"
-    		        ,ctx.channel(),cause,ctx.channel().attr(XroshotChannelManager.KEY));
+    		        ,ctx.channel(),cause,ctx.channel().attr(XroshotChannelManager.KEY),cause);
     		
     		
     		if(XroshotChannelManager.isLoginSuccess(ctx.channel())) {
