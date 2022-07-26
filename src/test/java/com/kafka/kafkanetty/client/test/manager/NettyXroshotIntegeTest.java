@@ -22,8 +22,8 @@ import com.kt.onnuripay.message.kafka.xroshot.client.handler.SendSingleMessageHa
 import com.kt.onnuripay.message.kafka.xroshot.client.handler.codec.DefaultMessageToByteEncoder;
 import com.kt.onnuripay.message.kafka.xroshot.client.handler.codec.MessageDecoderTo;
 import com.kt.onnuripay.message.kafka.xroshot.model.xml.XMLConstant;
-import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.AuthInfoVo;
-import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.ServerTimeVo;
+import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.auth.AuthInfoVo;
+import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.serverTime.ServerTimeVo;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;

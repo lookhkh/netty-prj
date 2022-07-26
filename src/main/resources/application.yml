@@ -41,6 +41,13 @@ spring:
 
 logging:
   config: classpath:log4j2_dev.xml
+  level:
+    root: DEBUG
+    org.apache.kafka: WARN
+    io: INFO
+    org.springframework: INFO
+    jdk: INFO
+    
 
 netty:
   leakDetection:

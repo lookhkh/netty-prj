@@ -40,6 +40,13 @@ public class XMLConstant {
 	
 	
 	public static final String REQ_SEND_MESSAGE_SINGLE = "req_send_message_2";
+    public static final String RES_SEND_MESSAGE = "res_send_message";
+
+
+    public static final String ENDING_MAS = "</MAS>";
+
+    public static final Object RES_SEND_MESSAGE_ALL = "res_send_message_all";
+
 
 
 }

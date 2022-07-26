@@ -20,8 +20,8 @@ import com.kt.onnuripay.message.kafka.xroshot.client.channelmanager.XroshotChann
 import com.kt.onnuripay.message.kafka.xroshot.client.handler.util.NewXroshotAuth;
 import com.kt.onnuripay.message.kafka.xroshot.model.xml.Mas;
 import com.kt.onnuripay.message.kafka.xroshot.model.xml.XMLConstant;
-import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.AuthInfoVo;
-import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.ServerTimeVo;
+import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.auth.AuthInfoVo;
+import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.serverTime.ServerTimeVo;
 import com.kt.onnuripay.message.util.LoggerUtils;
 
 import io.netty.channel.ChannelHandler.Sharable;

@@ -22,7 +22,8 @@ import com.google.api.client.util.DateTime.SecondsAndNanos;
 import com.kt.onnuripay.message.common.exception.XroshotRuntimeException;
 import com.kt.onnuripay.message.kafka.xroshot.model.xml.Mas;
 import com.kt.onnuripay.message.kafka.xroshot.model.xml.XMLConstant;
-import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.PingResponse;
+import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.ping.PingResponse;
+import com.kt.onnuripay.message.util.LoggerUtils;
 
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -41,7 +42,9 @@ public class RequestPingHandler extends ChannelDuplexHandler {
     private LocalTime responseTime;
     
     private final long interval = 5;
+  
     private ScheduledFuture<?> schedulFuture ;
+    private ScheduledFuture<?> send5;
     
     private final ScheduledExecutorService scheduler;
     
@@ -52,12 +55,18 @@ public class RequestPingHandler extends ChannelDuplexHandler {
     }
     
     @Override
-    public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
-      
-      log.info("{} is added",this);
-      super.handlerAdded(ctx);
-    }
-  
+        public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        
+        schedulFuture = scheduler
+                            .scheduleWithFixedDelay(
+                                    ()->{
+                                        send5 = scheduler.schedule(()->startPingSchduler(ctx), interval, TimeUnit.SECONDS);
+                                    }, 0, 10, TimeUnit.SECONDS);
+        
+        super.channelActive(ctx);
+        }
+    
+
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
       if(msg instanceof PingResponse) {
@@ -85,28 +94,13 @@ public class RequestPingHandler extends ChannelDuplexHandler {
           this.setResponseTime(null);
           this.setSendTime(null);
           schedulFuture.cancel(false);
+          schedulFuture= null;
           
           log.info(" cleanup all state in the handler ===> count {}, responseTime {},sendTime {} set null ,,,, {}",count,responseTime, sendTime,schedulFuture);
           
     }
   
-    
-    @Override
-    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-      if(msg.equals(XMLConstant.REQ_PING)) {
-          
-          log.info(" Schduler start to work ");
-
-          schedulFuture = scheduler.scheduleWithFixedDelay(()->startPingSchduler(ctx,promise), 0, interval, TimeUnit.SECONDS);
-
-      }else {
-          super.write(ctx, msg, promise);
-          
-      }
-      
-    }
-
-    private void startPingSchduler(ChannelHandlerContext ctx,ChannelPromise promise) {
+    private void startPingSchduler(ChannelHandlerContext ctx) {
 
         Mas reqPing = Mas.builder()
                   .method(XMLConstant.REQ_PING)
@@ -123,6 +117,7 @@ public class RequestPingHandler extends ChannelDuplexHandler {
       
                   if(count>3) {
                       log.error("PING 횟수 초과 에러 발생");
+                      schedulFuture.cancel(false);
                       ctx.fireExceptionCaught(new XroshotRuntimeException("Exceeded 3 times for ping"));
                   }
             }

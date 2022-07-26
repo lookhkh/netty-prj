@@ -9,13 +9,14 @@
  *  approval of kt corp, and the copyright notice above does not evidence any actual or
  *  intended publication of such software.
  */
-package com.kt.onnuripay.message.kafka.xroshot.model.xml.response;
+package com.kt.onnuripay.message.kafka.xroshot.model.xml.response.auth;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonCreator.Mode;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.kt.onnuripay.message.common.exception.XroshotRuntimeException;
+import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.BaseXMLResponse;
 
 import lombok.Builder;
 import lombok.Getter;

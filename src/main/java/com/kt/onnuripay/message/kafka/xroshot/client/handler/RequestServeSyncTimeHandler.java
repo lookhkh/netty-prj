@@ -17,7 +17,7 @@ import com.kt.onnuripay.message.common.config.vo.XroshotParameter;
 import com.kt.onnuripay.message.kafka.xroshot.client.channelmanager.XroshotChannelManager;
 import com.kt.onnuripay.message.kafka.xroshot.model.xml.Mas;
 import com.kt.onnuripay.message.kafka.xroshot.model.xml.XMLConstant;
-import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.ServerTimeVo;
+import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.serverTime.ServerTimeVo;
 import com.kt.onnuripay.message.util.LoggerUtils;
 
 import io.netty.channel.ChannelHandler.Sharable;

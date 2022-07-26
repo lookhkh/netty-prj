@@ -17,7 +17,7 @@ import com.kt.onnuripay.message.kafka.xroshot.client.handler.ExceptionHospitalHa
 import com.kt.onnuripay.message.kafka.xroshot.client.handler.RequestPingHandler;
 import com.kt.onnuripay.message.kafka.xroshot.model.xml.Mas;
 import com.kt.onnuripay.message.kafka.xroshot.model.xml.XMLConstant;
-import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.PingResponse;
+import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.ping.PingResponse;
 
 import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.handler.logging.LogLevel;

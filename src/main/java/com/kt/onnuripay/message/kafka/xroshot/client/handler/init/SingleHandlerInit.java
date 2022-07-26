@@ -72,7 +72,7 @@ public class SingleHandlerInit  {
 				p.addLast(decoder);
 				p.addLast(new RequestPingHandler(scheduler));
 				p.addLast(requestServerTimeHandler);
-				p.addLast(authTicketHandler);
+			//	p.addLast(authTicketHandler);
 				p.addLast(exceptionHospital);				
 			}
 		};

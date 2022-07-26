@@ -54,7 +54,7 @@ public class KafkaConfig {
 	public ConcurrentKafkaListenerContainerFactory<String, String> kafkaContainerFactory(){
 		
 		Map<String, Object> config = createConfig();
-
+		
 		ConsumerFactory<String, String> consumerFactory = new DefaultKafkaConsumerFactory<>(config);
 		
 		ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<String, String>();
@@ -94,12 +94,13 @@ public class KafkaConfig {
 	private Map<String, Object> createConfig() {
 		Map<String,Object> config = new HashMap<>();
 		config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, param.getBrokers());
-		config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
+		config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);
 		config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 		config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 		config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 		config.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, param.getMaxPollRecords());
-
+		config.put(ConsumerConfig.ALLOW_AUTO_CREATE_TOPICS_CONFIG, false);
+		config.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG, "org.apache.kafka.clients.consumer.CooperativeStickyAssignor");
 		return config;
 	}
 	

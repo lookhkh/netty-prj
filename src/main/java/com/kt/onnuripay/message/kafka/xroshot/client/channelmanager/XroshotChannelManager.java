@@ -7,6 +7,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -21,7 +22,7 @@ import com.kt.onnuripay.message.kafka.parser.XMLParser;
 import com.kt.onnuripay.message.kafka.xroshot.client.ClientBootStrap;
 import com.kt.onnuripay.message.kafka.xroshot.client.handler.init.SingleHandlerInit;
 import com.kt.onnuripay.message.kafka.xroshot.model.xml.XMLConstant;
-import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.SmsPushServerInfoVo;
+import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.serverInfo.SmsPushServerInfoVo;
 import com.kt.onnuripay.message.util.LoggerUtils;
 
 import io.netty.channel.Channel;
@@ -52,7 +53,6 @@ public class XroshotChannelManager {
     private final ClientBootStrap bootStrap;
     private final XMLParser parser;
     private final SingleHandlerInit init;
-    private final ScheduledExecutorService scheduler;
     
     
     private Channel xroshotChannel;
@@ -64,12 +64,11 @@ public class XroshotChannelManager {
     public static final String REQ_SERVER_TIME = "req_server_time_completed";
     public static final String REQ_AUTH = "req_auth_completed";
     
-    public XroshotChannelManager(XroshotParameter param, ClientBootStrap bootStrap, XMLParser parser, SingleHandlerInit init, @Qualifier("scheduler-thread")ScheduledExecutorService scheduler) {
+    public XroshotChannelManager(XroshotParameter param, ClientBootStrap bootStrap, XMLParser parser, SingleHandlerInit init) {
         this.param = param;
         this.bootStrap = bootStrap;
         this.parser = parser;
         this.init = init;
-        this.scheduler = scheduler;
     }
 
     @PostConstruct
@@ -77,7 +76,6 @@ public class XroshotChannelManager {
         try {
             
             connectToXroshotServer();
-            startPingRequest();
    
         } catch (IOException e) {
             
@@ -88,12 +86,8 @@ public class XroshotChannelManager {
     }
 
     
-    private void startPingRequest() {
-        /**
-         * TODO PING 스케줄러 구현하기 220725 조현일
-         */
-        
-    }
+
+    
 
     /**
      * 
@@ -171,7 +165,7 @@ public class XroshotChannelManager {
         try {
             this.xroshotChannel.close().sync().addListener(new GenericFutureListener<Future<? super Void>>() {
                 public void operationComplete(Future<? super Void> future) throws Exception {
-                    log.warn("{} close operation finished, current active status {}", xroshotChannel,xroshotChannel.isActive());              
+                    log.warn("{} close operation finished, current active status {}", xroshotChannel,xroshotChannel.isActive());    
                 };
             });
         } catch (InterruptedException e) {

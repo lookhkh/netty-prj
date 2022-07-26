@@ -9,7 +9,7 @@
  *  approval of kt corp, and the copyright notice above does not evidence any actual or
  *  intended publication of such software.
  */
-package com.kt.onnuripay.message.kafka.xroshot.model.xml.response.sub;
+package com.kt.onnuripay.message.kafka.xroshot.model.xml.response.auth.sub;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -28,11 +28,10 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 @Builder
-public class ProductStatus {
+public class LimitedMsgPerMonth {
 
 	@JacksonXmlProperty(isAttribute = true, localName = "msgType")
 	private final int type;
 	@JacksonXmlText
 	private final String limit;
-	
 }
