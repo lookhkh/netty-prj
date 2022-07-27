@@ -8,9 +8,11 @@ import static org.mockito.Mockito.mock;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import com.kt.onnuripay.message.common.config.vo.XroshotParameter;
 import com.kt.onnuripay.message.kafka.parser.XMLParser;
+import com.kt.onnuripay.message.kafka.xroshot.client.channelmanager.XroshotChannelManager;
 import com.kt.onnuripay.message.kafka.xroshot.client.handler.ExceptionHospitalHandler;
 import com.kt.onnuripay.message.kafka.xroshot.client.handler.codec.DefaultMessageToByteEncoder;
 import com.kt.onnuripay.message.kafka.xroshot.client.handler.codec.MessageDecoderTo;
@@ -51,7 +53,8 @@ public class SMSHandlerTestClass {
 
 	XMLParser realParserMapper = XroshotTestUtil.getParser();
 
-	
+    XroshotChannelManager manager = Mockito.mock(XroshotChannelManager.class);
+
 
 	SmsPushServerInfoVo info = SmsPushServerInfoVo.builder()
 													.method(XMLConstant.MESSAGE_INFO_REQUEST)
@@ -106,7 +109,7 @@ public class SMSHandlerTestClass {
                 , new DelimiterBasedFrameDecoder(Integer.MAX_VALUE,Unpooled.copiedBuffer("</MAS>".getBytes(CharsetUtil.UTF_8)))
                 , new MessageDecoderTo(realParserMapper) 
                 , new DefaultMessageToByteEncoder(realParserMapper)
-                , new ExceptionHospitalHandler()
+                , new ExceptionHospitalHandler(manager)
                 );
       
       ch.writeInbound(Unpooled.copiedBuffer(str.getBytes(CharsetUtil.UTF_8)));
@@ -165,7 +168,7 @@ public class SMSHandlerTestClass {
                 new LoggingHandler(LogLevel.DEBUG)
                 , new MessageDecoderTo(realParserMapper) 
                 , new DefaultMessageToByteEncoder(realParserMapper)
-                , new ExceptionHospitalHandler()
+                , new ExceptionHospitalHandler(manager)
                 );
         
         ch.writeInbound(Unpooled.copiedBuffer("temp".getBytes(CharsetUtil.UTF_8)));

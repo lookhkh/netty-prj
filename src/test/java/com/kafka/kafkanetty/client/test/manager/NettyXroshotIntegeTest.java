@@ -9,12 +9,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import com.fasterxml.jackson.dataformat.xml.JacksonXmlModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import com.kt.onnuripay.message.common.config.vo.XroshotParameter;
 import com.kt.onnuripay.message.kafka.parser.XMLParser;
+import com.kt.onnuripay.message.kafka.xroshot.client.channelmanager.XroshotChannelManager;
 import com.kt.onnuripay.message.kafka.xroshot.client.handler.ExceptionHospitalHandler;
 import com.kt.onnuripay.message.kafka.xroshot.client.handler.RequestAuthTicketHandler;
 import com.kt.onnuripay.message.kafka.xroshot.client.handler.RequestServeSyncTimeHandler;
@@ -41,12 +43,13 @@ public class NettyXroshotIntegeTest {
 	XmlMapper realParser;
 	XMLParser realParserMapper;
 	
-	
+    XroshotChannelManager manager = Mockito.mock(XroshotChannelManager.class);
+
 	
 	@BeforeEach
 	public void init() {
 
-			
+	    
 			JacksonXmlModule module = new JacksonXmlModule();
 			module.setDefaultUseWrapper(false);
 			XmlMapper xmlMapper = new XmlMapper(module);
@@ -82,7 +85,7 @@ public class NettyXroshotIntegeTest {
 				, new DefaultMessageToByteEncoder(realParserMapper)
 				, new RequestServeSyncTimeHandler(this.param)
 				, new RequestAuthTicketHandler(this.param)
-				, new ExceptionHospitalHandler()
+				, new ExceptionHospitalHandler(manager)
 				);
 		
 		ChannelPipeline pipeline = ch.pipeline();

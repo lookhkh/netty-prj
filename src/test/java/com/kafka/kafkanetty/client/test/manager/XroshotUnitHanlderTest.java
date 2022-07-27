@@ -7,12 +7,16 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.shadow.com.univocity.parsers.common.processor.MasterDetailRecord;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 
 import com.fasterxml.jackson.dataformat.xml.JacksonXmlModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import com.kt.onnuripay.message.common.config.vo.XroshotParameter;
 import com.kt.onnuripay.message.kafka.parser.XMLParser;
+import com.kt.onnuripay.message.kafka.xroshot.client.channelmanager.XroshotChannelManager;
 import com.kt.onnuripay.message.kafka.xroshot.client.handler.ExceptionHospitalHandler;
 import com.kt.onnuripay.message.kafka.xroshot.client.handler.RequestPingHandler;
 import com.kt.onnuripay.message.kafka.xroshot.model.xml.Mas;
@@ -31,6 +35,8 @@ import util.XroshotTestUtil;
 @Slf4j
 public class XroshotUnitHanlderTest {
 
+    
+    XroshotChannelManager manager = Mockito.mock(XroshotChannelManager.class);
     
     XroshotParameter param = XroshotTestUtil.param;
     XmlMapper realParser;
@@ -77,6 +83,7 @@ public class XroshotUnitHanlderTest {
         
         EmbeddedChannel ch = new EmbeddedChannel(
                 new LoggingHandler(LogLevel.DEBUG)
+                , new TestPingResponseHanlder()
                 , new RequestPingHandler(Executors.newScheduledThreadPool(1, new ThreadFactory() {
                     
                     @Override
@@ -86,26 +93,11 @@ public class XroshotUnitHanlderTest {
                         return t;
                     }
                 }))
-                , new ExceptionHospitalHandler()
                     );
-        
-        
-        
-        for(int i=0; i<10; i++) {
-            ch.write(XMLConstant.REQ_PING);
-            
-            
-            Mas ping = (Mas)ch.readOutbound();
-            
-            log.info("{}",ping);
-            
-            Thread.sleep(6000);
 
-            
-            ch.writeInbound(new PingResponse(XMLConstant.RES_PING, XMLConstant.OK));
-            
-            System.out.println("*********************************************");
-        }
+        Thread.sleep(10_000_000);
+        
+      
      
     }
     

@@ -1,7 +1,5 @@
 package com.kt.onnuripay.message.kafka.xroshot.client.handler;
 
-import java.time.Duration;
-
 /**
  * MessageServer - Xroshot 
  * Ping Protocol
@@ -18,7 +16,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import com.google.api.client.util.DateTime.SecondsAndNanos;
 import com.kt.onnuripay.message.common.exception.XroshotRuntimeException;
 import com.kt.onnuripay.message.kafka.xroshot.model.xml.Mas;
 import com.kt.onnuripay.message.kafka.xroshot.model.xml.XMLConstant;
@@ -27,7 +24,6 @@ import com.kt.onnuripay.message.util.LoggerUtils;
 
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPromise;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import lombok.Data;
@@ -44,7 +40,7 @@ public class RequestPingHandler extends ChannelDuplexHandler {
     private final long interval = 5;
   
     private ScheduledFuture<?> schedulFuture ;
-    private ScheduledFuture<?> send5;
+    private ScheduledFuture<?> sendAtIntervalOf5Second;
     
     private final ScheduledExecutorService scheduler;
     
@@ -54,14 +50,20 @@ public class RequestPingHandler extends ChannelDuplexHandler {
         this.scheduler = scheduler;
     }
     
-    @Override
+        @Override
         public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        
+        System.out.println("channel active");
         schedulFuture = scheduler
                             .scheduleWithFixedDelay(
                                     ()->{
-                                        send5 = scheduler.schedule(()->startPingSchduler(ctx), interval, TimeUnit.SECONDS);
-                                    }, 0, 10, TimeUnit.SECONDS);
+                                        sendAtIntervalOf5Second = scheduler
+                                                .scheduleWithFixedDelay(() -> {
+                                                    
+                                                   if(!sendAtIntervalOf5Second.isCancelled()) startPingSchduler(ctx);
+                                                    
+                                                }, 0 ,5, TimeUnit.SECONDS);
+                                        
+                                    }, 0, 20, TimeUnit.SECONDS);
         
         super.channelActive(ctx);
         }
@@ -70,17 +72,22 @@ public class RequestPingHandler extends ChannelDuplexHandler {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
       if(msg instanceof PingResponse) {
+         
+          checkPingCount(ctx);
+          
           setResponseTime(LocalTime.now());
           
-          log.info("Ping Hanlder Received Ping Response from server {}, last send time {}, response time {}",msg, sendTime, responseTime);
-                    
           long diff = responseTime.getSecond() - sendTime.getSecond();
+
+          
+          LoggerUtils.logDebug(log, "Ping Hanlder Received Ping Response from server {}, last send time {}, response time {}, dif {}", msg, sendTime, responseTime,diff);
+          
                    
           if(diff <= 5) {
-              log.info("5초 이내에 response 도착 result => valid");
-              cleanup();
+              LoggerUtils.logDebug(log,"5초 이내에 response 도착 result => valid");
+              initStatusOnPingSuccess();
           }else {
-              log.error("response 도착 5초 초과, result => invalid, 재시도 | 현재 시도 횟수 : {}",count);
+              log.warn("response 도착 5초 초과, result => invalid, 재시도 | 현재 시도 횟수 : {}",count);
               
           }
           
@@ -88,43 +95,47 @@ public class RequestPingHandler extends ChannelDuplexHandler {
           super.channelRead(ctx, msg);
       }
     }
+    
+    private void initStatusOnPingSuccess() {
+        this.setCount(0);
+        this.setResponseTime(null);
+        this.setSendTime(null);
+        this.sendAtIntervalOf5Second.cancel(false);
+        LoggerUtils.logDebug(log, "cleanup all state in the handler ===> count {}, responseTime {},sendTime {} set null ,,,, {}", count,responseTime, sendTime,schedulFuture);
 
-    private void cleanup() {
-          this.setCount(0);
-          this.setResponseTime(null);
-          this.setSendTime(null);
-          schedulFuture.cancel(false);
-          schedulFuture= null;
-          
-          log.info(" cleanup all state in the handler ===> count {}, responseTime {},sendTime {} set null ,,,, {}",count,responseTime, sendTime,schedulFuture);
-          
-    }
-  
+              
+  }
+
+ 
+
+    
     private void startPingSchduler(ChannelHandlerContext ctx) {
 
         Mas reqPing = Mas.builder()
                   .method(XMLConstant.REQ_PING)
                   .result(XMLConstant.OK)
                   .build();
+        
+        setSendTime(LocalTime.now());
+        setCount(count+1);
           
           ctx.writeAndFlush(reqPing)
              .addListener(new GenericFutureListener<Future<? super Void>>() {
               @Override
               public void operationComplete(Future<? super Void> future) throws Exception {
 
-                  setSendTime(LocalTime.now());
-                  setCount(count+1);
-      
-                  if(count>3) {
-                      log.error("PING 횟수 초과 에러 발생");
-                      schedulFuture.cancel(false);
-                      ctx.fireExceptionCaught(new XroshotRuntimeException("Exceeded 3 times for ping"));
-                  }
+                  checkPingCount(ctx);
             }
+
           });
     }
 
-    
-   
- 
+    private void checkPingCount(ChannelHandlerContext ctx) {
+        if(count>4) {
+              sendAtIntervalOf5Second.cancel(false);
+              schedulFuture.cancel(false);
+              log.warn("Ping Failed and cleanUp all PingRequestHandler Resource || status => {},{}",schedulFuture,sendAtIntervalOf5Second);
+              ctx.fireExceptionCaught(new XroshotRuntimeException("Exceeded 3 times for ping"));
+          }
+    }
 }
