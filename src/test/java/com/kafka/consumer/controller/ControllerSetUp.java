@@ -27,6 +27,8 @@ public class ControllerSetUp {
 		this.mockParser = Mockito.mock(KafkaMsgParser.class);
 		this.mockHanlder = Mockito.mock(DynamicHandlerManager.class);
 		this.mockDb = Mockito.mock(SmsPushMapper.class);		
+		
+		
 	}
 	
 }

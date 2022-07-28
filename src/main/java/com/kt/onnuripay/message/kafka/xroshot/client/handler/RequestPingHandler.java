@@ -24,6 +24,7 @@ import com.kt.onnuripay.message.util.LoggerUtils;
 
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.EventLoop;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import lombok.Data;
@@ -41,30 +42,25 @@ public class RequestPingHandler extends ChannelDuplexHandler {
   
     private ScheduledFuture<?> schedulFuture ;
     private ScheduledFuture<?> sendAtIntervalOf5Second;
-    
-    private final ScheduledExecutorService scheduler;
-    
 
-    public RequestPingHandler(ScheduledExecutorService scheduler) {
-        super();
-        this.scheduler = scheduler;
-    }
     
         @Override
         public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        System.out.println("channel active");
-        schedulFuture = scheduler
+        EventLoop loop = ctx.channel().eventLoop();
+        
+        schedulFuture = loop
                             .scheduleWithFixedDelay(
                                     ()->{
-                                        sendAtIntervalOf5Second = scheduler
+                                        sendAtIntervalOf5Second = loop
                                                 .scheduleWithFixedDelay(() -> {
                                                     
                                                    if(!sendAtIntervalOf5Second.isCancelled()) startPingSchduler(ctx);
                                                     
                                                 }, 0 ,5, TimeUnit.SECONDS);
                                         
-                                    }, 0, 20, TimeUnit.SECONDS);
-        
+                                    }, 0, 60, TimeUnit.SECONDS);
+        LoggerUtils.logDebug(log, "PingRequestHandler active and start Ping schdule", "");
+
         super.channelActive(ctx);
         }
     
@@ -101,12 +97,10 @@ public class RequestPingHandler extends ChannelDuplexHandler {
         this.setResponseTime(null);
         this.setSendTime(null);
         this.sendAtIntervalOf5Second.cancel(false);
-        LoggerUtils.logDebug(log, "cleanup all state in the handler ===> count {}, responseTime {},sendTime {} set null ,,,, {}", count,responseTime, sendTime,schedulFuture);
+        LoggerUtils.logDebug(log, "ping success and cleanup all state in the handler  ===> count {}, responseTime {},sendTime {} set null ,,,, {}", count,responseTime, sendTime,schedulFuture);
 
               
   }
-
- 
 
     
     private void startPingSchduler(ChannelHandlerContext ctx) {
@@ -130,12 +124,25 @@ public class RequestPingHandler extends ChannelDuplexHandler {
           });
     }
 
+
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        log.error("Error happend | Message => {}, and ping request handler clean up all resources",cause.getMessage());
+        removeAllTaskFromScheduler();
+        super.exceptionCaught(ctx, cause);
+    }
+    
     private void checkPingCount(ChannelHandlerContext ctx) {
         if(count>4) {
-              sendAtIntervalOf5Second.cancel(false);
-              schedulFuture.cancel(false);
+              removeAllTaskFromScheduler();
               log.warn("Ping Failed and cleanUp all PingRequestHandler Resource || status => {},{}",schedulFuture,sendAtIntervalOf5Second);
               ctx.fireExceptionCaught(new XroshotRuntimeException("Exceeded 3 times for ping"));
           }
+    }
+    
+    private void removeAllTaskFromScheduler() {
+        sendAtIntervalOf5Second.cancel(false);
+        schedulFuture.cancel(false);
     }
 }

@@ -54,11 +54,8 @@ public class XroshotChannelManager {
     private final XMLParser parser;
     private final SingleHandlerInit init;
     
-    
     private Channel xroshotChannel;
-    
-    
-       
+
     public static final AttributeKey<String> KEY = AttributeKey.valueOf("status");
    
     public static final String REQ_SERVER_TIME = "req_server_time_completed";
@@ -69,25 +66,20 @@ public class XroshotChannelManager {
         this.bootStrap = bootStrap;
         this.parser = parser;
         this.init = init;
-    }
-
-    @PostConstruct
-    public void init() {
+        
         try {
-            
             connectToXroshotServer();
-   
         } catch (IOException e) {
-            
+            log.error("Failed to connect to Xroshot Server");
             e.printStackTrace();
-            
+            /**
+             * TODO 재연결 시도 로직 추가 (220728 조현일)
+             */
         }
         
     }
 
-    
-
-    
+ 
 
     /**
      * 
@@ -116,7 +108,8 @@ public class XroshotChannelManager {
         
         LoggerUtils.logDebug(log, "deserialzied result of server info => {}", vo); 
         
-        this.xroshotChannel = bootStrap.start(init.getChannelInit(), vo.getResource().getAddress(), vo.getResource().getPort());
+        this.xroshotChannel = bootStrap
+                                .start(init.getChannelInit(), vo.getResource().getAddress(), vo.getResource().getPort());
         
     }
 

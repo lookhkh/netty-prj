@@ -11,23 +11,18 @@
  */
 package com.kt.onnuripay.message.kafka.xroshot.client.handler.init;
 
-import java.util.concurrent.ScheduledExecutorService;
-
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import com.kt.onnuripay.message.kafka.xroshot.client.handler.RequestPingHandler;
 import com.kt.onnuripay.message.kafka.xroshot.client.handler.codec.DefaultMessageToByteEncoder;
 import com.kt.onnuripay.message.kafka.xroshot.client.handler.codec.MessageDecoderTo;
-import com.kt.onnuripay.message.kafka.xroshot.model.xml.Mas;
 
 import io.netty.channel.ChannelInboundHandler;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.codec.MessageToByteEncoder;
-import io.netty.handler.codec.xml.XmlFrameDecoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 
@@ -40,14 +35,12 @@ public class SingleHandlerInit  {
 	private final ChannelInboundHandler requestServerTimeHandler;
 	private final DefaultMessageToByteEncoder encoder;
 	private final MessageDecoderTo decoder;
-	private final ScheduledExecutorService scheduler;
 
 	
 	public SingleHandlerInit(
 			@Qualifier("auth_ticket_handler") ChannelInboundHandlerAdapter authTicketHandler,
 			@Qualifier("exception_hospital_handler") ChannelInboundHandler exceptionHospital,
-			@Qualifier("request_server_time_handler") ChannelInboundHandler requestServerTimeHandler,
-			@Qualifier("scheduler-thread")ScheduledExecutorService scheduler,
+			@Qualifier("request_server_time_handler") ChannelInboundHandler requestServerTimeHandler,			
 			MessageDecoderTo decoder,
 			DefaultMessageToByteEncoder encoder
 			) {
@@ -57,7 +50,6 @@ public class SingleHandlerInit  {
 		this.requestServerTimeHandler = requestServerTimeHandler;
 		this.decoder = decoder;
 		this.encoder = encoder;
-		this.scheduler = scheduler;
 	}
 	
 	
@@ -70,10 +62,11 @@ public class SingleHandlerInit  {
 				p.addLast(new LoggingHandler(LogLevel.DEBUG));
 				p.addLast(encoder);
 				p.addLast(decoder);
-				p.addLast(new RequestPingHandler(scheduler));
+				p.addLast(new RequestPingHandler());
 				p.addLast(requestServerTimeHandler);
-			//	p.addLast(authTicketHandler);
-				p.addLast(exceptionHospital);				
+				//p.addLast(authTicketHandler);
+				p.addLast(exceptionHospital);		
+			
 			}
 		};
 		

@@ -25,7 +25,7 @@ public class TestPingResponseHanlder extends ChannelOutboundHandlerAdapter {
         
         PingResponse r = new PingResponse(XMLConstant.RES_PING, XMLConstant.OK);
         
-        Thread.sleep(new Random().nextLong(1000, 9000));
+        Thread.sleep(new Random().nextLong(6000, 9000));
 
         ctx.fireChannelRead(r);
         

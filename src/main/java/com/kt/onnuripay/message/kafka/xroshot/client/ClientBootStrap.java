@@ -15,6 +15,7 @@ package com.kt.onnuripay.message.kafka.xroshot.client;
 import org.springframework.stereotype.Component;
 
 import com.kt.onnuripay.message.common.exception.RunTimeExceptionWrapper;
+import com.kt.onnuripay.message.kafka.xroshot.client.handler.init.SingleHandlerInit;
 import com.kt.onnuripay.message.util.LoggerUtils;
 
 import io.netty.bootstrap.Bootstrap;
@@ -42,9 +43,11 @@ import lombok.extern.slf4j.Slf4j;
 public class ClientBootStrap {
 
 	private final EventLoopGroup workerGroup;
+    private final SingleHandlerInit init;
+
 	
-	public  ClientBootStrap(EventLoopGroup workerGroup) {
-	
+	public  ClientBootStrap(EventLoopGroup workerGroup, SingleHandlerInit init) {
+	    this.init = init;
 		this.workerGroup = workerGroup;
 	
 	}
@@ -62,11 +65,8 @@ public class ClientBootStrap {
             b.handler(init);
 
             ChannelFuture f = b.connect(host, port).sync();
-            
-            //f.channel().closeFuture().sync();
-            
+                        
             return f.channel();
-            // Wait until the connection is closed.
             
         } catch (InterruptedException e) {
 			e.printStackTrace();

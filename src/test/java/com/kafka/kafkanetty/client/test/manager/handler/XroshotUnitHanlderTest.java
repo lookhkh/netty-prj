@@ -1,4 +1,4 @@
-package com.kafka.kafkanetty.client.test.manager;
+package com.kafka.kafkanetty.client.test.manager.handler;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -14,6 +14,7 @@ import org.mockito.Mockito;
 import com.fasterxml.jackson.dataformat.xml.JacksonXmlModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
+import com.kafka.kafkanetty.client.test.manager.TestPingResponseHanlder;
 import com.kt.onnuripay.message.common.config.vo.XroshotParameter;
 import com.kt.onnuripay.message.kafka.parser.XMLParser;
 import com.kt.onnuripay.message.kafka.xroshot.client.channelmanager.XroshotChannelManager;
@@ -41,15 +42,7 @@ public class XroshotUnitHanlderTest {
     XroshotParameter param = XroshotTestUtil.param;
     XmlMapper realParser;
     XMLParser realParserMapper;
-    ScheduledExecutorService e = Executors.newScheduledThreadPool(1,new ThreadFactory() {
-        
-        @Override
-        public Thread newThread(Runnable r) {
-            Thread t = new Thread(r);
-            t.setName("스케줄러-쓰레드");
-            return t;
-        }
-    });
+    
     
     
     @BeforeEach
@@ -84,15 +77,7 @@ public class XroshotUnitHanlderTest {
         EmbeddedChannel ch = new EmbeddedChannel(
                 new LoggingHandler(LogLevel.DEBUG)
                 , new TestPingResponseHanlder()
-                , new RequestPingHandler(Executors.newScheduledThreadPool(1, new ThreadFactory() {
-                    
-                    @Override
-                    public Thread newThread(Runnable r) {
-                        Thread t = new Thread(r);
-                        t.setName("스케줄러 쓰레드");
-                        return t;
-                    }
-                }))
+                , new RequestPingHandler()
                     );
 
         Thread.sleep(10_000_000);

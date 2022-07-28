@@ -38,8 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class ExceptionHospitalHandler extends ChannelInboundHandlerAdapter {
 
-    private final XroshotChannelManager manager;
-
+    
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 	    
@@ -48,10 +47,9 @@ public class ExceptionHospitalHandler extends ChannelInboundHandlerAdapter {
     	   
     	    ctx.close()
     	        .sync()
-    	        .addListener(retryXroshotConnection(ctx, cause, manager));
+    	        .addListener(retryXroshotConnection(ctx, cause));
     	    
 	}
-
 
 	/**
 	 * 
@@ -62,13 +60,12 @@ public class ExceptionHospitalHandler extends ChannelInboundHandlerAdapter {
 	 * @apiNote connection이 끊어진 이후, 새로운 커넥션을 맺는다.
 	 */
     private GenericFutureListener<Future<? super Void>> retryXroshotConnection(ChannelHandlerContext ctx,
-            Throwable cause, XroshotChannelManager manager) {
+            Throwable cause) {
         return new GenericFutureListener<Future<? super Void>>() {
             @Override
             public void operationComplete(Future<? super Void> future) throws Exception {
-                log.error("Channel {} is closed because of {}, and retry connection",ctx.channel(),cause);
-                manager.connectToXroshotServer();
-                
+                log.error("Channel {} is closed because of {}, and retry connection",ctx.channel().toString(),cause.getMessage());
+                   
             }
         };
     }

@@ -85,7 +85,7 @@ public class NettyXroshotIntegeTest {
 				, new DefaultMessageToByteEncoder(realParserMapper)
 				, new RequestServeSyncTimeHandler(this.param)
 				, new RequestAuthTicketHandler(this.param)
-				, new ExceptionHospitalHandler(manager)
+				, new ExceptionHospitalHandler()
 				);
 		
 		ChannelPipeline pipeline = ch.pipeline();
