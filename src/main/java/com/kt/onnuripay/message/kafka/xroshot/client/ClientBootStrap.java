@@ -43,11 +43,9 @@ import lombok.extern.slf4j.Slf4j;
 public class ClientBootStrap {
 
 	private final EventLoopGroup workerGroup;
-    private final SingleHandlerInit init;
 
 	
-	public  ClientBootStrap(EventLoopGroup workerGroup, SingleHandlerInit init) {
-	    this.init = init;
+	public  ClientBootStrap(EventLoopGroup workerGroup) {
 		this.workerGroup = workerGroup;
 	
 	}
