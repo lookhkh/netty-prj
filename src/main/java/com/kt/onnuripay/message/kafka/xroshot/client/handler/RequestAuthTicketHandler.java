@@ -78,10 +78,8 @@ public class RequestAuthTicketHandler extends ChannelInboundHandlerAdapter {
 	        LoggerUtils.logDebug(log, "received AuhInfo FROM Server {}", msg);	       
 	        ctx.channel().attr(XroshotChannelManager.KEY).set(XroshotChannelManager.REQ_AUTH);
 	        ctx.pipeline().remove(this);
-	        
-	        /**
-	         * 왜 에러가 안 떨어지면 멈추지?
-	         */
+	        ctx.fireChannelActive(); // session 생성에 성공할 경우, pingRequestHanlder를 실행시킨다.
+
 	    }
 		
 		

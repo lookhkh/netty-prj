@@ -28,11 +28,13 @@ import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.serverTime.Serv
 
 import io.grpc.netty.shaded.io.netty.util.CharsetUtil;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+@Sharable
 @Slf4j
 @AllArgsConstructor
 @Service

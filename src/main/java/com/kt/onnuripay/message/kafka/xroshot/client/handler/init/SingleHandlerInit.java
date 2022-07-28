@@ -37,6 +37,8 @@ public class SingleHandlerInit  {
 	private final MessageDecoderTo decoder;
 
 	
+	
+	
 	public SingleHandlerInit(
 			@Qualifier("auth_ticket_handler") ChannelInboundHandlerAdapter authTicketHandler,
 			@Qualifier("exception_hospital_handler") ChannelInboundHandler exceptionHospital,
@@ -64,7 +66,7 @@ public class SingleHandlerInit  {
 				p.addLast(decoder);
 				p.addLast(new RequestPingHandler());
 				p.addLast(requestServerTimeHandler);
-				//p.addLast(authTicketHandler);
+				p.addLast(authTicketHandler);
 				p.addLast(exceptionHospital);		
 			
 			}

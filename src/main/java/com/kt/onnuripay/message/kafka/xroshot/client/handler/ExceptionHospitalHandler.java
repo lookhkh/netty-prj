@@ -17,7 +17,7 @@ import com.kt.onnuripay.message.kafka.xroshot.client.channelmanager.XroshotChann
 import com.kt.onnuripay.message.kafka.xroshot.model.xml.Mas;
 import com.kt.onnuripay.message.kafka.xroshot.model.xml.XMLConstant;
 
-import io.grpc.netty.shaded.io.netty.channel.ChannelHandler.Sharable;
+import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.concurrent.Future;

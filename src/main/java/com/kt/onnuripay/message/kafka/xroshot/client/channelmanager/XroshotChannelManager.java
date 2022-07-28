@@ -6,12 +6,11 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-
-import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -21,7 +20,6 @@ import com.kt.onnuripay.message.common.config.vo.XroshotParameter;
 import com.kt.onnuripay.message.kafka.parser.XMLParser;
 import com.kt.onnuripay.message.kafka.xroshot.client.ClientBootStrap;
 import com.kt.onnuripay.message.kafka.xroshot.client.handler.init.SingleHandlerInit;
-import com.kt.onnuripay.message.kafka.xroshot.model.xml.XMLConstant;
 import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.serverInfo.SmsPushServerInfoVo;
 import com.kt.onnuripay.message.util.LoggerUtils;
 
@@ -53,6 +51,7 @@ public class XroshotChannelManager {
     private final ClientBootStrap bootStrap;
     private final XMLParser parser;
     private final SingleHandlerInit init;
+    private final ScheduledExecutorService connectionChecker;
     
     private Channel xroshotChannel;
 
@@ -61,22 +60,31 @@ public class XroshotChannelManager {
     public static final String REQ_SERVER_TIME = "req_server_time_completed";
     public static final String REQ_AUTH = "req_auth_completed";
     
-    public XroshotChannelManager(XroshotParameter param, ClientBootStrap bootStrap, XMLParser parser, SingleHandlerInit init) {
+    public XroshotChannelManager(XroshotParameter param, ClientBootStrap bootStrap, XMLParser parser, SingleHandlerInit init, @Qualifier("scheduler-thread")ScheduledExecutorService connectionChecker) {
         this.param = param;
         this.bootStrap = bootStrap;
         this.parser = parser;
         this.init = init;
+        this.connectionChecker = connectionChecker;
         
-        try {
-            connectToXroshotServer();
-        } catch (IOException e) {
-            log.error("Failed to connect to Xroshot Server");
-            e.printStackTrace();
-            /**
-             * TODO 재연결 시도 로직 추가 (220728 조현일)
-             */
-        }
-        
+        connectToXroshotServer();
+        startMonitoringChannelStatus();   
+    }
+
+
+    /**
+     * Channel의 상태를 감시하며, conneciton이 closed 될 시 connect를 재시도한다.
+     * TODO 초기 딜레이 및 감시 delay 시간을 조절할 필요 있음 220728 조현일
+     */
+    private void startMonitoringChannelStatus() {
+        connectionChecker.scheduleWithFixedDelay(()->{
+           
+            LoggerUtils.logDebug(log, "Checking Xroshot Channel status channel active =>[{}]",xroshotChannel.isActive());
+            if(!xroshotChannel.isActive()) {
+                connectToXroshotServer();          
+             }
+            
+        }, 60, 5, TimeUnit.SECONDS);
     }
 
  
@@ -100,16 +108,26 @@ public class XroshotChannelManager {
      * 
      * 
      */
-    public void connectToXroshotServer() throws IOException {
+    public void connectToXroshotServer() {
 
-        StringBuffer temp = connectToXroshotControllerServerAndGetServerInfo();
-                
-        SmsPushServerInfoVo vo = this.parser.deserialzeFromJson(temp.toString(), SmsPushServerInfoVo.class);
-        
-        LoggerUtils.logDebug(log, "deserialzied result of server info => {}", vo); 
-        
-        this.xroshotChannel = bootStrap
-                                .start(init.getChannelInit(), vo.getResource().getAddress(), vo.getResource().getPort());
+        try {
+            /**
+             * TODO 서버정보 캐시 기능 추가 고려해보기 220728 조현일
+             */
+            StringBuffer temp = connectToXroshotControllerServerAndGetServerInfo();
+                    
+            SmsPushServerInfoVo vo = this.parser.deserialzeFromJson(temp.toString(), SmsPushServerInfoVo.class);
+            
+            LoggerUtils.logDebug(log, "deserialzied result of server info => {}", vo); 
+            
+            this.xroshotChannel = bootStrap
+                                    .start(init.getChannelInit(), vo.getResource().getAddress(), vo.getResource().getPort());
+        }catch(IOException e) {
+            log.error("Failed to connect to Xroshot Server",e);
+            /**
+             * TODO Connection 맺는 게 실패했을 때 어떻게 처리할지? 220728 조현일
+             */
+        }
         
     }
 

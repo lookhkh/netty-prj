@@ -18,12 +18,13 @@ import com.kt.onnuripay.message.kafka.xroshot.model.xml.Mas;
 import com.kt.onnuripay.message.util.LoggerUtils;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.util.CharsetUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
+@Sharable
 @AllArgsConstructor
 @Service
 @Slf4j

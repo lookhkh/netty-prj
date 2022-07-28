@@ -58,7 +58,7 @@ public class RequestPingHandler extends ChannelDuplexHandler {
                                                     
                                                 }, 0 ,5, TimeUnit.SECONDS);
                                         
-                                    }, 0, 60, TimeUnit.SECONDS);
+                                    }, 60, 60, TimeUnit.SECONDS);
         LoggerUtils.logDebug(log, "PingRequestHandler active and start Ping schdule", "");
 
         super.channelActive(ctx);
@@ -142,7 +142,7 @@ public class RequestPingHandler extends ChannelDuplexHandler {
     }
     
     private void removeAllTaskFromScheduler() {
-        sendAtIntervalOf5Second.cancel(false);
-        schedulFuture.cancel(false);
+        if(sendAtIntervalOf5Second !=null)sendAtIntervalOf5Second.cancel(false);
+        if(schedulFuture!=null)schedulFuture.cancel(false);
     }
 }
