@@ -17,6 +17,7 @@ import com.kt.onnuripay.datavo.MetaData;
 import com.kt.onnuripay.datavo.msg.MessageWrapper;
 import com.kt.onnuripay.message.common.exception.JsonDataProcessingWrapperException;
 import com.kt.onnuripay.message.common.exception.RunTimeExceptionWrapper;
+import com.kt.onnuripay.message.kafka.client.handler.mapper.PushMapperContainer;
 import com.kt.onnuripay.message.kafka.client.handler.mapper.SmsPushMapper;
 import com.kt.onnuripay.message.kafka.dynamic.DynamicHandlerManager;
 import com.kt.onnuripay.message.kafka.model.ResultOfPush;
@@ -33,7 +34,7 @@ public class DispatcherControllerImpl implements DispatcherController{
 
 	private final KafkaMsgParser parser;
 	private final DynamicHandlerManager manager;
-	private final SmsPushMapper mapper;
+	private final PushMapperContainer container;
 	
 	@Override
 	public void route(String msg) {
@@ -50,7 +51,7 @@ public class DispatcherControllerImpl implements DispatcherController{
 				log.warn("can`t parsing this recived msg into JSON {}",e.getMessage());
 
 			
-				mapper.insertDbHistory(
+				container.insetResultOfPush(
 						ResultOfPush.builder()
 							.vo(null)
 							.metaData(null)
@@ -65,7 +66,7 @@ public class DispatcherControllerImpl implements DispatcherController{
 				log.error("Unknown Error Happend {}",e.getVo(),e);
 				
 		
-				mapper.insertDbHistory(
+				container.insetResultOfPush(
 						ResultOfPush.builder()
 							.vo((MessageWrapper)e.getVo())
 							.metaData(e.getVo() instanceof MessageWrapper ? (MetaData)e.getVo():null)

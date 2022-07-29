@@ -89,8 +89,7 @@ public class PushSingleManager implements SendManager {
     private String getJsonMsgFromVo(MessageWrapper vo) {
 
         Map<String, ? super Object> reqBody = new HashMap<>();
-        
-        
+           
         reqBody.put("message", vo.getMessageObjList().get(0));
         reqBody.put("validate_only", env.getProperty("spring.profiles.active").equals("local")? true: false);
         

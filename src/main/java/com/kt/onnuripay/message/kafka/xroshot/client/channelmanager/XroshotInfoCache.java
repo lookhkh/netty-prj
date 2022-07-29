@@ -34,10 +34,14 @@ public class XroshotInfoCache<T> {
 
     private final ThreadLocal<LocalTime> lastRequestTime;
     private final ThreadLocal<T> json;
-    private final int interval;
+    private final long interval;
     
-
-    public XroshotInfoCache(int interval) {
+    
+    /**
+     * 
+     * @param interval 밀리세컨드 단위
+     */
+    public XroshotInfoCache(long interval) {
         this.lastRequestTime = new ThreadLocal<LocalTime>();
         this.json = new ThreadLocal<T>();
         this.interval = interval;
@@ -54,7 +58,7 @@ public class XroshotInfoCache<T> {
         LocalTime now = LocalTime.now();
         
         
-        long dif = ChronoUnit.SECONDS.between(lastAccessed==null?now:lastAccessed, now);
+        long dif = ChronoUnit.MILLIS.between(lastAccessed==null?now:lastAccessed, now);
         
         boolean result = json.get()!=null 
                 && lastRequestTime.get()!=null
@@ -66,6 +70,10 @@ public class XroshotInfoCache<T> {
         
     }
 
+    /**
+     * 
+     * @return Stale한 값을 반환할 수 있기 때문에 항상 isAvailable() 메소드를 통해 방어로직을 작성
+     */
     public T getCachedData() {
         return json.get();
     }

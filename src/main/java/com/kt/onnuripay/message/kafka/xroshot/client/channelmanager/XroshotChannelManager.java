@@ -68,16 +68,10 @@ public class XroshotChannelManager {
                this.xroshotChannel = manager.connectToXroshotServer();          
              }
             
-        }, 60, 5, TimeUnit.SECONDS);
+        }, 60, 60, TimeUnit.SECONDS);
     }
 
- 
-
-    
-
-   
     /**
-     * 
      * @param vo
      * @param consume 메시지가 비동기 적으로 write 이벤트가 성공할 경우, 처리할 callback을 전달
      * @apiNote xroshotChannel이 writable 한 경우, 메시지를 비동기 적으로 전송한다.

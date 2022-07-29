@@ -39,7 +39,7 @@ public class XroshotChannelResourceManager {
         this.parser = parser;
         this.init = init;
         
-        this.cache = new XroshotInfoCache<>(30);
+        this.cache = new XroshotInfoCache<>(30_000);
     }
     
     /**

@@ -86,7 +86,7 @@ public class ClientConfig {
 	    
 	        
 	    
-	       LoopResources loop = LoopResources.create("worker-event-loop", 1, parameter.getEventLoops(), true);
+	       LoopResources loop = LoopResources.create("fcm-worker-event-loop", 1, parameter.getEventLoops(), true);
 	       
 	       DefaultUriBuilderFactory uriFactory = new DefaultUriBuilderFactory(parameter.getBaseUrl());
 	       
