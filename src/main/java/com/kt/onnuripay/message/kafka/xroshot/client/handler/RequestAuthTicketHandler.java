@@ -12,8 +12,6 @@
 package com.kt.onnuripay.message.kafka.xroshot.client.handler;
 
 
-import org.springframework.stereotype.Service;
-
 import com.kt.onnuripay.message.common.config.vo.XroshotParameter;
 import com.kt.onnuripay.message.common.exception.RunTimeExceptionWrapper;
 import com.kt.onnuripay.message.kafka.xroshot.client.channelmanager.XroshotChannelManager;
@@ -24,7 +22,6 @@ import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.auth.AuthInfoVo
 import com.kt.onnuripay.message.kafka.xroshot.model.xml.response.serverTime.ServerTimeVo;
 import com.kt.onnuripay.message.util.LoggerUtils;
 
-import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.AllArgsConstructor;
@@ -38,20 +35,12 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 
-@Service(value = "auth_ticket_handler")
 @Slf4j
 @AllArgsConstructor
-@Sharable
 public class RequestAuthTicketHandler extends ChannelInboundHandlerAdapter {
 	
 	private final XroshotParameter param;
 
-	@Override
-	public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
-		LoggerUtils.logDebug(log, "{} RequestAuthTicketHandler removed", ctx.channel());
-		super.handlerRemoved(ctx);
-	}
-	
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 	   LoggerUtils.logDebug(log, "received Msg from previous handler {}", msg);
@@ -75,6 +64,7 @@ public class RequestAuthTicketHandler extends ChannelInboundHandlerAdapter {
     		
 	    }else if(msg instanceof AuthInfoVo) {
 	        
+	        
 	        LoggerUtils.logDebug(log, "received AuhInfo FROM Server {}", msg);	       
 	        ctx.channel().attr(XroshotChannelManager.KEY).set(XroshotChannelManager.REQ_AUTH);
 	        ctx.pipeline().remove(this);
@@ -84,14 +74,16 @@ public class RequestAuthTicketHandler extends ChannelInboundHandlerAdapter {
 		
 		
 	}
-
+	
 	private String createAuthTicket(ServerTimeVo vo, XroshotParameter param) {
-		
+
+
 		String tempPublicKey =param.getCertFile().substring(param.getIndexBegin(), param.getIndexEnd()) ;
-		String tempAuthTicket = param.getServiceProviderId() + "|" + param.getServiceProviderPw() + "|" + param.getServiceProviderId() + "|" + vo.getTime() + "|" + param.getOneTimeSecretKey();
+		String tempAuthTicket = param.getServiceProviderId() + "|" + param.getServiceProviderPw() + "|" + param.getEndUserId() + "|" + vo.getTime() + "|" + param.getOneTimeSecretKey();
 
 		try {
-			return NewXroshotAuth.encrypto2(tempAuthTicket.getBytes(), tempPublicKey.getBytes());
+			
+		    return NewXroshotAuth.encrypto2(tempAuthTicket.getBytes(), tempPublicKey.getBytes());
 			
 		} catch (Exception e) {
 			e.printStackTrace();
